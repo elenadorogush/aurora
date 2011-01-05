@@ -2,7 +2,6 @@
  * @(#) HelloWorld.java
  */
 
-
 /*
  * Testing
  * @version $Id: $
