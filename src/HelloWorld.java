@@ -2,8 +2,6 @@
  * @(#) HelloWorld.java
  */
 
-import java.io.*
-
 
 /*
  * Testing
