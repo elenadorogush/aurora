@@ -17,7 +17,7 @@ import aurora.*;
  * Top object that contains pointers
  * to all the Aurora system configuration.
  * @author Alex Kurzhanskiy
- * @version $Id: ContainerHWC.java 155 2010-09-22 20:11:22Z akurzhan $
+ * @version $Id: ContainerHWC.java 124 2010-05-05 21:37:11Z akurzhan $
  */
 public final class ContainerHWC extends AbstractContainer {
 	private static final long serialVersionUID = 2277054116304494673L;
@@ -253,9 +253,9 @@ public final class ContainerHWC extends AbstractContainer {
 		myStatus.setSaved(true);
 		// roll back events
 		myEventManager.deactivateCurrentEvents(myNetwork, 0.0);
-		// set maximum simulation step   FIXME: remove
-		/*double maxTime = Math.min(getMySettings().getTSMax()*myNetwork.getTP(), getMySettings().getTimeMax());
-		myNetwork.setMaxTimeStep((int)Math.floor(maxTime/myNetwork.getTP()));*/
+		// set maximum simulation step
+		double maxTime = Math.min(getMySettings().getTSMax()*myNetwork.getTP(), getMySettings().getTimeMax());
+		myNetwork.setMaxTimeStep((int)Math.floor(maxTime/myNetwork.getTP()));
 		// reset network
 		res &= myNetwork.initialize();
 		return res;

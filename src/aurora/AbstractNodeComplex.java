@@ -15,7 +15,7 @@ import org.w3c.dom.*;
 /**
  * Base class for Network Nodes.
  * @author Alex Kurzhanskiy
- * @version $Id: AbstractNodeComplex.java 155 2010-09-22 20:11:22Z akurzhan $
+ * @version $Id: AbstractNodeComplex.java 135 2010-06-05 00:57:31Z akurzhan $
  */
 public abstract class AbstractNodeComplex extends AbstractNode {
 	private static final long serialVersionUID = -6880500889959625206L;
@@ -23,7 +23,7 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 	protected double tp = 1.0/3600;  // sampling time
 	//protected Vector<Double> timeH = new Vector<Double>();
 	protected int simNo = 0; // simulation number
-	//protected int maxTimeStep = 100000; // maximum simulation step  FIXME: remove
+	protected int maxTimeStep = 100000; // maximum simulation step
 	protected boolean top = false;
 	protected boolean controlled = true;
 	protected DataStorage database = null;
@@ -558,9 +558,9 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 	/**
 	 * Returns maximum simulation step.
 	 */
-	/*public final int getMaxTimeStep0() { //FIXME: remove
+	public final int getMaxTimeStep() {
 		return maxTimeStep;
-	}*/
+	}
 	
 	/**
 	 * Returns database interface.
@@ -857,9 +857,9 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 		boolean res = super.initialize();
 		simNo++;
 		tsV = ts;
-		/*if (!top) {  //FIXME: remove
+		if (!top) {
 			maxTimeStep = (int)Math.floor((getTop().getTP()*getTop().getMaxTimeStep())/tp);
-		}*/
+		}
 		if (top) {
 			PrintStream os = container.getMySettings().getTmpDataOutput();
 			if (os != null) {
@@ -932,12 +932,12 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 	 * @param x maximum time step.
 	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
 	 */
-	/*public synchronized boolean setMaxTimeStep(int x) { //FIXME: remove
+	public synchronized boolean setMaxTimeStep(int x) {
 		if (x < 1)
 			return false;
 		maxTimeStep = x;
 		return true;
-	}*/
+	}
 	
 	/**
 	 * Sets database interface.<br>
@@ -1383,7 +1383,7 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 		database = ntwk.getDatabase();
 		simNo = ntwk.getSimNo();
 		tp = ntwk.getTP();
-		//maxTimeStep = ntwk.getMaxTimeStep(); //FIXME: remove
+		maxTimeStep = ntwk.getMaxTimeStep();
 		sensors = ntwk.getSensors();
 		monitors = ntwk.getMonitors();
 		nodes = ntwk.getNodes();
