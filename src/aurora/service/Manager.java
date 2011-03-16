@@ -4,18 +4,11 @@
 package aurora.service;
 
 import java.io.*;
-import java.net.URI;
-import java.util.*;
 import javax.xml.parsers.*;
 import org.xml.sax.InputSource;
-
 import org.w3c.dom.*;
-
-import aurora.*;
-import aurora.common.*;
 import aurora.hwc.*;
-import aurora.hwc.common.*;
-import aurora.util.*;
+
 
 /**
  * Main class for running aurora simulator as a service
@@ -30,7 +23,7 @@ public class Manager {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public String run_once(String input_xml, String outfile, Updatable updater, int period) {
+	public String run_once(String input_xml, String outfile, String output_config, Updatable updater, int period) {
 		ContainerHWC mySystem = new ContainerHWC();
 		mySystem.batchMode();
 		try {
@@ -78,7 +71,18 @@ public class Manager {
 		if (!res)
 			return "Simulation failed on time step " + ts;
 		mySystem.getMySettings().getTmpDataOutput().close();
-		
+		if (output_config != null) {
+			File cfp = new File(output_config);
+			try {
+				String cfpath = cfp.getAbsolutePath();
+				PrintStream oos = new PrintStream(new FileOutputStream(cfpath));
+				mySystem.xmlDump(oos);
+				oos.close();
+			}
+			catch(Exception e) {
+				return "Error: Failed to generate configuration file";
+			}
+		}
 		return("Done!");
 	}
 
