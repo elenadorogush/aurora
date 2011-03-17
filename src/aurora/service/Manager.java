@@ -4,6 +4,7 @@
 package aurora.service;
 
 import java.io.*;
+
 import javax.xml.parsers.*;
 import org.xml.sax.InputSource;
 import org.w3c.dom.*;
@@ -23,7 +24,7 @@ public class Manager {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public String run_once(String input_xml, String outfile, String output_config, Updatable updater, int period) {
+	public String run_once(String input_xml, String outfile, String[] output_xml, Updatable updater, int period) {
 		ContainerHWC mySystem = new ContainerHWC();
 		mySystem.batchMode();
 		try {
@@ -71,17 +72,19 @@ public class Manager {
 		if (!res)
 			return "Simulation failed on time step " + ts;
 		mySystem.getMySettings().getTmpDataOutput().close();
-		if (output_config != null) {
-			File cfp = new File(output_config);
+		if ((output_xml != null) && (output_xml.length > 0)) {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			PrintStream ps = new PrintStream(baos);
+			PrintStream oos = new PrintStream(ps);
 			try {
-				String cfpath = cfp.getAbsolutePath();
-				PrintStream oos = new PrintStream(new FileOutputStream(cfpath));
 				mySystem.xmlDump(oos);
-				oos.close();
 			}
 			catch(Exception e) {
+				oos.close();
 				return "Error: Failed to generate configuration file";
 			}
+			output_xml[0] = ps.toString();
+			oos.close();
 		}
 		return("Done!");
 	}
