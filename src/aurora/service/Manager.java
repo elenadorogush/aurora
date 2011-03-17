@@ -75,16 +75,15 @@ public class Manager {
 		if ((output_xml != null) && (output_xml.length > 0)) {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			PrintStream ps = new PrintStream(baos);
-			PrintStream oos = new PrintStream(ps);
 			try {
-				mySystem.xmlDump(oos);
+				mySystem.xmlDump(ps);
 			}
 			catch(Exception e) {
-				oos.close();
+				ps.close();
 				return "Error: Failed to generate configuration file";
 			}
 			output_xml[0] = ps.toString();
-			oos.close();
+			ps.close();
 		}
 		return("Done!");
 	}
