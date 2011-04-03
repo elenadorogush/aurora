@@ -17,11 +17,10 @@ import aurora.*;
  * Top object that contains pointers
  * to all the Aurora system configuration.
  * @author Alex Kurzhanskiy
- * @version $Id: ContainerHWC.java 124 2010-05-05 21:37:11Z akurzhan $
+ * @version $Id: ContainerHWC.java 156 2011-03-29 03:37:11Z cratershine $
  */
 public final class ContainerHWC extends AbstractContainer {
 	private static final long serialVersionUID = 2277054116304494673L;
-
 
 	public ContainerHWC() { }
 	public ContainerHWC(AbstractNodeComplex ntwk) { myNetwork = ntwk; }
@@ -182,6 +181,10 @@ public final class ContainerHWC extends AbstractContainer {
 				if (p.getChildNodes().item(i).getNodeName().equals("EventList")) {
 					res &= myEventManager.initFromDOM(p.getChildNodes().item(i));
 				}
+				if (p.getChildNodes().item(i).getNodeName().equals("DirectionsCache")) {
+					dircache = new GoogleDirectionsCache();
+					res &= dircache.initFromDOM(p.getChildNodes().item(i));
+				}
 			}
 			for (int i = 0; i < p.getChildNodes().getLength(); i++) {
 				if (p.getChildNodes().item(i).getNodeName().equals("DemandProfile"))
@@ -192,6 +195,11 @@ public final class ContainerHWC extends AbstractContainer {
 					res &= initCapacityProfileFromDOM(p.getChildNodes().item(i));
 				if (p.getChildNodes().item(i).getNodeName().equals("InitialDensityProfile"))
 					res &= initInitialDensityProfileFromDOM(p.getChildNodes().item(i));
+				
+				
+
+				
+				
 			}
 		}
 		catch(Exception e) {
@@ -253,9 +261,9 @@ public final class ContainerHWC extends AbstractContainer {
 		myStatus.setSaved(true);
 		// roll back events
 		myEventManager.deactivateCurrentEvents(myNetwork, 0.0);
-		// set maximum simulation step
-		double maxTime = Math.min(getMySettings().getTSMax()*myNetwork.getTP(), getMySettings().getTimeMax());
-		myNetwork.setMaxTimeStep((int)Math.floor(maxTime/myNetwork.getTP()));
+		// set maximum simulation step   FIXME: remove
+		/*double maxTime = Math.min(getMySettings().getTSMax()*myNetwork.getTP(), getMySettings().getTimeMax());
+		myNetwork.setMaxTimeStep((int)Math.floor(maxTime/myNetwork.getTP()));*/
 		// reset network
 		res &= myNetwork.initialize();
 		return res;
@@ -291,7 +299,8 @@ public final class ContainerHWC extends AbstractContainer {
 		ne_type2classname.put("ST", "aurora.hwc.LinkStreet");
 		ne_type2classname.put("D", "aurora.hwc.LinkDummy");
 		// sensors
-		ne_type2classname.put("LD", "aurora.hwc.SensorLoopDetector");
+		//ne_type2classname.put("LD", "aurora.hwc.SensorLoopDetector");
+		ne_type2classname.put("LOOP", "aurora.hwc.SensorLoopDetector");
 		// *** Events ***
 		evt_type2classname.put("FD", "aurora.hwc.EventFD");
 		evt_type2classname.put("DEMAND", "aurora.hwc.EventDemand");
