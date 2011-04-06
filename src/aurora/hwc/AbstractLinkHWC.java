@@ -20,10 +20,12 @@ import aurora.util.*;
  * @see LinkFwML, LinkFwHOV, LinkHw, LinkOR, LinkFR, LinkIc, LinkStreet, LinkDummy
  * 
  * @author Alex Kurzhanskiy
- * @version $Id: AbstractLinkHWC.java 151 2010-08-04 00:19:23Z akurzhan $
+ * @version $Id: AbstractLinkHWC.java 157 2011-03-30 04:30:49Z akurzhan $
  */
 public abstract class AbstractLinkHWC extends AbstractLink {
 	private static final long serialVersionUID = 7448808131935808045L;
+	
+	protected String name = "";
 	
 	protected double lanes = 1.0;
 	protected double flowMax = 1800; // in vph
@@ -93,6 +95,8 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 			length = Double.parseDouble(p.getAttributes().getNamedItem("length").getNodeValue());
 			if (length > 5)
 				length = 0.000189393939 * length; // feet to miles
+			if (p.getAttributes().getNamedItem("name") != null) 
+				name = p.getAttributes().getNamedItem("name").getNodeValue();
 			lanes = Double.parseDouble(p.getAttributes().getNamedItem("lanes").getNodeValue());
 			Node sa = p.getAttributes().getNamedItem("record");
 			if ((sa != null) && Boolean.parseBoolean(sa.getNodeValue()))
@@ -175,7 +179,7 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 		boolean ss = false;
 		if ((saveState == 3) || (saveState == 2))
 			ss = true;
-		out.print("<link type=\"" + getTypeLetterCode() + "\" id=\"" + Integer.toString(id) + "\" length=\"" + Math.round(5280*length) + "\" lanes=\"" + Double.toString(lanes) + "\" record=\"" + ss + "\">");
+		out.print("<link type=\"" + getTypeLetterCode() + "\" id=\"" + Integer.toString(id) + "\" name=\"" + name + "\" length=\"" + Math.round(5280*length) + "\" lanes=\"" + Double.toString(lanes) + "\" record=\"" + ss + "\">");
 		if (predecessors.size() > 0)
 			out.print("<begin id=\"" + Integer.toString(predecessors.firstElement().getId()) + "\"/>");
 		if (successors.size() > 0)
