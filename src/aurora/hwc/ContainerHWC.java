@@ -224,9 +224,9 @@ public final class ContainerHWC extends AbstractContainer {
 	 * @throws IOException
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
-		out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<AuroraRNM>\n");
+		out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Scenario>\n");
 		super.xmlDump(out);
-		out.print("</AuroraRNM>\n");
+		out.print("</Scenario>\n");
 		return;
 	}
 	

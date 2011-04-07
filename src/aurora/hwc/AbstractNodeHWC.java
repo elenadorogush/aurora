@@ -79,8 +79,14 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 												}
 											}
 										}
-										addInLink(lk, ctrl);
-										m++;
+										if (lk != null) {
+											int ilidx = predecessors.indexOf(lk);
+											if (ilidx < 0)
+												addInLink(lk, ctrl);
+											else
+												setSimpleController(ctrl, ilidx);
+											m++;
+										}
 									}
 							}
 						if (pp.item(i).getNodeName().equals("outputs"))
@@ -88,27 +94,37 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 								NodeList pp2 = pp.item(i).getChildNodes();
 								for (j = 0; j < pp2.getLength(); j++)
 									if (pp2.item(j).getNodeName().equals("output")) {
-										addOutLink(myNetwork.getLinkById(Integer.parseInt(pp2.item(j).getAttributes().getNamedItem("id").getNodeValue())));
+										AbstractLink olk = myNetwork.getLinkById(Integer.parseInt(pp2.item(j).getAttributes().getNamedItem("id").getNodeValue()));
+										int olidx = successors.indexOf(olk);
+										if (olidx < 0)
+											addOutLink(olk);
 										n++;
 									}
 							}
 						if (pp.item(i).getNodeName().equals("splitratios"))
 							initSplitRatioProfileFromDOM(pp.item(i));
 					}
-					if ((wfbuf.size() > 0) && (n > 0)) {
-						weavingFactorMatrix = new double[wfbuf.size()][n];
-						for (i = 0; i < wfbuf.size(); i++) {
-							StringTokenizer st = new StringTokenizer(wfbuf.get(i), ", \t");
-							j = 0;
-							while ((st.hasMoreTokens()) && (j < n)) {
-								try {
-									weavingFactorMatrix[i][j] = Double.parseDouble(st.nextToken());
+					int nIL = predecessors.size();
+					int nOL = successors.size();
+					if ((nIL > 0) && (nOL > 0)) {
+						weavingFactorMatrix = new double[nIL][nOL];
+						for (i = 0; i < nIL; i++) {
+							if (i < wfbuf.size()) {
+								StringTokenizer st = new StringTokenizer(wfbuf.get(i), ", \t");
+								j = 0;
+								while ((st.hasMoreTokens()) && (j < nOL)) {
+									try {
+										weavingFactorMatrix[i][j] = Double.parseDouble(st.nextToken());
+									}
+									catch(Exception e) {
+										weavingFactorMatrix[i][j] = 1;
+									}
+									j++;
 								}
-								catch(Exception e) {
-									weavingFactorMatrix[i][j] = 1;
-								}
-								j++;
 							}
+							else
+								for (j = 0; j < nOL; j++)
+									weavingFactorMatrix[i][j] = 1;
 						}
 					}
 					else {
@@ -117,40 +133,52 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 							for (j = 0; j < n; j++)
 								weavingFactorMatrix[i][j] = 1;
 					}
-					if ((srbuf.size() > 0) && (n > 0)) {
-						splitRatioMatrix = new AuroraIntervalVector[srbuf.size()][n];
-						splitRatioMatrix0 = new AuroraIntervalVector[srbuf.size()][n];
+					if ((nIL > 0) && (nOL > 0)) {
+						splitRatioMatrix = new AuroraIntervalVector[nIL][nOL];
+						splitRatioMatrix0 = new AuroraIntervalVector[nIL][nOL];
 						int sz = ((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).countVehicleTypes();
-						for (i = 0; i < srbuf.size(); i++) {
-							StringTokenizer st = new StringTokenizer(srbuf.get(i), ", \t");
-							j = 0;
-							while ((st.hasMoreTokens()) && (j < n)) {
-								String srvtxt = st.nextToken();
-								AuroraIntervalVector srv = new AuroraIntervalVector();
-								srv.setRawIntervalVectorFromString(srvtxt);
-								int rsz = srv.size();
-								if (myNetwork.getContainer().isSimulation()) {
-									srv = new AuroraIntervalVector(sz);
-									srv.setIntervalVectorFromString(srvtxt);
-									for (int idx = rsz; idx < sz; idx++)
-										srv.get(idx).copy(srv.get(rsz-1));
-								}
-								splitRatioMatrix[i][j] = srv;
-								splitRatioMatrix0[i][j] = new AuroraIntervalVector();
-								splitRatioMatrix0[i][j].copy(srv);
-								j++;
-							}
-							while (j < n) {
-								if (myNetwork.getContainer().isSimulation()) {
-									splitRatioMatrix[i][j] = new AuroraIntervalVector(sz);
-									splitRatioMatrix0[i][j] = new AuroraIntervalVector(sz);
-								}
-								else {
-									splitRatioMatrix[i][j] = new AuroraIntervalVector();
+						for (i = 0; i < nIL; i++) {
+							if (i < srbuf.size()) {
+								StringTokenizer st = new StringTokenizer(srbuf.get(i), ", \t");
+								j = 0;
+								while ((st.hasMoreTokens()) && (j < nOL)) {
+									String srvtxt = st.nextToken();
+									AuroraIntervalVector srv = new AuroraIntervalVector();
+									srv.setRawIntervalVectorFromString(srvtxt);
+									int rsz = srv.size();
+									if (myNetwork.getContainer().isSimulation()) {
+										srv = new AuroraIntervalVector(sz);
+										srv.setIntervalVectorFromString(srvtxt);
+										for (int idx = rsz; idx < sz; idx++)
+											srv.get(idx).copy(srv.get(rsz-1));
+									}
+									splitRatioMatrix[i][j] = srv;
 									splitRatioMatrix0[i][j] = new AuroraIntervalVector();
+									splitRatioMatrix0[i][j].copy(srv);
+									j++;
 								}
-								j++;
+								while (j < nOL) {
+									if (myNetwork.getContainer().isSimulation()) {
+										splitRatioMatrix[i][j] = new AuroraIntervalVector(sz);
+										splitRatioMatrix0[i][j] = new AuroraIntervalVector(sz);
+									}
+									else {
+										splitRatioMatrix[i][j] = new AuroraIntervalVector();
+										splitRatioMatrix0[i][j] = new AuroraIntervalVector();
+									}
+									j++;
+								}
 							}
+							else
+								for (j = 0; j < nOL; j++)
+									if (myNetwork.getContainer().isSimulation()) {
+										splitRatioMatrix[i][j] = new AuroraIntervalVector(sz);
+										splitRatioMatrix0[i][j] = new AuroraIntervalVector(sz);
+									}
+									else {
+										splitRatioMatrix[i][j] = new AuroraIntervalVector();
+										splitRatioMatrix0[i][j] = new AuroraIntervalVector();
+									}
 						}
 					}
 				}
@@ -272,29 +300,29 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 		out.print("<description>" + description + "</description>\n");
 		out.print("<outputs>");
 		for (int i = 0; i < successors.size(); i++)
-			out.print("<output id=\"" + successors.get(i).getId() + "\"/>");
+			out.print("<output link_id=\"" + successors.get(i).getId() + "\"/>");
 		out.print("</outputs>\n<inputs>");
 		for (int i = 0; i < predecessors.size(); i++) {
-			String buf = "";
+			//String buf = "";
 			String buf2 = "";
 			for (int j = 0; j < successors.size(); j++) {
 				if (j > 0) {
-					buf += ", ";
+					//buf += ", ";
 					buf2 += ", ";
 				}
-				buf += splitRatioMatrix[i][j].toString();
+				//buf += splitRatioMatrix[i][j].toString();
 				buf2 += Double.toString(weavingFactorMatrix[i][j]);
 			}
-			out.print("<input id=\"" + predecessors.get(i).getId() + "\">");
-			out.print("<splitratios>" + buf + "</splitratios>");
+			out.print("<input link_id=\"" + predecessors.get(i).getId() + "\">");
+			//out.print("<splitratios>" + buf + "</splitratios>");
 			out.print("<weavingfactors>" + buf2 + "</weavingfactors>");
 			if (controllers.get(i) != null)
 				controllers.get(i).xmlDump(out);
 			out.print("</input>");
 		}
 		out.print("</inputs>\n");
-		if (srmProfile != null)
-			out.print("<splitratios tp=\"" + Double.toString(srTP) + "\">\n" + getSplitRatioProfileAsXML() + "</splitratios>\n");
+		/*if (srmProfile != null)
+			out.print("<splitratios tp=\"" + Double.toString(srTP) + "\">\n" + getSplitRatioProfileAsXML() + "</splitratios>\n");*/
 		position.xmlDump(out);
 		out.print("</node>\n");
 		return;

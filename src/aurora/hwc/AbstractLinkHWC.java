@@ -106,10 +106,18 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 			if (p.hasChildNodes()) {
 				NodeList pp = p.getChildNodes();
 				for (int i = 0; i < pp.getLength(); i++) {
-					if (pp.item(i).getNodeName().equals("begin"))
-						setBeginNode(myNetwork.getNodeById(Integer.parseInt(pp.item(i).getAttributes().getNamedItem("id").getNodeValue())));
-					if (pp.item(i).getNodeName().equals("end"))
-						setEndNode(myNetwork.getNodeById(Integer.parseInt(pp.item(i).getAttributes().getNamedItem("id").getNodeValue())));
+					if (pp.item(i).getNodeName().equals("begin")) {
+						AbstractNode bnd = myNetwork.getNodeById(Integer.parseInt(pp.item(i).getAttributes().getNamedItem("id").getNodeValue()));
+						if (bnd != null)
+							bnd.addOutLink(this);
+						setBeginNode(bnd);
+					}
+					if (pp.item(i).getNodeName().equals("end")) {
+						AbstractNode end = myNetwork.getNodeById(Integer.parseInt(pp.item(i).getAttributes().getNamedItem("id").getNodeValue()));
+						if (end != null)
+							end.addInLink(this);
+						setEndNode(end);
+					}
 					if (pp.item(i).getNodeName().equals("dynamics")) {
 						Node type_attr = pp.item(i).getAttributes().getNamedItem("type");
 						String class_name = null;
@@ -181,12 +189,12 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 			ss = true;
 		out.print("<link type=\"" + getTypeLetterCode() + "\" id=\"" + Integer.toString(id) + "\" name=\"" + name + "\" length=\"" + Math.round(5280*length) + "\" lanes=\"" + Double.toString(lanes) + "\" record=\"" + ss + "\">");
 		if (predecessors.size() > 0)
-			out.print("<begin id=\"" + Integer.toString(predecessors.firstElement().getId()) + "\"/>");
+			out.print("<begin node_id=\"" + Integer.toString(predecessors.firstElement().getId()) + "\"/>");
 		if (successors.size() > 0)
-			out.print("<end id=\"" + Integer.toString(successors.firstElement().getId()) + "\"/>");
+			out.print("<end node_id=\"" + Integer.toString(successors.firstElement().getId()) + "\"/>");
 		out.print("<dynamics type=\"" + myDynamics.getTypeLetterCode() + "\"/>");
 		out.print("<density>" + density.toStringWithInverseWeights(((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).getVehicleWeights(), false) + "</density>");
-		if (!demand.isEmpty()) {
+		/*if (!demand.isEmpty()) {
 			out.print("<demand tp=\"" + Double.toString(demandTP) + "\" knob=\"" + getDemandKnobsAsString() + "\">");
 			out.print(getDemandVectorAsString());
 			out.print("</demand>");
@@ -195,7 +203,7 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 			out.print("<capacity tp=\"" + Double.toString(capacityTP) + "\">");
 			out.print(getCapacityVectorAsString());
 			out.print("</capacity>");
-		}
+		}*/
 		out.print("<qmax>" + Double.toString(qMax) + "</qmax>");
 		out.print("<fd densityCritical =\"" + densityCritical + "\" densityJam=\"" + densityJam + "\" flowMax=\"" + flowMaxRange.toString() + "\" capacityDrop=\"" + capacityDrop + "\"/>");
 		myPosition.xmlDump(out);
