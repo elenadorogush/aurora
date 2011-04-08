@@ -137,7 +137,10 @@ public final class PanelNewNode extends AbstractNewNetworkElementPanel implement
 		}
 		nnd.setMyNetwork(myNetwork);
 		nnd.getPosition().set(pointPosition);
-		myNetwork.addNode(nnd);
+		if (nnd.isSimple())
+			myNetwork.addNode((AbstractNodeSimple)nnd);
+		else
+			myNetwork.addNetwork((AbstractNodeComplex)nnd);
 		tpane.addNodeComponent(nnd, myNetwork);
 		return;
 	}

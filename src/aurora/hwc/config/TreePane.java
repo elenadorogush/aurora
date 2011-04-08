@@ -363,13 +363,18 @@ public class TreePane extends JPanel {
     	int i;
     	DefaultMutableTreeNode list = null;
     	DefaultMutableTreeNode item = null;
-    	Vector<AbstractNode> nodes = ntwk.getNodes();
+    	Vector<AbstractNodeComplex> networks = ntwk.getNetworks();
+    	Vector<AbstractNodeSimple> nodes = ntwk.getNodes();
     	list = new DefaultMutableTreeNode("Nodes");
     	root.add(list);
+    	for (i = 0; i < networks.size(); i++) {
+    		item = new DefaultMutableTreeNode(networks.get(i));
+    		fillTreeData(item, networks.get(i));
+    		list.add(item);
+    		ne2tn.put(networks.get(i), item);
+        }
     	for (i = 0; i < nodes.size(); i++) {
     		item = new DefaultMutableTreeNode(nodes.get(i));
-    		if (!nodes.get(i).isSimple())
-    			fillTreeData(item, (AbstractNodeComplex)nodes.get(i));
     		list.add(item);
     		ne2tn.put(nodes.get(i), item);
         }
@@ -622,14 +627,14 @@ public class TreePane extends JPanel {
     private void deleteNetwork(AbstractNodeComplex ntwk) {
     	if (ntwk == null)
     		return;
-    	Vector<AbstractNode> nodes = ntwk.getNodes();
-    	for (int i = 0; i < nodes.size(); i++)
-    		if ((nodes.get(i).getType() & TypesHWC.MASK_NETWORK) > 0)
-    			deleteNetwork((AbstractNodeComplex)nodes.get(i));
-    		else {
-    			ne2tn.remove(nodes.get(i));
-    			ne2win.remove(nodes.get(i));
-    		}
+    	Vector<AbstractNodeComplex> networks = ntwk.getNetworks();
+    	Vector<AbstractNodeSimple> nodes = ntwk.getNodes();
+    	for (int i = 0; i < networks.size(); i++)
+    		deleteNetwork(networks.get(i));
+    	for (int i = 0; i < nodes.size(); i++) {
+    		ne2tn.remove(nodes.get(i));
+    		ne2win.remove(nodes.get(i));
+    	}
     	Vector<AbstractLink> links = ntwk.getLinks();
     	for (int i = 0; i < links.size(); i++) {
     		ne2tn.remove(links.get(i));

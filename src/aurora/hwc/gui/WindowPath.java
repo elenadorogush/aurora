@@ -994,6 +994,7 @@ public final class WindowPath extends JInternalFrame implements ActionListener {
 	private final class VertexPaintFunctionHWC implements VertexPaintFunction {
 		PickedInfo pi;
 		
+		@SuppressWarnings("unused")
 		public VertexPaintFunctionHWC() { }
 		public VertexPaintFunctionHWC(PickedInfo pi) { this.pi = pi; }
 
@@ -1020,6 +1021,7 @@ public final class WindowPath extends JInternalFrame implements ActionListener {
 		private AbstractContainer mySystem = null;
 		PickedInfo pi = null;
 		
+		@SuppressWarnings("unused")
 		public VertexIconAndShapeFunctionHWC() {
 			setSizeFunction(this);
 		}
@@ -1075,6 +1077,7 @@ public final class WindowPath extends JInternalFrame implements ActionListener {
 	private final static class VertexStringerHWC implements VertexStringer {
 		private PickedInfo pi;
 		
+		@SuppressWarnings("unused")
 		public VertexStringerHWC() { }
 		public VertexStringerHWC(PickedInfo pi) { this.pi = pi; }
 
@@ -1093,6 +1096,7 @@ public final class WindowPath extends JInternalFrame implements ActionListener {
 		private final static float[] dotting = {1.0f, 3.0f};
 		private PickedInfo pi;
 		
+		@SuppressWarnings("unused")
 		public EdgeStrokeFunctionHWC() { }
 		public EdgeStrokeFunctionHWC(PickedInfo pi) { this.pi = pi; }
 		
@@ -1118,12 +1122,14 @@ public final class WindowPath extends JInternalFrame implements ActionListener {
 	 * Class needed to paint the edge.
 	 */
 	private final class GradientEdgePaintFunctionHWC extends GradientEdgePaintFunction {
+		@SuppressWarnings("unused")
 		protected boolean fill_edge = false;
         
 		public GradientEdgePaintFunctionHWC(EdgePaintFunction defaultEdgePaintFunction, HasGraphLayout vv, LayoutTransformer transformer) {
 			super(Color.WHITE, Color.BLACK, vv, transformer);
 		}
         
+		@SuppressWarnings("unused")
 		public void useFill(boolean b) {
 			fill_edge = b;
 		}
@@ -1176,6 +1182,7 @@ public final class WindowPath extends JInternalFrame implements ActionListener {
 	private final static class EdgeStringerHWC implements EdgeStringer {
 		private PickedInfo pi;
 		
+		@SuppressWarnings("unused")
 		public EdgeStringerHWC() { }
 		public EdgeStringerHWC(PickedInfo pi) { this.pi = pi; }
 
@@ -1194,6 +1201,7 @@ public final class WindowPath extends JInternalFrame implements ActionListener {
 		private TreePane tree;
 		private PickedInfo pi;
 		
+		@SuppressWarnings("unused")
 		public PickedStateListener() { }
 		public PickedStateListener(TreePane tree, PickedInfo pi) {
 			this.tree = tree;

@@ -97,7 +97,7 @@ public final class EventNetworkControl extends AbstractEvent {
 		if (!enabled)
 			return enabled;
 		NodeHWCNetwork ntwk;
-		ntwk = (NodeHWCNetwork)top.getNodeById(neid);
+		ntwk = (NodeHWCNetwork)top.getNetworkById(neid);
 		if (ntwk == null)
 			throw new ExceptionEvent("Network (" + neid + ") not found.");
 		System.out.println("Event! Time " + Util.time2string(tstamp) + ": " + description);
@@ -123,7 +123,7 @@ public final class EventNetworkControl extends AbstractEvent {
 		if (top.getId() == neid)
 			ntwk = (NodeHWCNetwork)top;
 		else
-			ntwk = (NodeHWCNetwork)top.getNodeById(neid);
+			ntwk = (NodeHWCNetwork)top.getNetworkById(neid);
 		if (ntwk == null)
 			throw new ExceptionEvent("Network (" + neid + ") not found.");
 		System.out.println("Event rollback! Time " + Util.time2string(tstamp) + ": " + description);

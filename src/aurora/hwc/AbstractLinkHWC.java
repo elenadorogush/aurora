@@ -25,7 +25,7 @@ import aurora.util.*;
 public abstract class AbstractLinkHWC extends AbstractLink {
 	private static final long serialVersionUID = 7448808131935808045L;
 	
-	protected String name = "";
+	protected String name = null;
 	
 	protected double lanes = 1.0;
 	protected double flowMax = 1800; // in vph
@@ -107,12 +107,18 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 				NodeList pp = p.getChildNodes();
 				for (int i = 0; i < pp.getLength(); i++) {
 					if (pp.item(i).getNodeName().equals("begin")) {
-						AbstractNode bnd = myNetwork.getNodeById(Integer.parseInt(pp.item(i).getAttributes().getNamedItem("id").getNodeValue()));
+						Node bid_attr = pp.item(i).getAttributes().getNamedItem("node_id");
+						if (bid_attr == null)
+							bid_attr = pp.item(i).getAttributes().getNamedItem("id");
+						AbstractNode bnd = myNetwork.getNodeById(Integer.parseInt(bid_attr.getNodeValue()));
 						if (bnd != null)
 							bnd.addOutLink(this);
 						setBeginNode(bnd);
 					}
 					if (pp.item(i).getNodeName().equals("end")) {
+						Node eid_attr = pp.item(i).getAttributes().getNamedItem("node_id");
+						if (eid_attr == null)
+							eid_attr = pp.item(i).getAttributes().getNamedItem("id");
 						AbstractNode end = myNetwork.getNodeById(Integer.parseInt(pp.item(i).getAttributes().getNamedItem("id").getNodeValue()));
 						if (end != null)
 							end.addInLink(this);
@@ -171,6 +177,15 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 			res = false;
 			throw new ExceptionConfiguration(e.getMessage());
 		}
+		if (name == null) {
+			name = ">";
+			AbstractNode bnd = getBeginNode();
+			AbstractNode end = getEndNode();
+			if (bnd != null) 
+				name = bnd.getName() + " >";
+			if (end != null) 
+				name += " " + end.getName();
+		}
 		initialized = true;
 		return res;
 	}
@@ -193,7 +208,7 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 		if (successors.size() > 0)
 			out.print("<end node_id=\"" + Integer.toString(successors.firstElement().getId()) + "\"/>");
 		out.print("<dynamics type=\"" + myDynamics.getTypeLetterCode() + "\"/>");
-		out.print("<density>" + density.toStringWithInverseWeights(((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).getVehicleWeights(), false) + "</density>");
+		//out.print("<density>" + density.toStringWithInverseWeights(((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).getVehicleWeights(), false) + "</density>");
 		/*if (!demand.isEmpty()) {
 			out.print("<demand tp=\"" + Double.toString(demandTP) + "\" knob=\"" + getDemandKnobsAsString() + "\">");
 			out.print(getDemandVectorAsString());
@@ -206,7 +221,7 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 		}*/
 		out.print("<qmax>" + Double.toString(qMax) + "</qmax>");
 		out.print("<fd densityCritical =\"" + densityCritical + "\" densityJam=\"" + densityJam + "\" flowMax=\"" + flowMaxRange.toString() + "\" capacityDrop=\"" + capacityDrop + "\"/>");
-		myPosition.xmlDump(out);
+		//myPosition.xmlDump(out);
 		out.print("</link>\n");
 		return;
 	}

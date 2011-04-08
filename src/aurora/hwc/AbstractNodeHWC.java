@@ -316,8 +316,8 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 			out.print("<input link_id=\"" + predecessors.get(i).getId() + "\">");
 			//out.print("<splitratios>" + buf + "</splitratios>");
 			out.print("<weavingfactors>" + buf2 + "</weavingfactors>");
-			if (controllers.get(i) != null)
-				controllers.get(i).xmlDump(out);
+			//if (controllers.get(i) != null)
+				//controllers.get(i).xmlDump(out);
 			out.print("</input>");
 		}
 		out.print("</inputs>\n");

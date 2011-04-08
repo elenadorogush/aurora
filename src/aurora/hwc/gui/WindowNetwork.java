@@ -23,6 +23,7 @@ import java.awt.geom.Point2D;
 import java.io.*;
 import java.text.NumberFormat;
 import java.util.*;
+
 import javax.swing.*;
 import javax.swing.event.*;
 import edu.uci.ics.jung.graph.*;
@@ -399,7 +400,23 @@ public final class WindowNetwork extends JInternalFrame implements ActionListene
 		g.getEdgeConstraints().remove(Graph.NOT_PARALLEL_EDGE);
 		HashMap<AbstractNode, VertexNodeHWC> n2v = new HashMap<AbstractNode, VertexNodeHWC>();
 		// vertices come first
-		Vector<AbstractNode> nodes = myNetwork.getNodes();
+		Vector<AbstractNodeComplex> networks = myNetwork.getNetworks();
+		for (i = 0; i < networks.size(); i++) {
+			AbstractNode net = networks.get(i);
+			MiscUtil.processNode(net);
+			VertexNodeHWC v = new VertexNodeHWC(net);
+			n2v.put(net, v);
+			if (i == 0) {
+				geoBounds[0] = net.getPosition().get();
+				geoBounds[1] = net.getPosition().get();
+			}
+			else {
+				geoBounds[0] = makeMinPoint(geoBounds[0], net.getPosition().get());
+				geoBounds[1] = makeMaxPoint(geoBounds[1], net.getPosition().get());
+			}
+			g.addVertex(v);
+		}
+		Vector<AbstractNodeSimple> nodes = myNetwork.getNodes();
 		for (i = 0; i < nodes.size(); i++) {
 			AbstractNode node = nodes.get(i);
 			MiscUtil.processNode(node);
@@ -616,6 +633,7 @@ public final class WindowNetwork extends JInternalFrame implements ActionListene
 	private final class VertexPaintFunctionHWC implements VertexPaintFunction {
 		PickedInfo pi;
 		
+		@SuppressWarnings("unused")
 		public VertexPaintFunctionHWC() { }
 		public VertexPaintFunctionHWC(PickedInfo pi) { this.pi = pi; }
 
@@ -642,6 +660,7 @@ public final class WindowNetwork extends JInternalFrame implements ActionListene
 		private AbstractContainer mySystem = null;
 		PickedInfo pi = null;
 		
+		@SuppressWarnings("unused")
 		public VertexIconAndShapeFunctionHWC() {
 			setSizeFunction(this);
 		}
@@ -697,6 +716,7 @@ public final class WindowNetwork extends JInternalFrame implements ActionListene
 	private final static class VertexStringerHWC implements VertexStringer {
 		private PickedInfo pi;
 		
+		@SuppressWarnings("unused")
 		public VertexStringerHWC() { }
 		public VertexStringerHWC(PickedInfo pi) { this.pi = pi; }
 
@@ -715,6 +735,7 @@ public final class WindowNetwork extends JInternalFrame implements ActionListene
 		private final static float[] dotting = {1.0f, 3.0f};
 		private PickedInfo pi;
 		
+		@SuppressWarnings("unused")
 		public EdgeStrokeFunctionHWC() { }
 		public EdgeStrokeFunctionHWC(PickedInfo pi) { this.pi = pi; }
 		
@@ -740,12 +761,14 @@ public final class WindowNetwork extends JInternalFrame implements ActionListene
 	 * Class needed to paint the edge.
 	 */
 	private final class GradientEdgePaintFunctionHWC extends GradientEdgePaintFunction {
+		@SuppressWarnings("unused")
 		protected boolean fill_edge = false;
         
 		public GradientEdgePaintFunctionHWC(EdgePaintFunction defaultEdgePaintFunction, HasGraphLayout vv, LayoutTransformer transformer) {
 			super(Color.WHITE, Color.BLACK, vv, transformer);
 		}
         
+		@SuppressWarnings("unused")
 		public void useFill(boolean b) {
 			fill_edge = b;
 		}
@@ -798,6 +821,7 @@ public final class WindowNetwork extends JInternalFrame implements ActionListene
 	private final static class EdgeStringerHWC implements EdgeStringer {
 		private PickedInfo pi;
 		
+		@SuppressWarnings("unused")
 		public EdgeStringerHWC() { }
 		public EdgeStringerHWC(PickedInfo pi) { this.pi = pi; }
 
@@ -816,6 +840,7 @@ public final class WindowNetwork extends JInternalFrame implements ActionListene
 		private TreePane tree;
 		private PickedInfo pi;
 		
+		@SuppressWarnings("unused")
 		public PickedStateListener() { }
 		public PickedStateListener(TreePane tree, PickedInfo pi) {
 			this.tree = tree;

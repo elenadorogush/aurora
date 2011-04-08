@@ -446,7 +446,35 @@ public final class WindowNetwork extends JInternalFrame implements ChangeListene
 		ne2edge.clear();
 		pickedNE.clear();
 		// vertices come first
-		Vector<AbstractNode> nodes = myNetwork.getNodes();
+		Vector<AbstractNodeComplex> networks = myNetwork.getNetworks();
+		for (i = 0; i < networks.size(); i++) {
+			AbstractNode net = networks.get(i);
+			Vector<AbstractNetworkElement> nelist = net.getPredecessors();
+			int j;
+			boolean goodNode = !filterON;
+			for (j = 0; ((j < nelist.size()) && !goodNode); j++)
+				if (nelist.get(j).getType() == (treePane.getLinkFilter() & nelist.get(j).getType()))
+					goodNode = true;
+			nelist = net.getSuccessors();
+			for (j = 0; ((j < nelist.size()) && !goodNode); j++)
+				if (nelist.get(j).getType() == (treePane.getLinkFilter() & nelist.get(j).getType()))
+					goodNode = true;
+			if (!goodNode)
+				continue;
+			MiscUtil.processNode(net);
+			VertexNodeHWC v = new VertexNodeHWC(net);
+			ne2vrtx.put(net, v);
+			if (i == 0) {
+				geoBounds[0] = net.getPosition().get();
+				geoBounds[1] = net.getPosition().get();
+			}
+			else {
+				geoBounds[0] = makeMinPoint(geoBounds[0], net.getPosition().get());
+				geoBounds[1] = makeMaxPoint(geoBounds[1], net.getPosition().get());
+			}
+			g.addVertex(v);
+		}
+		Vector<AbstractNodeSimple> nodes = myNetwork.getNodes();
 		for (i = 0; i < nodes.size(); i++) {
 			AbstractNode node = nodes.get(i);
 			Vector<AbstractNetworkElement> nelist = node.getPredecessors();

@@ -4,6 +4,8 @@
 
 package aurora.hwc;
 
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.*;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -61,6 +63,21 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 			}
 		}
 		return res;
+	}
+	
+	/**
+	 * Generates XML description of the complex Node.<br>
+	 * If the print stream is specified, then XML buffer is written to the stream.
+	 * @param out print stream.
+	 * @throws IOException
+	 */
+	public void xmlDump(PrintStream out) throws IOException {
+		if (out == null)
+			out = System.out;
+		out.print("<network id=\"" + id + "\" name=\"" + name + "\" ml_control=\"" + controlled + "\" q_control=\"" + qControl + "\" + dt=\"" + 3600*tp + "\">\n");
+		super.xmlDump(out);
+		out.print("</network>\n");
+		return;
 	}
 	
 	/**
@@ -162,9 +179,8 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 		boolean res = true;
 		controlled = cv;
 		qControl = qcv;
-		for (int i = 0; i < nodes.size(); i++) {
-			if (!nodes.get(i).isSimple())
-				res &= ((NodeHWCNetwork)nodes.get(i)).setControlled(cv, qcv);
+		for (int i = 0; i < networks.size(); i++) {
+			res &= ((NodeHWCNetwork)networks.get(i)).setControlled(cv, qcv);
 		}
 		return res;
 	}
@@ -194,11 +210,10 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 	public synchronized boolean adjustWeightedData(double[] w) {
 		int i;
 		boolean res = true;
+		for (i = 0; i < networks.size(); i++)
+			res &= ((NodeHWCNetwork)networks.get(i)).adjustWeightedData(w);
 		for (i = 0; i < nodes.size(); i++)
-			if (nodes.get(i).isSimple())
-				res &= ((AbstractNodeHWC)nodes.get(i)).adjustWeightedData(w);
-			else
-				res &= ((NodeHWCNetwork)nodes.get(i)).adjustWeightedData(w);
+			res &= ((AbstractNodeHWC)nodes.get(i)).adjustWeightedData(w);
 		for (i = 0; i < links.size(); i++)
 			res &= ((AbstractLinkHWC)links.get(i)).adjustWeightedData(w);
 		return res;
