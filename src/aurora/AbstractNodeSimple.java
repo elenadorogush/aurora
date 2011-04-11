@@ -34,13 +34,7 @@ public abstract class AbstractNodeSimple extends AbstractNode {
 	 * @throws ExceptionDatabase, ExceptionSimulation
 	 */
 	public synchronized boolean dataUpdate(int ts) throws ExceptionDatabase, ExceptionSimulation {
-		boolean res = true;
-		DataStorage db = myNetwork.getDatabase();
-		if (db != null)
-			res &= db.saveNodeData(this);
-		if (res)
-			res &= super.dataUpdate(ts);
-		return res;
+		return super.dataUpdate(ts);
 	}
 	
 	/**

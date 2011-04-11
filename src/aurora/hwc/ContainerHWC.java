@@ -34,15 +34,21 @@ public final class ContainerHWC extends AbstractContainer {
 	/**
 	 * Initializes demand profile from DOM structure.
 	 */
-	private boolean initDemandProfileFromDOM(Node p) throws Exception {
+	private boolean initDemandProfileSetFromDOM(Node p) throws Exception {
 		if (p == null)
 			return false;
 		if (p.hasChildNodes()) {
 			NodeList pp = p.getChildNodes();
 			for (int j = 0; j < pp.getLength(); j++) {
 				if (pp.item(j).getNodeName().equals("demand")) {
-					int lkid = Integer.parseInt(pp.item(j).getAttributes().getNamedItem("id").getNodeValue());
-					double demandTP = Double.parseDouble(pp.item(j).getAttributes().getNamedItem("tp").getNodeValue());
+					Node id_attr = pp.item(j).getAttributes().getNamedItem("link_id");
+					if (id_attr == null)
+						id_attr = pp.item(j).getAttributes().getNamedItem("id");
+					int lkid = Integer.parseInt(id_attr.getNodeValue());
+					Node dt_attr = pp.item(j).getAttributes().getNamedItem("dt");
+					if (dt_attr == null)
+						dt_attr = pp.item(j).getAttributes().getNamedItem("tp");
+					double demandTP = Double.parseDouble(dt_attr.getNodeValue());
 					if (demandTP > 24) // sampling period in seconds
 						demandTP = demandTP/3600;
 					String demandKnob = pp.item(j).getAttributes().getNamedItem("knob").getNodeValue();
@@ -56,8 +62,8 @@ public final class ContainerHWC extends AbstractContainer {
 				if (pp.item(j).getNodeName().equals("include")) {
 					Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(pp.item(j).getAttributes().getNamedItem("uri").getNodeValue());
 					for (int i = 0; i < doc.getChildNodes().getLength(); i++)
-						if (doc.getChildNodes().item(i).getNodeName().equals("DemandProfile"))
-							initDemandProfileFromDOM(doc.getChildNodes().item(i));
+						if (doc.getChildNodes().item(i).getNodeName().equals("DemandProfile") || doc.getChildNodes().item(i).getNodeName().equals("DemandProfileSet"))
+							initDemandProfileSetFromDOM(doc.getChildNodes().item(i));
 				}
 			}
 		}
@@ -65,16 +71,63 @@ public final class ContainerHWC extends AbstractContainer {
 	}
 	
 	/**
+	 * Initializes controller set from DOM structure.
+	 */
+	private boolean initControllerSetFromDOM(Node p) throws Exception {
+		if (p == null)
+			return false;
+		boolean res = true;
+		if (p.hasChildNodes()) {
+			NodeList pp = p.getChildNodes();
+			for (int j = 0; j < pp.getLength(); j++) {
+				if (pp.item(j).getNodeName().equals("controller")) {
+					Node type_attr = pp.item(j).getAttributes().getNamedItem("type");
+					String class_name = null;
+					if (type_attr != null)
+						class_name = ctrType2Classname(type_attr.getNodeValue());
+					Class c = Class.forName(class_name);
+					AbstractController ctrl = (AbstractController)c.newInstance();
+					Node id_attr = pp.item(j).getAttributes().getNamedItem("link_id");
+					if (id_attr != null)
+						((AbstractControllerSimple)ctrl).setMyLink(myNetwork.getLinkById(Integer.parseInt(id_attr.getNodeValue())));
+					else {
+						id_attr = pp.item(j).getAttributes().getNamedItem("node_id");
+						if (id_attr != null)
+							((AbstractControllerNode)ctrl).setMyNode(myNetwork.getNodeById(Integer.parseInt(id_attr.getNodeValue())));
+						else {
+							id_attr = pp.item(j).getAttributes().getNamedItem("network_id");
+							if (id_attr != null)
+								((AbstractControllerComplex)ctrl).setMyNetwork(myNetwork.getNetworkById(Integer.parseInt(id_attr.getNodeValue())));
+						}
+					}
+					if (ctrl.getMyNE() != null)
+						res &= ctrl.initFromDOM(pp.item(j));
+				}
+				if (pp.item(j).getNodeName().equals("include")) {
+					Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(pp.item(j).getAttributes().getNamedItem("uri").getNodeValue());
+					for (int i = 0; i < doc.getChildNodes().getLength(); i++)
+						if (doc.getChildNodes().item(i).getNodeName().equals("ControllerSet"))
+							initControllerSetFromDOM(doc.getChildNodes().item(i));
+				}
+			}
+		}
+		return res;
+	}
+	
+	/**
 	 * Initializes split ratio profile from DOM structure.
 	 */
-	private boolean initSRProfileFromDOM(Node p) throws Exception {
+	private boolean initSplitRatioProfileSetFromDOM(Node p) throws Exception {
 		if (p == null)
 			return false;
 		if (p.hasChildNodes()) {
 			NodeList pp = p.getChildNodes();
 			for (int j = 0; j < pp.getLength(); j++) {
 				if (pp.item(j).getNodeName().equals("splitratios")) {
-					int nid = Integer.parseInt(pp.item(j).getAttributes().getNamedItem("id").getNodeValue());
+					Node id_attr = pp.item(j).getAttributes().getNamedItem("node_id");
+					if (id_attr == null)
+						id_attr = pp.item(j).getAttributes().getNamedItem("id");
+					int nid = Integer.parseInt(id_attr.getNodeValue());
 					AbstractNodeHWC nd = (AbstractNodeHWC)myNetwork.getNodeById(nid);
 					if (nd != null)
 						nd.initSplitRatioProfileFromDOM(pp.item(j));
@@ -82,8 +135,8 @@ public final class ContainerHWC extends AbstractContainer {
 				if (pp.item(j).getNodeName().equals("include")) {
 					Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(pp.item(j).getAttributes().getNamedItem("uri").getNodeValue());
 					for (int i = 0; i < doc.getChildNodes().getLength(); i++)
-						if (doc.getChildNodes().item(i).getNodeName().equals("SRProfile"))
-							initSRProfileFromDOM(doc.getChildNodes().item(i));
+						if (doc.getChildNodes().item(i).getNodeName().equals("SRProfile") || doc.getChildNodes().item(i).getNodeName().equals("SplitRatioProfileSet"))
+							initSplitRatioProfileSetFromDOM(doc.getChildNodes().item(i));
 				}
 			}
 		}
@@ -93,15 +146,21 @@ public final class ContainerHWC extends AbstractContainer {
 	/**
 	 * Initializes capacity profile from DOM structure.
 	 */
-	private boolean initCapacityProfileFromDOM(Node p) throws Exception {
+	private boolean initCapacityProfileSetFromDOM(Node p) throws Exception {
 		if (p == null)
 			return false;
 		if (p.hasChildNodes()) {
 			NodeList pp = p.getChildNodes();
 			for (int j = 0; j < pp.getLength(); j++) {
 				if (pp.item(j).getNodeName().equals("capacity")) {
-					int lkid = Integer.parseInt(pp.item(j).getAttributes().getNamedItem("id").getNodeValue());
-					double capacityTP = Double.parseDouble(pp.item(j).getAttributes().getNamedItem("tp").getNodeValue());
+					Node id_attr = pp.item(j).getAttributes().getNamedItem("link_id");
+					if (id_attr == null)
+						id_attr = pp.item(j).getAttributes().getNamedItem("id");
+					int lkid = Integer.parseInt(id_attr.getNodeValue());
+					Node dt_attr = pp.item(j).getAttributes().getNamedItem("dt");
+					if (dt_attr == null)
+						dt_attr = pp.item(j).getAttributes().getNamedItem("tp");
+					double capacityTP = Double.parseDouble(dt_attr.getNodeValue());
 					if (capacityTP > 24) // sampling period in seconds
 						capacityTP = capacityTP/3600;
 					AbstractLinkHWC lk = (AbstractLinkHWC)myNetwork.getLinkById(lkid);
@@ -113,8 +172,8 @@ public final class ContainerHWC extends AbstractContainer {
 				if (pp.item(j).getNodeName().equals("include")) {
 					Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(pp.item(j).getAttributes().getNamedItem("uri").getNodeValue());
 					for (int i = 0; i < doc.getChildNodes().getLength(); i++)
-						if (doc.getChildNodes().item(i).getNodeName().equals("CapacityProfile"))
-							initCapacityProfileFromDOM(doc.getChildNodes().item(i));
+						if (doc.getChildNodes().item(i).getNodeName().equals("CapacityProfile") || doc.getChildNodes().item(i).getNodeName().equals("CapacityProfileSet"))
+							initCapacityProfileSetFromDOM(doc.getChildNodes().item(i));
 				}
 			}
 		}
@@ -131,7 +190,10 @@ public final class ContainerHWC extends AbstractContainer {
 			NodeList pp = p.getChildNodes();
 			for (int j = 0; j < pp.getLength(); j++) {
 				if (pp.item(j).getNodeName().equals("density")) {
-					int lkid = Integer.parseInt(pp.item(j).getAttributes().getNamedItem("id").getNodeValue());
+					Node id_attr = pp.item(j).getAttributes().getNamedItem("link_id");
+					if (id_attr == null)
+						id_attr = pp.item(j).getAttributes().getNamedItem("id");
+					int lkid = Integer.parseInt(id_attr.getNodeValue());
 					AbstractLinkHWC lk = (AbstractLinkHWC)myNetwork.getLinkById(lkid);
 					if (lk != null) {
 						lk.setInitialDensity(pp.item(j).getTextContent());
@@ -178,7 +240,7 @@ public final class ContainerHWC extends AbstractContainer {
 					res &= myNetwork.setContainer(this);
 					res &= myNetwork.initFromDOM(p.getChildNodes().item(i));
 				}
-				if (p.getChildNodes().item(i).getNodeName().equals("EventList")) {
+				if (p.getChildNodes().item(i).getNodeName().equals("EventList") || p.getChildNodes().item(i).getNodeName().equals("EventSet")) {
 					res &= myEventManager.initFromDOM(p.getChildNodes().item(i));
 				}
 				if (p.getChildNodes().item(i).getNodeName().equals("DirectionsCache")) {
@@ -187,19 +249,16 @@ public final class ContainerHWC extends AbstractContainer {
 				}
 			}
 			for (int i = 0; i < p.getChildNodes().getLength(); i++) {
-				if (p.getChildNodes().item(i).getNodeName().equals("DemandProfile"))
-					res &= initDemandProfileFromDOM(p.getChildNodes().item(i));
-				if (p.getChildNodes().item(i).getNodeName().equals("SRProfile"))
-					res &= initSRProfileFromDOM(p.getChildNodes().item(i));
-				if (p.getChildNodes().item(i).getNodeName().equals("CapacityProfile"))
-					res &= initCapacityProfileFromDOM(p.getChildNodes().item(i));
+				if (p.getChildNodes().item(i).getNodeName().equals("ControllerSet") || p.getChildNodes().item(i).getNodeName().equals("SplitRatioProfileSet"))
+					res &= initControllerSetFromDOM(p.getChildNodes().item(i));
+				if (p.getChildNodes().item(i).getNodeName().equals("SRProfile") || p.getChildNodes().item(i).getNodeName().equals("SplitRatioProfileSet"))
+					res &= initSplitRatioProfileSetFromDOM(p.getChildNodes().item(i));
+				if (p.getChildNodes().item(i).getNodeName().equals("DemandProfile") || p.getChildNodes().item(i).getNodeName().equals("DemandProfileSet"))
+					res &= initDemandProfileSetFromDOM(p.getChildNodes().item(i));
+				if (p.getChildNodes().item(i).getNodeName().equals("CapacityProfile") || p.getChildNodes().item(i).getNodeName().equals("CapacityProfileSet"))
+					res &= initCapacityProfileSetFromDOM(p.getChildNodes().item(i));
 				if (p.getChildNodes().item(i).getNodeName().equals("InitialDensityProfile"))
 					res &= initInitialDensityProfileFromDOM(p.getChildNodes().item(i));
-				
-				
-
-				
-				
 			}
 		}
 		catch(Exception e) {
@@ -224,9 +283,24 @@ public final class ContainerHWC extends AbstractContainer {
 	 * @throws IOException
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
-		out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Scenario>\n");
+		out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<scenario>\n");
 		super.xmlDump(out);
-		out.print("</Scenario>\n");
+		out.print("\n<ControllerSet>");
+		((NodeHWCNetwork)myNetwork).xmlDumpControllerSet(out);
+		out.print("</ControllerSet>\n");
+		out.print("\n<InitialDensityProfile>\n");
+		((NodeHWCNetwork)myNetwork).xmlDumpInitialDensityProfile(out);
+		out.print("</InitialDensityProfile>\n");
+		out.print("\n<DemandProfileSet>\n");
+		((NodeHWCNetwork)myNetwork).xmlDumpDemandProfileSet(out);
+		out.print("</DemandProfileSet>\n");
+		out.print("\n<SplitRatioProfileSet>\n");
+		((NodeHWCNetwork)myNetwork).xmlDumpSplitRatioProfileSet(out);
+		out.print("</SplitRatioProfileSet>\n");
+		out.print("\n<CapacityProfileSet>\n");
+		((NodeHWCNetwork)myNetwork).xmlDumpCapacityProfileSet(out);
+		out.print("</CapacityProfileSet>\n");
+		out.print("</scenario>\n");
 		return;
 	}
 	
@@ -286,6 +360,7 @@ public final class ContainerHWC extends AbstractContainer {
 		ne_type2classname.put("S", "aurora.hwc.NodeUJSignal");
 		ne_type2classname.put("P", "aurora.hwc.NodeUJStop");
 		ne_type2classname.put("O", "aurora.hwc.NodeOther");
+		ne_type2classname.put("T", "aurora.hwc.NodeTerminal");
 		// links
 		ne_type2classname.put("FW", "aurora.hwc.LinkFwML");
 		ne_type2classname.put("HW", "aurora.hwc.LinkHw");

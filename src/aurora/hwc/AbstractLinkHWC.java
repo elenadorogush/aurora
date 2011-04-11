@@ -191,6 +191,57 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 	}
 	
 	/**
+	 * Generates XML buffer for the initial density.<br>
+	 * If the print stream is specified, then XML buffer is written to the stream.
+	 * @param out print stream.
+	 * @throws IOException
+	 */
+	public void xmlDumpInitialDensity(PrintStream out) throws IOException {
+		if (out == null)
+			out = System.out;
+		if ((getEndNode() == null) && (!capacity.isEmpty())) {
+			out.print("<density link_id=\"" + id + "\">");
+			out.print(density.toStringWithInverseWeights(((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).getVehicleWeights(), false));
+			out.println("</density>");
+		}
+		return;
+	}
+	
+	/**
+	 * Generates XML buffer for the demand profile.<br>
+	 * If the print stream is specified, then XML buffer is written to the stream.
+	 * @param out print stream.
+	 * @throws IOException
+	 */
+	public void xmlDumpDemandProfile(PrintStream out) throws IOException {
+		if (out == null)
+			out = System.out;
+		if ((getBeginNode() == null) && (!demand.isEmpty())) {
+			out.print("<demand link_id=\"" + id + "\" dt=\"" + Math.round(3600*demandTP) + "\" knob=\"" + getDemandKnobsAsString() + "\">");
+			out.print(getDemandVectorAsString());
+			out.println("</demand>");
+		}
+		return;
+	}
+	
+	/**
+	 * Generates XML buffer for the capacity profile.<br>
+	 * If the print stream is specified, then XML buffer is written to the stream.
+	 * @param out print stream.
+	 * @throws IOException
+	 */
+	public void xmlDumpCapacityProfile(PrintStream out) throws IOException {
+		if (out == null)
+			out = System.out;
+		if ((getEndNode() == null) && (!capacity.isEmpty())) {
+			out.print("<capacity link_id=\"" + id + "\" dt=\"" + Math.round(3600*capacityTP) + "\">");
+			out.print(getCapacityVectorAsString());
+			out.println("</capacity>");
+		}
+		return;
+	}
+	
+	/**
 	 * Generates XML description of the Link.<br>
 	 * If the print stream is specified, then XML buffer is written to the stream.
 	 * @param out print stream.
@@ -233,9 +284,6 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 	 * @throws ExceptionDatabase, ExceptionSimulation
 	 */
 	public synchronized boolean dataUpdate(int ts) throws ExceptionDatabase, ExceptionSimulation {
-		DataStorage db = myNetwork.getDatabase();
-		if (db != null)
-			db.saveLinkData(this);
 		boolean res = super.dataUpdate(ts);
 		if (res) {
 			if (resetAllSums)

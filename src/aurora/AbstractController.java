@@ -35,7 +35,10 @@ public abstract class AbstractController implements AuroraConfigurable, Serializ
 		boolean res = true;
 		if (p == null)
 			return !res;
-		tp = Double.parseDouble(p.getAttributes().getNamedItem("tp").getNodeValue());
+		Node dt_attr = p.getAttributes().getNamedItem("dt");
+		if (dt_attr == null)
+			dt_attr = p.getAttributes().getNamedItem("tp");
+		tp = Double.parseDouble(dt_attr.getNodeValue());
 		if (tp > 0.4) // invocation period in seconds
 			tp = tp/3600;
 		initialized = true;
@@ -61,7 +64,18 @@ public abstract class AbstractController implements AuroraConfigurable, Serializ
 	public void xmlDump(PrintStream out) throws IOException {
 		if (out == null)
 			out = System.out;
-		out.print("<controller type=\"" + getTypeLetterCode() + "\" tp=\"" + Double.toString(3600*tp) + "\">");
+		AbstractNetworkElement ne = getMyNE();
+		String buf = "";
+		if (ne != null) {
+			if ((ne.getType() & AbstractTypes.MASK_NETWORK) > 0)
+				buf = "network_id=\"";
+			else if ((ne.getType() & AbstractTypes.MASK_NODE) > 0)
+				buf = "node_id=\"";
+			else
+				buf = "link_id=\"";
+			buf += ne.getId() + "\"";
+		}
+		out.print("\n<controller type=\"" + getTypeLetterCode() + "\" " + buf + " dt=\"" + Math.round(3600*tp) + "\">\n");
 		return;
 	}
 	
@@ -102,6 +116,11 @@ public abstract class AbstractController implements AuroraConfigurable, Serializ
 		return dependent;
 	}
 	
+	/**
+	 * Returns the Network Element it belongs to.
+	 */
+	public abstract AbstractNetworkElement getMyNE();
+
 	/**
 	 * Returns simulation sampling period.
 	 */

@@ -233,7 +233,10 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 		if ((p == null) || (!p.hasChildNodes()) || (m <= 0) || (n <= 0))
 			return !res;
 		try {
-			srTP = Double.parseDouble(p.getAttributes().getNamedItem("tp").getNodeValue());
+			Node dt_attr = p.getAttributes().getNamedItem("dt");
+			if (dt_attr == null)
+				dt_attr = p.getAttributes().getNamedItem("tp");
+			srTP = Double.parseDouble(dt_attr.getNodeValue());
 			if (srTP > 24) // sampling period in seconds
 				srTP = srTP/3600;
 			NodeList pp = p.getChildNodes();
@@ -285,6 +288,40 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 			throw new ExceptionConfiguration(e.getMessage());
 		}
 		return res;
+	}
+	
+	/**
+	 * Generates XML buffer for controller descriptions.<br>
+	 * If the print stream is specified, then XML buffer is written to the stream.
+	 * @param out print stream.
+	 * @throws IOException
+	 */
+	public void xmlDumpControllers(PrintStream out) throws IOException {
+		if (out == null)
+			out = System.out;
+		if (controller != null)
+			controller.xmlDump(out);
+		for (int i = 0; i < controllers.size(); i++)
+			controllers.get(i).xmlDump(out);
+		return;
+	}
+	
+	/**
+	 * Generates XML buffer for the split ratio profile.<br>
+	 * If the print stream is specified, then XML buffer is written to the stream.
+	 * @param out print stream.
+	 * @throws IOException
+	 */
+	public void xmlDumpSplitRatioProfile(PrintStream out) throws IOException {
+		if (out == null)
+			out = System.out;
+		out.print("<splitratios node_id=\"" + id + "\" dt=\"" + Math.round(srTP) + "\">\n");
+		if (srmProfile != null)
+			out.print(getSplitRatioProfileAsXML());
+		else
+			out.print(getSplitRatioMatrixAsXML());
+		out.print("\n</splitratios>\n");
+		return;
 	}
 	
 	/**
@@ -1116,7 +1153,32 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 	}
 	
 	/**
-	 * Returns split ratio profile as text buffer.
+	 * Returns split ratio matrix as XML buffer.
+	 */
+	public String getSplitRatioMatrixAsXML() {
+		String buf = "";
+		int m = 0;
+		int n = 0;
+		if (splitRatioMatrix != null) {
+			m = splitRatioMatrix.length;
+			n = splitRatioMatrix[0].length;
+		}
+		buf += "<srm>";
+		for (int j = 0; j < m; j++) {
+			if (j > 0)
+				buf += "; ";
+			for (int k = 0; k < n; k++) {
+				if (k > 0)
+					buf += ", ";
+				buf += splitRatioMatrix[j][k].toString();
+			}
+		}
+		buf += "</srm>\n";
+		return buf;
+	}
+	
+	/**
+	 * Returns split ratio profile as XML buffer.
 	 */
 	public String getSplitRatioProfileAsXML() {
 		String buf = "";

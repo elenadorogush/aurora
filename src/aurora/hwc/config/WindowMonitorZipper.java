@@ -522,6 +522,7 @@ public final class WindowMonitorZipper extends JInternalFrame implements ActionL
 	private final class WindowAdd extends WindowLinkPair {
 		private static final long serialVersionUID = 9215245098365958882L;
 		
+		@SuppressWarnings("unused")
 		public WindowAdd() { }
 		public WindowAdd(JFrame parent) {
 			super(parent, "New");
@@ -532,6 +533,7 @@ public final class WindowMonitorZipper extends JInternalFrame implements ActionL
 	private final class WindowEdit extends WindowLinkPair {
 		private static final long serialVersionUID = 6346774397645516687L;
 		
+		@SuppressWarnings("unused")
 		public WindowEdit() { }
 		public WindowEdit(JFrame parent, int idx) {
 			super(parent, "Edit");

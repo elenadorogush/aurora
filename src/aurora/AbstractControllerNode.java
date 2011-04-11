@@ -60,6 +60,13 @@ public abstract class AbstractControllerNode extends AbstractController {
 	}
 	
 	/**
+	 * Returns the Network Element it belongs to.
+	 */
+	public final AbstractNetworkElement getMyNE() {
+		return getMyNode();
+	}
+	
+	/**
 	 * Returns node to which this controller belongs.
 	 */
 	public final AbstractNode getMyNode() {

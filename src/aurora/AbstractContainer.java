@@ -52,18 +52,18 @@ public abstract class AbstractContainer implements AuroraConfigurable, Serializa
 	 * @throws IOException
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
-		if (myNetwork != null)
-			myNetwork.xmlDump(out);
 		if (mySettings != null) {
-			out.print("<settings>\n");
+			out.print("\n<settings>\n");
 			mySettings.xmlDump(out);
 			out.print("</settings>\n");
 		}
 		if (myEventManager != null) {
-			out.print("<EventSet>\n");
+			out.print("\n<EventSet>\n");
 			myEventManager.xmlDump(out);
 			out.print("</EventSet>\n");
 		}
+		if (myNetwork != null)
+			myNetwork.xmlDump(out);
 		if(this.dircache!=null){
 			dircache.xmlDump(out);
 		}

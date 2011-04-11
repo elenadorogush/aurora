@@ -15,6 +15,7 @@ public abstract class AbstractControllerComplex extends AbstractController {
 	private static final long serialVersionUID = 6181398228416347756L;
 	
 	protected AbstractMonitorController myMonitor = null;
+	protected AbstractNodeComplex myNetwork = null;
 	protected HashMap<AbstractController, Object> ctrl2input = new HashMap<AbstractController, Object>(); 
 	protected Vector<AbstractController> dependentControllers = new Vector<AbstractController>();
 	
@@ -63,10 +64,24 @@ public abstract class AbstractControllerComplex extends AbstractController {
 	}
 	
 	/**
+	 * Returns the Network Element it belongs to.
+	 */
+	public final AbstractNetworkElement getMyNE() {
+		return getMyNetwork();
+	}
+	
+	/**
 	 * Returns monitor to which this controller belongs.
 	 */
 	public final AbstractMonitor getMyMonitor() {
 		return myMonitor;
+	}
+	
+	/**
+	 * Returns network to which this controller belongs.
+	 */
+	public final AbstractNodeComplex getMyNetwork() {
+		return myNetwork;
 	}
 	
 	/**
@@ -139,6 +154,18 @@ public abstract class AbstractControllerComplex extends AbstractController {
 		if (x == null)
 			return false;
 		myMonitor = x;
+		return true;
+	}
+	
+	/**
+	 * Assigns network to which this controller should belong.
+	 * @param x network.
+	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
+	 */
+	public synchronized boolean setMyNetwork(AbstractNodeComplex x) {
+		if (x == null)
+			return false;
+		myNetwork = x;
 		return true;
 	}
 	

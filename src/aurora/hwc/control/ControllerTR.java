@@ -94,7 +94,7 @@ public class ControllerTR extends AbstractControllerSimpleHWC {
 		super.xmlDump(out);
 		for (int i = 0; i < t_dns.size(); i++)
 			out.println("<level id=\"" + i + "\" density=\"" + t_dns.get(i) + "\" flow=\"" + t_flw.get(i) + "\" speed=\"" + t_spd.get(i) + "\" rate=\"" + rate.get(i) + "\" />");
-		out.print("</controller>\n");
+		out.print("</controller>");
 		return;
 	}
 

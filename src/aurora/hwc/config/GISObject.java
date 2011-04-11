@@ -601,7 +601,7 @@ public class GISObject {
 		FeatureType featureType = featureSource.getSchema();
 		showAttributes(featureType, Boolean.TRUE); // show geomtry feature
 		showAttributes(featureType, Boolean.FALSE); // show non-geomtry feature
-		if (false){
+		/*if (false){
 			myLog("\n==First five records==");
 			Iterator iterator = featureCollection.iterator();
 			for (int count = 0; iterator.hasNext() & count < 5; count++) {
@@ -609,7 +609,7 @@ public class GISObject {
 				debug(feature);
 			}
 			featureCollection.close( iterator );
-		}
+		}*/
 		myLog("");
 	}
 	/**
@@ -631,6 +631,7 @@ public class GISObject {
 	}
 
 
+	@SuppressWarnings("unused")
 	private void debug(Feature feature) {
 		String out="";
 		for (int i = 0; i < feature.getNumberOfAttributes(); i++) {

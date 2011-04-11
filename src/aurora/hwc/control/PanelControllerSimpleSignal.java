@@ -318,6 +318,7 @@ public class PanelControllerSimpleSignal extends AbstractPanelSimpleController {
 	private final class WindowAdd extends WindowCycle {
 		private static final long serialVersionUID = -2533465176473872986L;
 		
+		@SuppressWarnings("unused")
 		public WindowAdd() { }
 		public WindowAdd(JFrame parent) {
 			super(parent, "New");
@@ -328,6 +329,7 @@ public class PanelControllerSimpleSignal extends AbstractPanelSimpleController {
 	private final class WindowEdit extends WindowCycle {
 		private static final long serialVersionUID = -9090898426405999714L;
 		
+		@SuppressWarnings("unused")
 		public WindowEdit() { }
 		public WindowEdit(JFrame parent, CycleDataRow x) {
 			super(parent, "Edit");

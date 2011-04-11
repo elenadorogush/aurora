@@ -79,12 +79,12 @@ public class GISImporter extends JFrame implements ActionListener {
 		myLog("Starting...");
 		timestamp();
 		
-		if (false){
+		/*if (false){
 			//file = new File("C:\\WORK\\devel\\support\\SanPablo_Aurora\\caalamst_north.shp");
 			oldFile = new File("C:\\WORK\\devel\\support\\SanPablo_Aurora\\cacontst_west.shp");
 			openFile(oldFile.toURI().toURL());
 			//simplifyEdges();
-		}
+		}*/
 	}
 
 

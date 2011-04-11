@@ -66,6 +66,111 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 	}
 	
 	/**
+	 * Initializes the complex Node from given DOM structure.
+	 * @param p DOM node.
+	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
+	 * @throws ExceptionConfiguration
+	 */
+	public boolean initFromDOM(Node p) throws ExceptionConfiguration {
+		boolean do_it = !initialized;
+		boolean res = super.initFromDOM(p);
+		if ((res == true) && do_it) {
+			Node mlc_attr = p.getAttributes().getNamedItem("ml_control");
+			if (mlc_attr == null)
+				mlc_attr = p.getAttributes().getNamedItem("controlled");
+			Node qc_attr = p.getAttributes().getNamedItem("q_control");
+			if (mlc_attr != null)
+				controlled = Boolean.parseBoolean(mlc_attr.getNodeValue());
+			if (qc_attr != null)
+				qControl = Boolean.parseBoolean(qc_attr.getNodeValue());
+		}
+		return res;
+	}
+	
+	/**
+	 * Generates XML buffer for the initial density profile.<br>
+	 * If the print stream is specified, then XML buffer is written to the stream.
+	 * @param out print stream.
+	 * @throws IOException
+	 */
+	public void xmlDumpInitialDensityProfile(PrintStream out) throws IOException {
+		if (out == null)
+			out = System.out;
+		for (int i = 0; i < links.size(); i++)
+			((AbstractLinkHWC)links.get(i)).xmlDumpInitialDensity(out);
+		for (int i = 0; i < networks.size(); i++)
+			((NodeHWCNetwork)networks.get(i)).xmlDumpInitialDensityProfile(out);
+		return;
+	}
+	
+	/**
+	 * Generates XML buffer for the demand profile set.<br>
+	 * If the print stream is specified, then XML buffer is written to the stream.
+	 * @param out print stream.
+	 * @throws IOException
+	 */
+	public void xmlDumpDemandProfileSet(PrintStream out) throws IOException {
+		if (out == null)
+			out = System.out;
+		for (int i = 0; i < links.size(); i++)
+			((AbstractLinkHWC)links.get(i)).xmlDumpDemandProfile(out);
+		for (int i = 0; i < networks.size(); i++)
+			((NodeHWCNetwork)networks.get(i)).xmlDumpDemandProfileSet(out);
+		return;
+	}
+	
+	/**
+	 * Generates XML buffer for the capacity profile set.<br>
+	 * If the print stream is specified, then XML buffer is written to the stream.
+	 * @param out print stream.
+	 * @throws IOException
+	 */
+	public void xmlDumpCapacityProfileSet(PrintStream out) throws IOException {
+		if (out == null)
+			out = System.out;
+		for (int i = 0; i < links.size(); i++)
+			((AbstractLinkHWC)links.get(i)).xmlDumpCapacityProfile(out);
+		for (int i = 0; i < networks.size(); i++)
+			((NodeHWCNetwork)networks.get(i)).xmlDumpCapacityProfileSet(out);
+		return;
+	}
+	
+	/**
+	 * Generates XML buffer for the split ratio profile set.<br>
+	 * If the print stream is specified, then XML buffer is written to the stream.
+	 * @param out print stream.
+	 * @throws IOException
+	 */
+	public void xmlDumpSplitRatioProfileSet(PrintStream out) throws IOException {
+		if (out == null)
+			out = System.out;
+		for (int i = 0; i < nodes.size(); i++)
+			((AbstractNodeHWC)nodes.get(i)).xmlDumpSplitRatioProfile(out);
+		for (int i = 0; i < networks.size(); i++)
+			((NodeHWCNetwork)networks.get(i)).xmlDumpSplitRatioProfileSet(out);
+		return;
+	}
+	
+	/**
+	 * Generates XML buffer for the split ratio profile set.<br>
+	 * If the print stream is specified, then XML buffer is written to the stream.
+	 * @param out print stream.
+	 * @throws IOException
+	 */
+	public void xmlDumpControllerSet(PrintStream out) throws IOException {
+		if (out == null)
+			out = System.out;
+		for (int i = 0; i < networks.size(); i++) {
+			for (int j = 0; j < controllers.size(); j++)
+				controllers.get(j).xmlDump(out);
+			((NodeHWCNetwork)networks.get(i)).xmlDumpControllerSet(out);
+		}
+		for (int i = 0; i < nodes.size(); i++)
+			((AbstractNodeHWC)nodes.get(i)).xmlDumpControllers(out);
+		return;
+	}
+	
+	/**
 	 * Generates XML description of the complex Node.<br>
 	 * If the print stream is specified, then XML buffer is written to the stream.
 	 * @param out print stream.
@@ -74,7 +179,7 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 	public void xmlDump(PrintStream out) throws IOException {
 		if (out == null)
 			out = System.out;
-		out.print("<network id=\"" + id + "\" name=\"" + name + "\" ml_control=\"" + controlled + "\" q_control=\"" + qControl + "\" + dt=\"" + 3600*tp + "\">\n");
+		out.print("\n<network id=\"" + id + "\" name=\"" + name + "\" ml_control=\"" + controlled + "\" q_control=\"" + qControl + "\" + dt=\"" + 3600*tp + "\">\n");
 		super.xmlDump(out);
 		out.print("</network>\n");
 		return;

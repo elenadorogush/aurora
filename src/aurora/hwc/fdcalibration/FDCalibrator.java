@@ -98,6 +98,7 @@ System.out.println(D.dty.size());
 	}
 	
 	// step 3
+	@SuppressWarnings("unchecked")
 	private void calibrate(SensorLoopDetector S){
 		int i;
 		int vds = S.getVDS();

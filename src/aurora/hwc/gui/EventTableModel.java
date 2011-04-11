@@ -123,10 +123,7 @@ public final class EventTableModel extends AbstractTableModel {
     			data[i][2] = ne;
     		else
     			data[i][2] = (Integer)evt.getNEID();
-    		if (evt != null)
-    			data[i][3] = evt.getDescription();
-    		else
-    			data[i][3] = "-";
+    		data[i][3] = evt.getDescription();
     		data[i][4] = new Boolean(evt.isEnabled());
     	}
     	fireTableDataChanged();

@@ -128,7 +128,7 @@ public final class ControllerALINEA extends AbstractControllerSimpleHWC {
 		out.println("<parameter name=\"gain\" value=\"" + Double.toString(gain) + "\"/>");
 		for (int i = 0; i < MLlinks.size(); i++)
 			out.println("<parameter name=\"link\" value=\"" + MLlinks.get(i).getId() + "\"/>");
-		out.println("</controller>");
+		out.print("</controller>");
 		return;
 	}
 	

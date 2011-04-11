@@ -42,12 +42,14 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 	protected int nodesToSave = 0;
 	protected int linksToSave = 0;
 	
-	protected AbstractContainer container = null; 
+	protected AbstractContainer container = null;
+	
+	protected Vector<AbstractControllerComplex> controllers = new Vector<AbstractControllerComplex>();
 	
 	private Vector<Node> domnodes = new Vector<Node>();
 	
 	/**
-	 * Initialize Node list from the DOM structure.
+	 * Initialize Network list from the DOM structure.
 	 */
 	public boolean initNetworkListFromDOM(Node p) throws Exception {
 		boolean res = true;
@@ -230,36 +232,8 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 		boolean res = true;
 		if (p == null)
 			return !res;
-		if (initialized) {
-			if (top)
-				return res;
-			try  {
-				if (p.hasChildNodes()) {
-					NodeList pp = p.getChildNodes();
-					for (int i = 0; i < pp.getLength(); i++) {
-						if (pp.item(i).getNodeName().equals("inputs"))
-							if (pp.item(i).hasAttributes()) {
-								NodeList pp2 = pp.item(i).getChildNodes();
-								for (int j = 0; j < pp2.getLength(); j++)
-									if (pp2.item(j).getNodeName().equals("input"))
-										addPredecessor(myNetwork.getLinkById(Integer.parseInt(pp2.item(j).getAttributes().getNamedItem("id").getNodeValue())));
-							}
-						if (pp.item(i).getNodeName().equals("outputs"))
-							if (pp.item(i).hasAttributes()) {
-								NodeList pp2 = pp.item(i).getChildNodes();
-								for (int j = 0; j < pp2.getLength(); j++)
-									if (pp2.item(j).getNodeName().equals("output"))
-										addSuccessor(myNetwork.getLinkById(Integer.parseInt(pp2.item(j).getAttributes().getNamedItem("id").getNodeValue())));
-							}
-					}
-				}
-			}
-			catch(Exception e) {
-				res = false;
-				throw new ExceptionConfiguration(e.getMessage());
-			}
+		if (initialized)
 			return res;
-		}
 		if (myNetwork == null) {
 			myNetwork = this;
 			top = true;
@@ -270,7 +244,6 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 		}
 		try  {
 			id = Integer.parseInt(p.getAttributes().getNamedItem("id").getNodeValue());
-			controlled = Boolean.parseBoolean(p.getAttributes().getNamedItem("controlled").getNodeValue());
 			Node dt_attr = p.getAttributes().getNamedItem("dt");
 			if (dt_attr == null)
 				dt_attr = p.getAttributes().getNamedItem("tp");
@@ -291,6 +264,9 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 					if (pp.item(i).getNodeName().equals("position")) {
 						position = new PositionNode();
 						res &= position.initFromDOM(pp.item(i));
+					}
+					if (pp.item(i).getNodeName().equals("NetworkList")) { // 0: Networks
+						res &= initNetworkListFromDOM(pp.item(i));
 					}
 					if (pp.item(i).getNodeName().equals("NodeList")) { // 1: Nodes
 						res &= initNodeListFromDOM(pp.item(i));
@@ -594,13 +570,6 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 	}
 	
 	/**
-	 * Returns database interface.
-	 */
-	public final DataStorage getDatabase() {
-		return database;
-	}
-	
-	/**
 	 * Returns verbosity mode.
 	 */
 	public final boolean getVerbose() {
@@ -619,6 +588,13 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 	 */
 	public final Vector<AbstractMonitor> getMonitors() {
 		return monitors;
+	}
+	
+	/**
+	 * Returns vector of Complex Controllers.
+	 */
+	public final Vector<AbstractControllerComplex> getControllers() {
+		return controllers;
 	}
 	
 	/**
@@ -1007,6 +983,18 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 		int idx = -1;
 		if ((x != null) && (monitors.add(x)))
 			idx = monitors.size() - 1;
+		return idx;
+	}
+	
+	/**
+	 * Adds a Complex Controller to the list.
+	 * @param x Complex Controller.
+	 * @return idx index of the added Controller, <code>-1</code> - if the Controller could not be added.
+	 */
+	public synchronized int addController(AbstractControllerComplex x) {
+		int idx = -1;
+		if ((x != null) && (controllers.add(x)))
+			idx = controllers.size() - 1;
 		return idx;
 	}
 	
@@ -1451,12 +1439,12 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 		container = ntwk.getContainer();
 		controlled = ntwk.isControlled();
 		top = ntwk.isTop();
-		database = ntwk.getDatabase();
 		simNo = ntwk.getSimNo();
 		tp = ntwk.getTP();
 		maxTimeStep = ntwk.getMaxTimeStep();
 		sensors = ntwk.getSensors();
 		monitors = ntwk.getMonitors();
+		controllers = ntwk.getControllers();
 		nodes = ntwk.getNodes();
 		links = ntwk.getLinks();
 		odList = ntwk.getODList();

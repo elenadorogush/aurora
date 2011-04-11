@@ -598,6 +598,7 @@ public final class MainPane extends JFrame implements ActionListener, ItemListen
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	public void LogErrors(Vector<ErrorConfiguration> e){
 		/*
 		String fpath = fp.getAbsolutePath();

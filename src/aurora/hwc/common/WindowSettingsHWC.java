@@ -198,6 +198,7 @@ public final class WindowSettingsHWC extends WindowSettings {
 		private final static String localOK = "okPressed";
 		private final static String localCancel = "cancelPressed";
 
+		@SuppressWarnings("unused")
 		public WindowAdd() { }
 		public WindowAdd(JFrame parent) {
 			super(parent, "New");

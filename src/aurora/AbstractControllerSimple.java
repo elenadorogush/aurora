@@ -39,6 +39,13 @@ public abstract class AbstractControllerSimple extends AbstractController {
 	}
 	
 	/**
+	 * Returns the Network Element it belongs to.
+	 */
+	public final AbstractNetworkElement getMyNE() {
+		return getMyLink();
+	}
+	
+	/**
 	 * Returns mask for compatible Node types.
 	 */
 	public int getCompatibleNodeTypes() {
