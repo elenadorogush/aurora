@@ -22,10 +22,9 @@ public final class EventWFM extends AbstractEvent {
 	protected double[][] weavingFactorMatrix = null;
 	
 	
-	public EventWFM() { description = "Weaving factor change at Node"; }
 	public EventWFM(int neid) {
-		this();
-		this.neid = neid;
+		super(neid);
+		description = "Weaving factor change at Node";
 	}
 	public EventWFM(int neid, double[][] wfm) {
 		this(neid);
@@ -141,14 +140,9 @@ public final class EventWFM extends AbstractEvent {
 		super.activate(top);
 		if (!enabled)
 			return enabled;
-		AbstractNode nd = top.getNodeById(neid);
-		if (nd == null)
-			throw new ExceptionEvent("Node (" + Integer.toString(neid) + ") not found.");
-		if (!nd.isSimple())
-			throw new ExceptionEvent(nd, "Wrong type.");
 		System.out.println("Event! Time " + Util.time2string(tstamp) + ": " + description);
-		double[][] wfm = ((AbstractNodeHWC)nd).getWeavingFactorMatrix();
-		boolean res = ((AbstractNodeHWC)nd).setWeavingFactorMatrix(weavingFactorMatrix);
+		double[][] wfm = ((AbstractNodeHWC)myNE).getWeavingFactorMatrix();
+		boolean res = ((AbstractNodeHWC)myNE).setWeavingFactorMatrix(weavingFactorMatrix);
 		weavingFactorMatrix = wfm;
 		return res;
 	}
@@ -163,14 +157,9 @@ public final class EventWFM extends AbstractEvent {
 			return false;
 		if (!enabled)
 			return enabled;
-		AbstractNode nd = top.getNodeById(neid);
-		if (nd == null)
-			throw new ExceptionEvent("Node (" + Integer.toString(neid) + ") not found.");
-		if (!nd.isSimple())
-			throw new ExceptionEvent(nd, "Wrong type.");
 		System.out.println("Event rollback! Time " + Util.time2string(tstamp) + ": " + description);
-		double[][] wfm = ((AbstractNodeHWC)nd).getWeavingFactorMatrix();
-		boolean res = ((AbstractNodeHWC)nd).setWeavingFactorMatrix(weavingFactorMatrix);
+		double[][] wfm = ((AbstractNodeHWC)myNE).getWeavingFactorMatrix();
+		boolean res = ((AbstractNodeHWC)myNE).setWeavingFactorMatrix(weavingFactorMatrix);
 		weavingFactorMatrix = wfm;
 		return res;
 	}

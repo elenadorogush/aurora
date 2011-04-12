@@ -20,6 +20,7 @@ import aurora.hwc.GoogleDirectionsCache;
 public abstract class AbstractContainer implements AuroraConfigurable, Serializable {
 	private static final long serialVersionUID = 5225922999390390092L;
 	
+	protected String name = "";
 	protected AbstractNodeComplex myNetwork = null;
 	protected EventManager myEventManager = null;
 	protected SimulationSettings mySettings = null;	
@@ -58,7 +59,7 @@ public abstract class AbstractContainer implements AuroraConfigurable, Serializa
 			out.print("</settings>\n");
 		}
 		if (myEventManager != null) {
-			out.print("\n<EventSet>\n");
+			out.print("\n<EventSet>");
 			myEventManager.xmlDump(out);
 			out.print("</EventSet>\n");
 		}
@@ -118,6 +119,13 @@ public abstract class AbstractContainer implements AuroraConfigurable, Serializa
 	 */
 	public final boolean isBatch() {
 		return isBatch;
+	}
+	
+	/**
+	 * Returns the scenario name. 
+	 */
+	public final String getName() {
+		return name;
 	}
 	
 	/**
@@ -230,6 +238,17 @@ public abstract class AbstractContainer implements AuroraConfigurable, Serializa
 	public synchronized void batchMode() {
 		isBatch = true;
 		return;
+	}
+	
+	/**
+	 * Sets the scenario name.
+	 * @param buf new name.
+	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise. 
+	 */
+	public synchronized boolean setName(String buf) {
+		if (buf != null)
+			name = buf;
+		return true;
 	}
 	
 	/**

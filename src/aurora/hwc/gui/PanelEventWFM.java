@@ -35,7 +35,7 @@ public final class PanelEventWFM extends AbstractEventPanel {
 	 */
 	public synchronized void initialize(AbstractNetworkElement ne, EventManager em, EventTableModel etm) {
 		eventTable = etm;
-		myEvent = new EventWFM();
+		myEvent = new EventWFM(ne.getId());
 		AbstractNodeHWC nd = (AbstractNodeHWC)ne;
 		nIn = nd.getInputs().size();
 		nOut = nd.getOutputs().size();
@@ -55,7 +55,7 @@ public final class PanelEventWFM extends AbstractEventPanel {
 		if (evt != null)
 			myEvent = evt;
 		else
-			myEvent = new EventWFM();
+			myEvent = new EventWFM(ne.getId());
 		AbstractNodeHWC nd = (AbstractNodeHWC)ne;
 		nIn = nd.getInputs().size();
 		nOut = nd.getOutputs().size();

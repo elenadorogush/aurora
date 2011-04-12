@@ -22,10 +22,9 @@ public final class EventControllerComplex extends AbstractEvent {
 	protected AbstractControllerComplex controller = null;
 	
 	
-	public EventControllerComplex() { description = "Complex Controller change at Monitor"; }
 	public EventControllerComplex(int neid) {
-		this();
-		this.neid = neid;
+		super(neid);
+		description = "Complex Controller change at Monitor";
 	}
 	public EventControllerComplex(int neid, AbstractControllerComplex ctrl) {
 		this(neid);
@@ -89,9 +88,7 @@ public final class EventControllerComplex extends AbstractEvent {
 		super.activate(top);
 		if (!enabled)
 			return enabled;
-		AbstractMonitorController mon = (AbstractMonitorController)top.getMonitorById(neid);
-		if (mon == null)
-			throw new ExceptionEvent("Monitor (" + Integer.toString(neid) + ") not found.");
+		AbstractMonitorController mon = (AbstractMonitorController)myNE;
 		System.out.println("Event! Time " + Util.time2string(tstamp) + ": " + description);
 		AbstractControllerComplex ctrl = mon.getMyController();
 		boolean res = mon.setMyController(controller);
@@ -109,9 +106,7 @@ public final class EventControllerComplex extends AbstractEvent {
 			return false;
 		if (!enabled)
 			return enabled;
-		AbstractMonitorController mon = (AbstractMonitorController)top.getMonitorById(neid);
-		if (mon == null)
-			throw new ExceptionEvent("Monitor (" + Integer.toString(neid) + ") not found.");
+		AbstractMonitorController mon = (AbstractMonitorController)myNE;
 		System.out.println("Event rollback! Time " + Util.time2string(tstamp) + ": " + description);
 		AbstractControllerComplex ctrl = mon.getMyController();
 		boolean res = mon.setMyController(controller);

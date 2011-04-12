@@ -33,7 +33,7 @@ public final class PanelEventSRM extends AbstractEventPanel {
 	 */
 	public synchronized void initialize(AbstractNetworkElement ne, EventManager em, EventTableModel etm) {
 		eventTable = etm;
-		myEvent = new EventSRM();
+		myEvent = new EventSRM(ne.getId());
 		AbstractNodeHWC nd = (AbstractNodeHWC)ne;
 		nIn = nd.getInputs().size();
 		nOut = nd.getOutputs().size();
@@ -53,7 +53,7 @@ public final class PanelEventSRM extends AbstractEventPanel {
 		if (evt != null)
 			myEvent = evt;
 		else
-			myEvent = new EventSRM();
+			myEvent = new EventSRM(ne.getId());
 		AbstractNodeHWC nd = (AbstractNodeHWC)ne;
 		nIn = nd.getInputs().size();
 		nOut = nd.getOutputs().size();

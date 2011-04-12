@@ -107,7 +107,7 @@ public abstract class AbstractEventPanel extends JPanel {
 	 * Saves event into the list.
 	 */
 	public synchronized void save() {
-		myEvent.setNEID(myNE.getId());
+		myEvent.setNE(myNE);
 		myEvent.setEnabled(true);
 		myEvent.setDescription(desc.getText());
 		int h = (Integer)hh.getValue();

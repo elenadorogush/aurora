@@ -21,10 +21,9 @@ public final class EventQueueMax extends AbstractEvent {
 	protected double qMax = 100.0;
 	
 	
-	public EventQueueMax() { description = "Queue Limit change at Link"; }
 	public EventQueueMax(int neid) {
-		this();
-		this.neid = neid;
+		super(neid);
+		description = "Queue Limit change at Link";
 	}
 	public EventQueueMax(int neid, double qmax) {
 		this(neid);
@@ -90,12 +89,9 @@ public final class EventQueueMax extends AbstractEvent {
 		super.activate(top);
 		if (!enabled)
 			return enabled;
-		AbstractLink alnk = top.getLinkById(neid);
-		if (alnk == null)
-			throw new ExceptionEvent("Link (" + Integer.toString(neid) + ") not found.");
 		System.out.println("Event! Time " + Util.time2string(tstamp) + ": " + description);
-		double v = ((AbstractLinkHWC)alnk).getQueueMax();
-		boolean res = ((AbstractLinkHWC)alnk).setQueueMax(qMax);
+		double v = ((AbstractLinkHWC)myNE).getQueueMax();
+		boolean res = ((AbstractLinkHWC)myNE).setQueueMax(qMax);
 		qMax = v;
 		return res;
 	}
@@ -110,12 +106,9 @@ public final class EventQueueMax extends AbstractEvent {
 			return false;
 		if (!enabled)
 			return enabled;
-		AbstractLink alnk = top.getLinkById(neid);
-		if (alnk == null)
-			throw new ExceptionEvent("Link (" + Integer.toString(neid) + ") not found.");
 		System.out.println("Event rollback! Time " + Util.time2string(tstamp) + ": " + description);
-		double v = ((AbstractLinkHWC)alnk).getQueueMax();
-		boolean res = ((AbstractLinkHWC)alnk).setQueueMax(qMax);
+		double v = ((AbstractLinkHWC)myNE).getQueueMax();
+		boolean res = ((AbstractLinkHWC)myNE).setQueueMax(qMax);
 		qMax = v;
 		return res;
 	}

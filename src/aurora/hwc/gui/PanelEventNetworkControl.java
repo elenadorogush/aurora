@@ -32,7 +32,7 @@ public final class PanelEventNetworkControl extends AbstractEventPanel implement
 	 */
 	public synchronized void initialize(AbstractNetworkElement ne, EventManager em, EventTableModel etm) {
 		eventTable = etm;
-		myEvent = new EventNetworkControl();
+		myEvent = new EventNetworkControl(ne.getId());
 		((EventNetworkControl)myEvent).setControl(((NodeHWCNetwork)ne).isControlled());
 		((EventNetworkControl)myEvent).setQControl(((NodeHWCNetwork)ne).hasQControl());
 		initialize(ne, em);
@@ -51,7 +51,7 @@ public final class PanelEventNetworkControl extends AbstractEventPanel implement
 		if (evt != null)
 			myEvent = evt;
 		else
-			myEvent = new EventNetworkControl();
+			myEvent = new EventNetworkControl(ne.getId());
 		initialize(ne, em);
 		return;
 	}

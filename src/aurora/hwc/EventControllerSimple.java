@@ -21,24 +21,11 @@ public final class EventControllerSimple extends AbstractEvent {
 	private static final long serialVersionUID = -4895477288111895032L;
 	
 	protected AbstractControllerSimple controller = null;
-	protected int linkId = -1;
 	
 	
-	public EventControllerSimple() { description = "Local Controller change at Node"; }
 	public EventControllerSimple(int neid) {
-		this();
-		this.neid = neid;
-	}
-	public EventControllerSimple(int neid, AbstractControllerSimple ctrl,  int lkid) {
-		this(neid);
-		linkId = lkid;
-		if (ctrl != null)
-			controller = ctrl;
-	}
-	public EventControllerSimple(int neid, AbstractControllerSimple ctrl,  int lkid, double tstamp) {
-		this(neid, ctrl, lkid);
-		if (tstamp >= 0.0)
-			this.tstamp = tstamp;
+		super(neid);
+		description = "Simple Controller change";
 	}
 	
 	
@@ -56,8 +43,6 @@ public final class EventControllerSimple extends AbstractEvent {
 			if (p.hasChildNodes()) {
 				NodeList pp = p.getChildNodes();
 				for (int i = 0; i < pp.getLength(); i++) {
-					if (pp.item(i).getNodeName().equals("lkid"))
-						linkId = Integer.parseInt(pp.item(i).getTextContent());
 					if (pp.item(i).getNodeName().equals("controller")) {
 						Node type_attr = pp.item(i).getAttributes().getNamedItem("type");
 						String class_name = null;
@@ -67,6 +52,7 @@ public final class EventControllerSimple extends AbstractEvent {
 							class_name = pp.item(i).getAttributes().getNamedItem("class").getNodeValue();
 						Class c = Class.forName(class_name);
 						controller = (AbstractControllerSimple)c.newInstance();
+						controller.setMyLink((AbstractLink)myNE);
 						res &= controller.initFromDOM(pp.item(i));
 					}
 				}
@@ -89,7 +75,7 @@ public final class EventControllerSimple extends AbstractEvent {
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
 		super.xmlDump(out);
-		out.print("<lkid>" + Integer.toString(linkId) + "</lkid>");
+		//out.print("<lkid>" + Integer.toString(linkId) + "</lkid>");
 		if (controller != null)
 			controller.xmlDump(out);
 		out.print("</event>");
@@ -107,17 +93,12 @@ public final class EventControllerSimple extends AbstractEvent {
 		super.activate(top);
 		if (!enabled)
 			return enabled;
-		AbstractNode nd = top.getNodeById(neid);
+		AbstractNode nd = ((AbstractLink)myNE).getEndNode();
 		if (nd == null)
-			throw new ExceptionEvent("Node (" + Integer.toString(neid) + ") not found.");
-		if (!nd.isSimple())
-			throw new ExceptionEvent(nd, "Wrong type.");
-		AbstractLink lk = top.getLinkById(linkId);
-		if (lk == null)
-			throw new ExceptionEvent("Link (" + Integer.toString(linkId) + ") not found.");
+			throw new ExceptionEvent("Link (" + Integer.toString(myNE.getId()) + ") has no end node.");
 		System.out.println("Event! Time " + Util.time2string(tstamp) + ": " + description);
-		AbstractControllerSimple ctrl = ((AbstractNodeSimple)nd).getSimpleController(lk);
-		boolean res = ((AbstractNodeSimple)nd).setSimpleController(controller, lk);
+		AbstractControllerSimple ctrl = ((AbstractNodeSimple)nd).getSimpleController((AbstractLink)myNE);
+		boolean res = ((AbstractNodeSimple)nd).setSimpleController(controller, (AbstractLink)myNE);
 		if (controller != null) {
 			try {
 				controller.initialize();
@@ -138,17 +119,12 @@ public final class EventControllerSimple extends AbstractEvent {
 			return false;
 		if (!enabled)
 			return enabled;
-		AbstractNode nd = top.getNodeById(neid);
+		AbstractNode nd = ((AbstractLink)myNE).getEndNode();
 		if (nd == null)
-			throw new ExceptionEvent("Node (" + Integer.toString(neid) + ") not found.");
-		if (!nd.isSimple())
-			throw new ExceptionEvent(nd, "Wrong type.");
-		AbstractLink lk = top.getLinkById(linkId);
-		if (lk == null)
-			throw new ExceptionEvent("Link (" + Integer.toString(linkId) + ") not found.");
+			throw new ExceptionEvent("Link (" + Integer.toString(myNE.getId()) + ") has no end node.");
 		System.out.println("Event rollback! Time " + Util.time2string(tstamp) + ": " + description);
-		AbstractControllerSimple ctrl = ((AbstractNodeSimple)nd).getSimpleController(lk);
-		boolean res = ((AbstractNodeSimple)nd).setSimpleController(controller, lk);
+		AbstractControllerSimple ctrl = ((AbstractNodeSimple)nd).getSimpleController((AbstractLink)myNE);
+		boolean res = ((AbstractNodeSimple)nd).setSimpleController(controller, (AbstractLink)myNE);
 		controller = ctrl;
 		return res;
 	}
@@ -175,13 +151,6 @@ public final class EventControllerSimple extends AbstractEvent {
 	}
 	
 	/**
-	 * Returns Link identifier.
-	 */
-	public final int getLinkId() {
-		return linkId;
-	}
-	
-	/**
 	 * Sets controller.<br>
 	 * @param x simple controller object.
 	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
@@ -191,16 +160,4 @@ public final class EventControllerSimple extends AbstractEvent {
 		return true;
 	}
 	
-	/**
-	 * Sets Link identifier.<br>
-	 * @param x Link Id.
-	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
-	 */
-	public synchronized boolean setLinkId(int x) {
-		if (x < 1)
-			return false;
-		linkId = x;
-		return true;
-	}
-
 }

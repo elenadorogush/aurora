@@ -58,7 +58,7 @@ public final class PanelEventFD extends AbstractEventPanel implements ChangeList
 	 */
 	public synchronized void initialize(AbstractNetworkElement ne, EventManager em, EventTableModel etm) {
 		eventTable = etm;
-		myEvent = new EventFD();
+		myEvent = new EventFD(ne.getId());
 		mf = ((AbstractLinkHWC)ne).getMaxFlow();
 		drp = Math.max(0, Math.min(mf, ((AbstractLinkHWC)ne).getCapacityDrop()));
 		cd = ((AbstractLinkHWC)ne).getCriticalDensity();
@@ -78,7 +78,7 @@ public final class PanelEventFD extends AbstractEventPanel implements ChangeList
 		if (evt != null)
 			myEvent = evt;
 		else
-			myEvent = new EventFD();
+			myEvent = new EventFD(ne.getId());
 		mf = ((EventFD)myEvent).getMaxFlow();
 		drp = ((EventFD)myEvent).getCapacityDrop();
 		cd = ((EventFD)myEvent).getCriticalDensity();

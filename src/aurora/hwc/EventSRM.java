@@ -22,10 +22,9 @@ public final class EventSRM extends AbstractEvent {
 	protected AuroraIntervalVector[][] splitRatioMatrix = null;
 	
 	
-	public EventSRM() { description = "Split Ratio Matrix change at Node"; }
 	public EventSRM(int neid) {
-		this();
-		this.neid = neid;
+		super(neid);
+		description = "Split Ratio Matrix change at Node";
 	}
 	public EventSRM(int neid, AuroraIntervalVector[][] srm) {
 		this(neid);
@@ -143,13 +142,8 @@ public final class EventSRM extends AbstractEvent {
 		super.activate(top);
 		if (!enabled)
 			return enabled;
-		AbstractNode nd = top.getNodeById(neid);
-		if (nd == null)
-			throw new ExceptionEvent("Node (" + Integer.toString(neid) + ") not found.");
-		if (!nd.isSimple())
-			throw new ExceptionEvent(nd, "Wrong type.");
 		System.out.println("Event! Time " + Util.time2string(tstamp) + ": " + description);
-		AuroraIntervalVector[][] srm = ((AbstractNodeHWC)nd).getSplitRatioMatrix0();
+		AuroraIntervalVector[][] srm = ((AbstractNodeHWC)myNE).getSplitRatioMatrix0();
 		boolean isNull = true;
 		if (splitRatioMatrix != null) {
 			int nIn = splitRatioMatrix.length;
@@ -162,9 +156,9 @@ public final class EventSRM extends AbstractEvent {
 		}
 		boolean res;
 		if (isNull)
-			res = ((AbstractNodeHWC)nd).setSplitRatioMatrix0(null);
+			res = ((AbstractNodeHWC)myNE).setSplitRatioMatrix0(null);
 		else
-			res = ((AbstractNodeHWC)nd).setSplitRatioMatrix0(splitRatioMatrix);
+			res = ((AbstractNodeHWC)myNE).setSplitRatioMatrix0(splitRatioMatrix);
 		splitRatioMatrix = srm;
 		return res;
 	}
@@ -179,14 +173,9 @@ public final class EventSRM extends AbstractEvent {
 			return false;
 		if (!enabled)
 			return enabled;
-		AbstractNode nd = top.getNodeById(neid);
-		if (nd == null)
-			throw new ExceptionEvent("Node (" + Integer.toString(neid) + ") not found.");
-		if (!nd.isSimple())
-			throw new ExceptionEvent(nd, "Wrong type.");
 		System.out.println("Event rollback! Time " + Util.time2string(tstamp) + ": " + description);
-		AuroraIntervalVector[][] srm = ((AbstractNodeHWC)nd).getSplitRatioMatrix0();
-		boolean res = ((AbstractNodeHWC)nd).setSplitRatioMatrix0(splitRatioMatrix);
+		AuroraIntervalVector[][] srm = ((AbstractNodeHWC)myNE).getSplitRatioMatrix0();
+		boolean res = ((AbstractNodeHWC)myNE).setSplitRatioMatrix0(splitRatioMatrix);
 		splitRatioMatrix = srm;
 		return res;
 	}

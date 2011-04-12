@@ -44,7 +44,7 @@ public final class mySerializableTest {
 		emgr.addEvent(new EventFD(7, 2200, 40, 160, 5400));
 		//double[][] srm = {{0.1, 0.9}};
 		//emgr.addEvent(new EventSRM(14, srm, 4324));
-		emgr.addEvent(new EventControllerSimple(21, ctrl, 20, 1004));
+		//emgr.addEvent(new EventControllerSimple(21, ctrl, 20, 1004));
 		
 		System.out.println("Creating container...");
 		ContainerHWC ctnr = new ContainerHWC(myNetwork, emgr);

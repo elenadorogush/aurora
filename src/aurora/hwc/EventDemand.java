@@ -22,10 +22,10 @@ public final class EventDemand extends AbstractEvent {
 	protected double[] knobs = new double[1];
 	
 	
-	public EventDemand() { knobs[0] = 1; description = "Demand change at Link"; }
 	public EventDemand(int neid) {
-		this();
-		this.neid = neid;
+		super(neid);
+		knobs[0] = 1;
+		description = "Demand change at Link";
 	}
 	public EventDemand(int neid, double[] knobs) {
 		this(neid);
@@ -95,12 +95,9 @@ public final class EventDemand extends AbstractEvent {
 		super.activate(top);
 		if (!enabled)
 			return enabled;
-		AbstractLink alnk = top.getLinkById(neid);
-		if (alnk == null)
-			throw new ExceptionEvent("Link (" + Integer.toString(neid) + ") not found.");
 		System.out.println("Event! Time " + Util.time2string(tstamp) + ": " + description);
-		double[] v = ((AbstractLinkHWC)alnk).getDemandKnobs();
-		boolean res = ((AbstractLinkHWC)alnk).setDemandKnobs(knobs);
+		double[] v = ((AbstractLinkHWC)myNE).getDemandKnobs();
+		boolean res = ((AbstractLinkHWC)myNE).setDemandKnobs(knobs);
 		setDemandKnobs(v);
 		return res;
 	}
@@ -115,12 +112,9 @@ public final class EventDemand extends AbstractEvent {
 			return false;
 		if (!enabled)
 			return enabled;
-		AbstractLink alnk = top.getLinkById(neid);
-		if (alnk == null)
-			throw new ExceptionEvent("Link (" + Integer.toString(neid) + ") not found.");
 		System.out.println("Event rollback! Time " + Util.time2string(tstamp) + ": " + description);
-		double[] v = ((AbstractLinkHWC)alnk).getDemandKnobs();
-		boolean res = ((AbstractLinkHWC)alnk).setDemandKnobs(knobs);
+		double[] v = ((AbstractLinkHWC)myNE).getDemandKnobs();
+		boolean res = ((AbstractLinkHWC)myNE).setDemandKnobs(knobs);
 		setDemandKnobs(v);
 		return res;
 	}

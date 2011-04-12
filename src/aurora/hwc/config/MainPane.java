@@ -161,6 +161,7 @@ public final class MainPane extends JFrame implements ActionListener, ItemListen
 				if (mySystem == null)
 					mySystem = new ContainerHWC();
 				mySystem.applicationConfiguration();
+				mySystem.setName(fc.getSelectedFile().getName());
 				try {
 					Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configURI);
 					mySystem.initFromDOM(doc.getChildNodes().item(0));

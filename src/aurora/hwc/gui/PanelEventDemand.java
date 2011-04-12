@@ -30,7 +30,7 @@ public final class PanelEventDemand extends AbstractEventPanel {
 	 */
 	public synchronized void initialize(AbstractNetworkElement ne, EventManager em, EventTableModel etm) {
 		eventTable = etm;
-		myEvent = new EventDemand();
+		myEvent = new EventDemand(ne.getId());
 		((EventDemand)myEvent).setDemandKnobs(((AbstractLinkHWC)ne).getDemandKnobs());
 		initialize(ne, em);
 		return;
@@ -48,7 +48,7 @@ public final class PanelEventDemand extends AbstractEventPanel {
 		if (evt != null)
 			myEvent = evt;
 		else
-			myEvent = new EventDemand();
+			myEvent = new EventDemand(ne.getId());
 		initialize(ne, em);
 		return;
 	}

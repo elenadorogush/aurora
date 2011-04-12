@@ -22,7 +22,7 @@ import aurora.util.*;
 public final class PanelEventControllerSimple extends AbstractEventPanel implements ActionListener {
 	private static final long serialVersionUID = 2103920304528351836L;
 	
-	private int linkId = -1;
+	//private int linkId = -1;
 	private AbstractControllerSimpleHWC controller = null;
 	
 	private JComboBox listInLinks;
@@ -38,8 +38,8 @@ public final class PanelEventControllerSimple extends AbstractEventPanel impleme
 	 */
 	public synchronized void initialize(AbstractNetworkElement ne, EventManager em, EventTableModel etm) {
 		eventTable = etm;
-		myEvent = new EventControllerSimple();
-		initialize(ne, em);
+		myEvent = new EventControllerSimple(ne.getPredecessors().firstElement().getId());
+		initialize(ne.getPredecessors().firstElement(), em);
 		controller = (AbstractControllerSimpleHWC)((AbstractNodeSimple)ne).getSimpleControllers().firstElement();
 		return;
 	}
@@ -56,10 +56,9 @@ public final class PanelEventControllerSimple extends AbstractEventPanel impleme
 		if (evt != null)
 			myEvent = evt;
 		else
-			myEvent = new EventControllerSimple();
+			myEvent = new EventControllerSimple(((EventControllerSimple)myEvent).getNE().getId());
 		controller = (AbstractControllerSimpleHWC)((EventControllerSimple)myEvent).getController();
-		linkId = ((EventControllerSimple)myEvent).getLinkId();
-		initialize(ne, em);
+		initialize(((EventControllerSimple)myEvent).getNE(), em);
 		return;
 	}
 
@@ -71,10 +70,11 @@ public final class PanelEventControllerSimple extends AbstractEventPanel impleme
 		JPanel pLL = new JPanel(new SpringLayout());
 		pLL.setBorder(BorderFactory.createTitledBorder("Input Links"));
 		listInLinks = new JComboBox();
-		Vector<AbstractNetworkElement> links = myNE.getPredecessors();
+		AbstractNodeSimple myNode = (AbstractNodeSimple)((AbstractLink)myNE).getEndNode();
+		Vector<AbstractNetworkElement> links = myNode.getPredecessors();
 		for (int i = 0; i < links.size(); i++) {
 			listInLinks.addItem(links.get(i));
-			if (links.get(i).getId() == linkId)
+			if (links.get(i).getId() == myEvent.getNE().getId())
 				listInLinks.setSelectedIndex(i);
 		}
 		pLL.add(listInLinks);
@@ -87,7 +87,7 @@ public final class PanelEventControllerSimple extends AbstractEventPanel impleme
 		buttonProp.setEnabled(false);
 		listControllers = new JComboBox();
 		listControllers.addItem("None");
-		String[] ctrlClasses = ((AbstractNodeHWC)myNE).getSimpleControllerClasses();
+		String[] ctrlClasses = ((AbstractNodeHWC)myNode).getSimpleControllerClasses();
 		for (int i = 0; i < ctrlClasses.length; i++)
 			if ((controller != null) && (controller.getClass().getName().compareTo(ctrlClasses[i]) == 0)) {
 				listControllers.addItem(controller);
@@ -120,9 +120,8 @@ public final class PanelEventControllerSimple extends AbstractEventPanel impleme
 	 * Saves event.
 	 */
 	public synchronized void save() {
-		int lkid = ((AbstractNetworkElement)listInLinks.getSelectedItem()).getId();
 		((EventControllerSimple)myEvent).setController(controller);
-		((EventControllerSimple)myEvent).setLinkId(lkid);
+		((EventControllerSimple)myEvent).setNE((AbstractNetworkElement)listInLinks.getSelectedItem());
 		super.save();
 		return;
 	}
@@ -154,7 +153,7 @@ public final class PanelEventControllerSimple extends AbstractEventPanel impleme
 			try {
 	    		Class c = Class.forName("aurora.hwc.control.Panel" + controller.getClass().getSimpleName());
 	    		AbstractPanelSimpleController cp = (AbstractPanelSimpleController)c.newInstance();
-	    		cp.initialize((AbstractControllerSimpleHWC)controller, null, -1, (AbstractNodeHWC)myNE);
+	    		cp.initialize((AbstractControllerSimpleHWC)controller, null, -1, (AbstractNodeHWC)((AbstractLink)myNE).getEndNode());
 	    	}
 	    	catch(Exception e) { }
 	    	return;

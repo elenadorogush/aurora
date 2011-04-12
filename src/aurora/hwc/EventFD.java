@@ -27,10 +27,9 @@ public final class EventFD extends AbstractEvent {
 	protected double fraction = -1;
 
 	
-	public EventFD() { description = "Fundamental Diagram change at Link"; }
 	public EventFD(int neid) {
-		this();
-		this.neid = neid;
+		super(neid);
+		description = "Fundamental Diagram change at Link";
 	}
 	public EventFD(int neid, double fmax, double rhoc, double rhoj, double cdrp) {
 		this(neid);
@@ -125,25 +124,22 @@ public final class EventFD extends AbstractEvent {
 		super.activate(top);
 		if (!enabled)
 			return enabled;
-		AbstractLink alnk = top.getLinkById(neid);
-		if (alnk == null)
-			throw new ExceptionEvent("Link (" + Integer.toString(neid) + ") not found.");
 		System.out.println("Event! Time " + Util.time2string(tstamp) + ": " + description);
-		double dc = ((AbstractLinkHWC)alnk).getCriticalDensity();
-		double dj = ((AbstractLinkHWC)alnk).getJamDensity();
-		double fm = ((AbstractLinkHWC)alnk).getMaxFlow();
-		double sz = ((AbstractLinkHWC)alnk).getMaxFlowRange().getSize();
-		double cd = ((AbstractLinkHWC)alnk).getCapacityDrop();
+		double dc = ((AbstractLinkHWC)myNE).getCriticalDensity();
+		double dj = ((AbstractLinkHWC)myNE).getJamDensity();
+		double fm = ((AbstractLinkHWC)myNE).getMaxFlow();
+		double sz = ((AbstractLinkHWC)myNE).getMaxFlowRange().getSize();
+		double cd = ((AbstractLinkHWC)myNE).getCapacityDrop();
 		boolean res = true;
 		if (fraction > 0) {
-			res &= ((AbstractLinkHWC)alnk).setFD(fraction * fm, fraction * dc, fraction * dj, fraction * cd);
-			res &= ((AbstractLinkHWC)alnk).setMaxFlowRange(fraction*sz/(2*fraction*fm));
+			res &= ((AbstractLinkHWC)myNE).setFD(fraction * fm, fraction * dc, fraction * dj, fraction * cd);
+			res &= ((AbstractLinkHWC)myNE).setMaxFlowRange(fraction*sz/(2*fraction*fm));
 		}
 		else {
-			res &= ((AbstractLinkHWC)alnk).setFD(flowMax, densityCritical, densityJam, capacityDrop);
-			res &= ((AbstractLinkHWC)alnk).setMaxFlowRange(sz/(2*flowMax));
+			res &= ((AbstractLinkHWC)myNE).setFD(flowMax, densityCritical, densityJam, capacityDrop);
+			res &= ((AbstractLinkHWC)myNE).setMaxFlowRange(sz/(2*flowMax));
 		}
-		res &= ((AbstractLinkHWC)alnk).randomizeFD();
+		res &= ((AbstractLinkHWC)myNE).randomizeFD();
 		densityCritical = dc;
 		densityJam = dj;
 		flowMax = fm;
@@ -162,18 +158,15 @@ public final class EventFD extends AbstractEvent {
 			return false;
 		if (!enabled)
 			return enabled;
-		AbstractLink alnk = top.getLinkById(neid);
-		if (alnk == null)
-			throw new ExceptionEvent("Link (" + Integer.toString(neid) + ") not found.");
 		System.out.println("Event rollback! Time " + Util.time2string(tstamp) + ": " + description);
-		double dc = ((AbstractLinkHWC)alnk).getCriticalDensity();
-		double dj = ((AbstractLinkHWC)alnk).getJamDensity();
-		double fm = ((AbstractLinkHWC)alnk).getMaxFlow();
-		double sz = ((AbstractLinkHWC)alnk).getMaxFlowRange().getSize();
-		double cd = ((AbstractLinkHWC)alnk).getCapacityDrop();
-		boolean res = ((AbstractLinkHWC)alnk).setFD(flowMax, densityCritical, densityJam, capacityDrop);
-		res &= ((AbstractLinkHWC)alnk).setMaxFlowRange(sz/(2*flowMax));
-		res &= ((AbstractLinkHWC)alnk).randomizeFD();
+		double dc = ((AbstractLinkHWC)myNE).getCriticalDensity();
+		double dj = ((AbstractLinkHWC)myNE).getJamDensity();
+		double fm = ((AbstractLinkHWC)myNE).getMaxFlow();
+		double sz = ((AbstractLinkHWC)myNE).getMaxFlowRange().getSize();
+		double cd = ((AbstractLinkHWC)myNE).getCapacityDrop();
+		boolean res = ((AbstractLinkHWC)myNE).setFD(flowMax, densityCritical, densityJam, capacityDrop);
+		res &= ((AbstractLinkHWC)myNE).setMaxFlowRange(sz/(2*flowMax));
+		res &= ((AbstractLinkHWC)myNE).randomizeFD();
 		densityCritical = dc;
 		densityJam = dj;
 		flowMax = fm;

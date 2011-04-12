@@ -29,7 +29,7 @@ public final class PanelEventQueueMax extends AbstractEventPanel {
 	 */
 	public void initialize(AbstractNetworkElement ne, EventManager em, EventTableModel etm) {
 		eventTable = etm;
-		myEvent = new EventQueueMax();
+		myEvent = new EventQueueMax(ne.getId());
 		((EventQueueMax)myEvent).setQueueMax((Double)((AbstractLinkHWC)ne).getQueueMax());
 		initialize(ne, em);
 		return;
@@ -47,7 +47,7 @@ public final class PanelEventQueueMax extends AbstractEventPanel {
 		if (evt != null)
 			myEvent = evt;
 		else
-			myEvent = new EventQueueMax();
+			myEvent = new EventQueueMax(ne.getId());
 		initialize(ne, em);
 		return;
 	}

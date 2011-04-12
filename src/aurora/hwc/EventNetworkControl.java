@@ -22,10 +22,9 @@ public final class EventNetworkControl extends AbstractEvent {
 	protected boolean qControl = false;
 	
 	
-	public EventNetworkControl() { description = "Control state change"; }
 	public EventNetworkControl(int neid) {
-		this();
-		this.neid = neid;
+		super(neid);
+		description = "Control state change";
 	}
 	public EventNetworkControl(int neid, boolean cv) {
 		this(neid);
@@ -97,9 +96,7 @@ public final class EventNetworkControl extends AbstractEvent {
 		if (!enabled)
 			return enabled;
 		NodeHWCNetwork ntwk;
-		ntwk = (NodeHWCNetwork)top.getNetworkById(neid);
-		if (ntwk == null)
-			throw new ExceptionEvent("Network (" + neid + ") not found.");
+		ntwk = (NodeHWCNetwork)myNE;
 		System.out.println("Event! Time " + Util.time2string(tstamp) + ": " + description);
 		boolean cv = ntwk.isControlled();
 		boolean qcv = ntwk.hasQControl();
@@ -119,13 +116,7 @@ public final class EventNetworkControl extends AbstractEvent {
 			return false;
 		if (!enabled)
 			return enabled;
-		NodeHWCNetwork ntwk;
-		if (top.getId() == neid)
-			ntwk = (NodeHWCNetwork)top;
-		else
-			ntwk = (NodeHWCNetwork)top.getNetworkById(neid);
-		if (ntwk == null)
-			throw new ExceptionEvent("Network (" + neid + ") not found.");
+		NodeHWCNetwork ntwk = (NodeHWCNetwork)myNE;
 		System.out.println("Event rollback! Time " + Util.time2string(tstamp) + ": " + description);
 		boolean cv = ntwk.isControlled();
 		boolean qcv = ntwk.hasQControl();

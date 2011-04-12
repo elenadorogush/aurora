@@ -122,7 +122,7 @@ public final class EventTableModel extends AbstractTableModel {
     		if (ne != null)
     			data[i][2] = ne;
     		else
-    			data[i][2] = (Integer)evt.getNEID();
+    			data[i][2] = (Integer)evt.getNE().getId();
     		data[i][3] = evt.getDescription();
     		data[i][4] = new Boolean(evt.isEnabled());
     	}
@@ -138,7 +138,7 @@ public final class EventTableModel extends AbstractTableModel {
     	AbstractEvent evt = myEventManager.getEvent(idx);
     	if (evt == null)
     		return;
-    	int neid = evt.getNEID();
+    	int neid = evt.getNE().getId();
     	AbstractNetworkElement ne;
     	ne = ntwk.getMonitorById(neid);
     	if (ne == null)
