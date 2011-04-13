@@ -31,7 +31,7 @@ public class SimulationSettings implements AuroraConfigurable, Serializable {
 	protected double displayTP = 1.0/12.0;
 	protected double timeMax = 24;
 	protected double timeInitial = 0;
-	protected int tsMax = 100000;
+	protected int tsMax = 1000000000;
 	protected int tsInitial = 0;
 	protected int timeout = 1000;
 	protected boolean isPred = false;
@@ -52,24 +52,32 @@ public class SimulationSettings implements AuroraConfigurable, Serializable {
 				NodeList pp = p.getChildNodes();
 				for (int i = 0; i < pp.getLength(); i++) {
 					if (pp.item(i).getNodeName().equals("display")) {
-						Node att = pp.item(i).getAttributes().getNamedItem("tp");
+						Node att = pp.item(i).getAttributes().getNamedItem("dt");
+						if (att == null)
+							att = pp.item(i).getAttributes().getNamedItem("tp");
 						if (att != null)
 							displayTP = Math.max(0, Double.parseDouble(att.getNodeValue()));
+						if (displayTP >= 1)
+							displayTP = displayTP / 3600;
 						att = pp.item(i).getAttributes().getNamedItem("timeout");
 						if (att != null)
 							timeout = Math.max(0, Integer.parseInt(att.getNodeValue()));
-						att = pp.item(i).getAttributes().getNamedItem("tsMax");
+						/*att = pp.item(i).getAttributes().getNamedItem("tsMax");
 						if (att != null)
-							tsMax = Math.max(0, Integer.parseInt(att.getNodeValue()));
+							tsMax = Math.max(0, Integer.parseInt(att.getNodeValue()));*/
 						att = pp.item(i).getAttributes().getNamedItem("timeMax");
 						if (att != null)
 							timeMax = Math.max(0, Double.parseDouble(att.getNodeValue()));
-						att = pp.item(i).getAttributes().getNamedItem("tsInitial");
+						if (timeMax > 24)
+							timeMax = timeMax / 3600;
+						/*att = pp.item(i).getAttributes().getNamedItem("tsInitial");
 						if (att != null)
-							tsInitial = Math.max(0, Integer.parseInt(att.getNodeValue()));
+							tsInitial = Math.max(0, Integer.parseInt(att.getNodeValue()));*/
 						att = pp.item(i).getAttributes().getNamedItem("timeInitial");
 						if (att != null)
 							timeInitial = Math.max(0, Double.parseDouble(att.getNodeValue()));
+						if (timeInitial > 24)
+							timeInitial = timeInitial / 3600;
 						att = pp.item(i).getAttributes().getNamedItem("mode");
 						if (att != null)
 							isPred = att.getNodeValue().toUpperCase().equals("P");
@@ -102,7 +110,7 @@ public class SimulationSettings implements AuroraConfigurable, Serializable {
 		String modeBuf = "";
 		if (isPred)
 			modeBuf = " mode=\"P\"";
-		out.print("<display tp=\"" + Double.toString(displayTP) + "\" timeout=\"" + Integer.toString(timeout) + "\" tsMax=\"" + Integer.toString(tsMax) + "\" timeMax=\"" + Double.toString(timeMax) + "\" tsInitial=\"" + Integer.toString(tsInitial) + "\" timeInitial=\"" + Double.toString(timeInitial) + "\"" + modeBuf + " />\n");
+		out.print("<display dt=\"" + Math.round(3600*displayTP) + "\" timeout=\"" + Integer.toString(timeout) + "\" timeInitial=\"" + Math.round(3600*timeInitial) + "\" timeMax=\"" + Math.round(3600*timeMax) + "\"" + modeBuf + " />\n");
 		return;
 	}
 	

@@ -23,6 +23,9 @@ public final class EventControllerSimple extends AbstractEvent {
 	protected AbstractControllerSimple controller = null;
 	
 	
+	public EventControllerSimple() {
+		description = "Simple Controller change";
+	}
 	public EventControllerSimple(int neid) {
 		super(neid);
 		description = "Simple Controller change";

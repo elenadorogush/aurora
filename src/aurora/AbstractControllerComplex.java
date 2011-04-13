@@ -6,6 +6,8 @@ package aurora;
 
 import java.util.*;
 
+import org.w3c.dom.Node;
+
 /**
  * This class is a base for Sytem Wide Controllers.
  * @author Alex Kurzhanskiy, Gabriel Gomes
@@ -19,6 +21,20 @@ public abstract class AbstractControllerComplex extends AbstractController {
 	protected HashMap<AbstractController, Object> ctrl2input = new HashMap<AbstractController, Object>(); 
 	protected Vector<AbstractController> dependentControllers = new Vector<AbstractController>();
 	
+	
+	/**
+	 * Initializes controller from given DOM structure.
+	 * @param p DOM node.
+	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
+	 * @throws ExceptionConfiguration
+	 */
+	public boolean initFromDOM(Node p) throws ExceptionConfiguration {
+		boolean res = super.initFromDOM(p);
+		if (!res)
+			return res;
+		myNetwork.addController(this);
+		return res;
+	}
 	
 	/**
 	 * Updates the state of controller.

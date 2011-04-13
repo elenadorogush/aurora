@@ -76,10 +76,8 @@ public class EventManager implements Serializable {
 	public void xmlDump(PrintStream out) throws IOException {
 		if (out == null)
 			out = System.out;
-		for (int i = 0; i < eventList.size(); i++) {
+		for (int i = 0; i < eventList.size(); i++)
 			eventList.get(i).xmlDump(out);
-			out.print("\n");
-		}
 		return;
 	}
 	

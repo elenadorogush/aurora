@@ -4,6 +4,8 @@
 
 package aurora;
 
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Vector;
 
 
@@ -19,6 +21,14 @@ public abstract class AbstractLink extends AbstractNetworkElement {
 	protected double length;
 	protected PositionLink myPosition;
 	
+	
+	/**
+	 * Generates XML buffer for the terminal node if applicable.<br>
+	 * If the print stream is specified, then XML buffer is written to the stream.
+	 * @param out print stream.
+	 * @throws IOException
+	 */
+	public abstract void xmlDumpTerminalNode(PrintStream out) throws IOException;
 	
 	/**
 	 * Validates Link configuration.

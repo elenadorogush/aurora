@@ -22,6 +22,9 @@ public final class EventSRM extends AbstractEvent {
 	protected AuroraIntervalVector[][] splitRatioMatrix = null;
 	
 	
+	public EventSRM() {
+		description = "Split Ratio Matrix change at Node";
+	}
 	public EventSRM(int neid) {
 		super(neid);
 		description = "Split Ratio Matrix change at Node";

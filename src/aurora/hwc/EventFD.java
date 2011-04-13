@@ -27,6 +27,7 @@ public final class EventFD extends AbstractEvent {
 	protected double fraction = -1;
 
 	
+	public EventFD() { description = "Fundamental Diagram change at Link"; }
 	public EventFD(int neid) {
 		super(neid);
 		description = "Fundamental Diagram change at Link";

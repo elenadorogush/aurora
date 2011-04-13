@@ -22,6 +22,9 @@ public final class EventNetworkControl extends AbstractEvent {
 	protected boolean qControl = false;
 	
 	
+	public EventNetworkControl() {
+		description = "Control state change";
+	}
 	public EventNetworkControl(int neid) {
 		super(neid);
 		description = "Control state change";

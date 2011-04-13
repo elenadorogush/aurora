@@ -22,6 +22,9 @@ public final class EventControllerComplex extends AbstractEvent {
 	protected AbstractControllerComplex controller = null;
 	
 	
+	public EventControllerComplex() {
+		description = "Complex Controller change at Monitor";
+	}
 	public EventControllerComplex(int neid) {
 		super(neid);
 		description = "Complex Controller change at Monitor";

@@ -21,6 +21,9 @@ public final class EventQueueMax extends AbstractEvent {
 	protected double qMax = 100.0;
 	
 	
+	public EventQueueMax() {
+		description = "Queue Limit change at Link";
+	}
 	public EventQueueMax(int neid) {
 		super(neid);
 		description = "Queue Limit change at Link";

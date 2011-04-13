@@ -57,7 +57,10 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 								for (j = 0; j < pp2.getLength(); j++)
 									if (pp2.item(j).getNodeName().equals("input")) {
 										AbstractControllerSimple ctrl = null;
-										AbstractLink lk = myNetwork.getLinkById(Integer.parseInt(pp2.item(j).getAttributes().getNamedItem("id").getNodeValue()));
+										Node id_attr = pp2.item(j).getAttributes().getNamedItem("link_id");
+										if (id_attr == null)
+											id_attr = pp2.item(j).getAttributes().getNamedItem("id");
+										AbstractLink lk = myNetwork.getLinkById(Integer.parseInt(id_attr.getNodeValue()));
 										if (pp2.item(j).hasChildNodes()) {
 											NodeList pp3 = pp2.item(j).getChildNodes();
 											for (int k = 0; k < pp3.getLength(); k++) {
@@ -83,8 +86,9 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 											int ilidx = predecessors.indexOf(lk);
 											if (ilidx < 0)
 												addInLink(lk, ctrl);
-											else
+											else {
 												setSimpleController(ctrl, ilidx);
+											}
 											m++;
 										}
 									}
@@ -94,7 +98,10 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 								NodeList pp2 = pp.item(i).getChildNodes();
 								for (j = 0; j < pp2.getLength(); j++)
 									if (pp2.item(j).getNodeName().equals("output")) {
-										AbstractLink olk = myNetwork.getLinkById(Integer.parseInt(pp2.item(j).getAttributes().getNamedItem("id").getNodeValue()));
+										Node id_attr = pp2.item(j).getAttributes().getNamedItem("link_id");
+										if (id_attr == null)
+											id_attr = pp2.item(j).getAttributes().getNamedItem("id");
+										AbstractLink olk = myNetwork.getLinkById(Integer.parseInt(id_attr.getNodeValue()));
 										int olidx = successors.indexOf(olk);
 										if (olidx < 0)
 											addOutLink(olk);
@@ -199,8 +206,8 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 				for (int i = 0; i < pp.getLength(); i++) {
 					if (pp.item(i).getNodeName().equals("description")) {
 						description = pp.item(i).getTextContent();
-						if (description.equals("null"))
-							description = null;
+						if ((description == null) || (description.equals("null")))
+							description = "";
 					}
 					if (pp.item(i).getNodeName().equals("position")) {
 						position = new PositionNode();
@@ -302,7 +309,8 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 		if (controller != null)
 			controller.xmlDump(out);
 		for (int i = 0; i < controllers.size(); i++)
-			controllers.get(i).xmlDump(out);
+			if (controllers.get(i) != null)
+				controllers.get(i).xmlDump(out);
 		return;
 	}
 	
@@ -315,12 +323,12 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 	public void xmlDumpSplitRatioProfile(PrintStream out) throws IOException {
 		if (out == null)
 			out = System.out;
-		out.print("<splitratios node_id=\"" + id + "\" dt=\"" + Math.round(srTP) + "\">\n");
+		out.print("<splitratios node_id=\"" + id + "\" dt=\"" + Math.round(3600*srTP) + "\">\n");
 		if (srmProfile != null)
 			out.print(getSplitRatioProfileAsXML());
 		else
 			out.print(getSplitRatioMatrixAsXML());
-		out.print("\n</splitratios>\n");
+		out.print("</splitratios>\n");
 		return;
 	}
 	
@@ -333,12 +341,12 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 	public void xmlDump(PrintStream out) throws IOException {
 		if (out == null)
 			out = System.out;
-		out.print("<node type=\"" + getTypeLetterCode() + "\" id=\"" + id + "\" name=\"" + name + "\">");
-		out.print("<description>" + description + "</description>\n");
-		out.print("<outputs>");
+		out.print("<node type=\"" + getTypeLetterCode() + "\" id=\"" + id + "\" name=\"" + name + "\">\n");
+		out.print("  <description>" + description + "</description>\n");
+		out.print("  <outputs>\n");
 		for (int i = 0; i < successors.size(); i++)
-			out.print("<output link_id=\"" + successors.get(i).getId() + "\"/>");
-		out.print("</outputs>\n<inputs>");
+			out.print("    <output link_id=\"" + successors.get(i).getId() + "\"/>\n");
+		out.print("  </outputs>\n  <inputs>\n");
 		for (int i = 0; i < predecessors.size(); i++) {
 			//String buf = "";
 			String buf2 = "";
@@ -350,18 +358,18 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 				//buf += splitRatioMatrix[i][j].toString();
 				buf2 += Double.toString(weavingFactorMatrix[i][j]);
 			}
-			out.print("<input link_id=\"" + predecessors.get(i).getId() + "\">");
+			out.print("    <input link_id=\"" + predecessors.get(i).getId() + "\">\n");
 			//out.print("<splitratios>" + buf + "</splitratios>");
-			out.print("<weavingfactors>" + buf2 + "</weavingfactors>");
+			out.print("      <weavingfactors>" + buf2 + "</weavingfactors>\n");
 			//if (controllers.get(i) != null)
 				//controllers.get(i).xmlDump(out);
-			out.print("</input>");
+			out.print("    </input>\n");
 		}
-		out.print("</inputs>\n");
+		out.print("  </inputs>\n  ");
 		/*if (srmProfile != null)
 			out.print("<splitratios tp=\"" + Double.toString(srTP) + "\">\n" + getSplitRatioProfileAsXML() + "</splitratios>\n");*/
 		position.xmlDump(out);
-		out.print("</node>\n");
+		out.print("\n</node>\n");
 		return;
 	}
 	

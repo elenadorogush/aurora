@@ -61,7 +61,7 @@ public abstract class AbstractContainer implements AuroraConfigurable, Serializa
 		if (myEventManager != null) {
 			out.print("\n<EventSet>");
 			myEventManager.xmlDump(out);
-			out.print("</EventSet>\n");
+			out.print("\n</EventSet>\n\n");
 		}
 		if (myNetwork != null)
 			myNetwork.xmlDump(out);

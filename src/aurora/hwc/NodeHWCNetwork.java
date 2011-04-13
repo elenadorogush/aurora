@@ -160,13 +160,12 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 	public void xmlDumpControllerSet(PrintStream out) throws IOException {
 		if (out == null)
 			out = System.out;
-		for (int i = 0; i < networks.size(); i++) {
-			for (int j = 0; j < controllers.size(); j++)
-				controllers.get(j).xmlDump(out);
-			((NodeHWCNetwork)networks.get(i)).xmlDumpControllerSet(out);
-		}
+		for (int i = 0; i < controllers.size(); i++)
+			controllers.get(i).xmlDump(out);
 		for (int i = 0; i < nodes.size(); i++)
 			((AbstractNodeHWC)nodes.get(i)).xmlDumpControllers(out);
+		for (int i = 0; i < networks.size(); i++)
+			((NodeHWCNetwork)networks.get(i)).xmlDumpControllerSet(out);
 		return;
 	}
 	
@@ -179,7 +178,7 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 	public void xmlDump(PrintStream out) throws IOException {
 		if (out == null)
 			out = System.out;
-		out.print("\n<network id=\"" + id + "\" name=\"" + name + "\" ml_control=\"" + controlled + "\" q_control=\"" + qControl + "\" + dt=\"" + 3600*tp + "\">\n");
+		out.print("\n<network id=\"" + id + "\" name=\"" + name + "\" ml_control=\"" + controlled + "\" q_control=\"" + qControl + "\"  dt=\"" + 3600*tp + "\">\n");
 		super.xmlDump(out);
 		out.print("</network>\n");
 		return;

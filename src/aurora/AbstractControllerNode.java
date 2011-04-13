@@ -4,6 +4,8 @@
 
 package aurora;
 
+import org.w3c.dom.Node;
+
 
 /**
  * This class is a base for Node Controllers.
@@ -13,8 +15,22 @@ package aurora;
 public abstract class AbstractControllerNode extends AbstractController {
 	private static final long serialVersionUID = -7845344291835328109L;
 	
-	AbstractNode myNode = null;
+	AbstractNodeSimple myNode = null;
 	
+	
+	/**
+	 * Initializes controller from given DOM structure.
+	 * @param p DOM node.
+	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
+	 * @throws ExceptionConfiguration
+	 */
+	public boolean initFromDOM(Node p) throws ExceptionConfiguration {
+		boolean res = super.initFromDOM(p);
+		if (!res)
+			return res;
+		myNode.setNodeController(this);
+		return res;
+	}
 	
 	/**
 	 * Updates the state of controller.
@@ -69,7 +85,7 @@ public abstract class AbstractControllerNode extends AbstractController {
 	/**
 	 * Returns node to which this controller belongs.
 	 */
-	public final AbstractNode getMyNode() {
+	public final AbstractNodeSimple getMyNode() {
 		return myNode;
 	}
 	
@@ -78,7 +94,7 @@ public abstract class AbstractControllerNode extends AbstractController {
 	 * @param x monitor.
 	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
 	 */
-	public synchronized boolean setMyNode(AbstractNode x) {
+	public synchronized boolean setMyNode(AbstractNodeSimple x) {
 		if (x == null)
 			return false;
 		myNode = x;

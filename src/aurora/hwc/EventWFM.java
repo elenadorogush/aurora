@@ -22,6 +22,9 @@ public final class EventWFM extends AbstractEvent {
 	protected double[][] weavingFactorMatrix = null;
 	
 	
+	public EventWFM() {
+		description = "Weaving factor change at Node";
+	}
 	public EventWFM(int neid) {
 		super(neid);
 		description = "Weaving factor change at Node";

@@ -313,29 +313,29 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 			out = System.out;
 		out.print("<description>" + description + "</description>\n");
 		position.xmlDump(out);
-		out.print("<MonitorList>\n");
+		out.print("\n\n<MonitorList>\n");
 		for (i = 0; i < monitors.size(); i++)
 			monitors.get(i).xmlDump(out);
 		out.print("</MonitorList>\n");
-		out.print("<NetworkList>\n");
-		for (i = 0; i < nodes.size(); i++)
-			if (!nodes.get(i).isSimple())
-				nodes.get(i).xmlDump(out);
+		out.print("\n<NetworkList>\n");
+		for (i = 0; i < networks.size(); i++)
+			networks.get(i).xmlDump(out);
 		out.print("</NetworkList>\n");
-		out.print("<NodeList>\n");
+		out.print("\n<NodeList>\n");
 		for (i = 0; i < nodes.size(); i++)
-			if (nodes.get(i).isSimple())
-				nodes.get(i).xmlDump(out);
+			nodes.get(i).xmlDump(out);
+		for (i = 0; i < links.size(); i++)
+			links.get(i).xmlDumpTerminalNode(out);
 		out.print("</NodeList>\n");
-		out.print("<LinkList>\n");
+		out.print("\n<LinkList>\n");
 		for (i = 0; i < links.size(); i++)
 			links.get(i).xmlDump(out);
 		out.print("</LinkList>\n");
-		out.print("<ODList>\n");
+		out.print("\n<ODList>\n");
 		for (i = 0; i < odList.size(); i++)
 			odList.get(i).xmlDump(out);
 		out.print("</ODList>\n");
-		out.print("<SensorList>\n");
+		out.print("\n<SensorList>\n");
 		for (i = 0; i < sensors.size(); i++)
 			sensors.get(i).xmlDump(out);
 		out.print("</SensorList>\n");

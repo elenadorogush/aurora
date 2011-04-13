@@ -22,6 +22,10 @@ public final class EventDemand extends AbstractEvent {
 	protected double[] knobs = new double[1];
 	
 	
+	public EventDemand() {
+		knobs[0] = 1;
+		description = "Demand change at Link";
+	}
 	public EventDemand(int neid) {
 		super(neid);
 		knobs[0] = 1;

@@ -16,7 +16,7 @@ public abstract class AbstractNode extends AbstractNetworkElement {
 	private static final long serialVersionUID = 4318602879545730827L;
 	
 	protected String name;
-	protected String description;
+	protected String description = "";
 	protected PositionNode position = new PositionNode();
 	
 	protected Vector<Object> inputs = new Vector<Object>();

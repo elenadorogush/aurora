@@ -26,6 +26,7 @@ public abstract class AbstractEvent implements AuroraConfigurable, Serializable 
 	
 	protected EventManager myManager = null;
 	
+	protected AbstractEvent() { }
 	protected AbstractEvent(int neid) {
 		myNE = myManager.getContainer().getMyNetwork().getMonitorById(neid);
 		if (myNE == null)
@@ -122,7 +123,7 @@ public abstract class AbstractEvent implements AuroraConfigurable, Serializable 
 			buf = "node_id";
 		else if ((myNE.getType() & TypesHWC.MASK_SENSOR) > 0)
 			buf = "sensor_id";
-		out.print("\n<event id=\"" + id + "\" type=\"" + getTypeLetterCode() + "\"" + buf + "=\"" + myNE.getId() + "\" tstamp=\"" + Double.toString(3600*tstamp) + "\" enabled=\"" + Boolean.toString(enabled) + "\">");
+		out.print("\n<event id=\"" + id + "\" type=\"" + getTypeLetterCode() + "\" " + buf + "=\"" + myNE.getId() + "\" tstamp=\"" + Double.toString(3600*tstamp) + "\" enabled=\"" + Boolean.toString(enabled) + "\">");
 		out.print("<description>" + description + "</description>");
 		return;
 	}

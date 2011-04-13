@@ -4,6 +4,8 @@
 
 package aurora;
 
+import org.w3c.dom.Node;
+
 /**
  * Base class for simple controllers.
  * @author Alex Kurzhanskiy
@@ -17,6 +19,23 @@ public abstract class AbstractControllerSimple extends AbstractController {
 	protected Object actualInput = null; // current input value
 	protected boolean allowActualInputSet = false;
 
+	
+	/**
+	 * Initializes controller from given DOM structure.
+	 * @param p DOM node.
+	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
+	 * @throws ExceptionConfiguration
+	 */
+	public boolean initFromDOM(Node p) throws ExceptionConfiguration {
+		boolean res = super.initFromDOM(p);
+		if (!res)
+			return res;
+		AbstractNodeSimple nd = (AbstractNodeSimple)myLink.getEndNode();
+		if (nd != null)
+			nd.setSimpleController(this, myLink);
+		return res;
+	}
+	
 	/**
 	 * Returns <code>true</code> indicating that it is a simple controller.
 	 */

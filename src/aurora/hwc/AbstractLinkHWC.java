@@ -77,7 +77,9 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 	protected double capacityTP = 1.0/12.0;  // capacity value change period (default: 1/12 hour)
 	protected AuroraInterval extCapVal = null; // capacity value that can be set externally, say, by a monitor
 	
-	protected DynamicsHWC myDynamics;
+	protected DynamicsHWC myDynamics = new DynamicsCTM();
+	
+	protected AbstractNodeHWC terminalNode = null; // terminal node for open-ended link
 	
 	
 	/**
@@ -113,16 +115,26 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 						AbstractNode bnd = myNetwork.getNodeById(Integer.parseInt(bid_attr.getNodeValue()));
 						if (bnd != null)
 							bnd.addOutLink(this);
-						setBeginNode(bnd);
+						if (bnd.getType() == TypesHWC.NODE_TERMINAL) {
+							terminalNode = (AbstractNodeHWC)bnd;
+							myNetwork.deleteNode(terminalNode);
+						}
+						else
+							setBeginNode(bnd);
 					}
 					if (pp.item(i).getNodeName().equals("end")) {
 						Node eid_attr = pp.item(i).getAttributes().getNamedItem("node_id");
 						if (eid_attr == null)
 							eid_attr = pp.item(i).getAttributes().getNamedItem("id");
-						AbstractNode end = myNetwork.getNodeById(Integer.parseInt(pp.item(i).getAttributes().getNamedItem("id").getNodeValue()));
+						AbstractNode end = myNetwork.getNodeById(Integer.parseInt(eid_attr.getNodeValue()));
 						if (end != null)
 							end.addInLink(this);
-						setEndNode(end);
+						if (end.getType() == TypesHWC.NODE_TERMINAL) {
+							terminalNode = (AbstractNodeHWC)end;
+							myNetwork.deleteNode(terminalNode);
+						}
+						else
+							setEndNode(end);
 					}
 					if (pp.item(i).getNodeName().equals("dynamics")) {
 						Node type_attr = pp.item(i).getAttributes().getNamedItem("type");
@@ -191,6 +203,35 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 	}
 	
 	/**
+	 * Generates XML buffer for the terminal node if applicable.<br>
+	 * If the print stream is specified, then XML buffer is written to the stream.
+	 * @param out print stream.
+	 * @throws IOException
+	 */
+	public void xmlDumpTerminalNode(PrintStream out) throws IOException {
+		if (out == null)
+			out = System.out;
+		if (terminalNode != null) {
+			terminalNode.xmlDump(out);
+			return;
+		}
+		if (getBeginNode() == null) {
+			NodeTerminal ndt = new NodeTerminal(id);
+			ndt.addOutLink(this);
+			ndt.getPosition().set(getPosition().get().firstElement());
+			ndt.xmlDump(out);
+			return;
+		}
+		if (getEndNode() == null) {
+			NodeTerminal ndt = new NodeTerminal(id);
+			ndt.addInLink(this);
+			ndt.getPosition().set(getPosition().get().lastElement());
+			ndt.xmlDump(out);
+		}
+		return;
+	}
+	
+	/**
 	 * Generates XML buffer for the initial density.<br>
 	 * If the print stream is specified, then XML buffer is written to the stream.
 	 * @param out print stream.
@@ -199,11 +240,9 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 	public void xmlDumpInitialDensity(PrintStream out) throws IOException {
 		if (out == null)
 			out = System.out;
-		if ((getEndNode() == null) && (!capacity.isEmpty())) {
-			out.print("<density link_id=\"" + id + "\">");
-			out.print(density.toStringWithInverseWeights(((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).getVehicleWeights(), false));
-			out.println("</density>");
-		}
+		out.print("<density link_id=\"" + id + "\">");
+		out.print(density.toStringWithInverseWeights(((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).getVehicleWeights(), false));
+		out.print("</density>\n");
 		return;
 	}
 	
@@ -253,26 +292,24 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 		boolean ss = false;
 		if ((saveState == 3) || (saveState == 2))
 			ss = true;
-		out.print("<link type=\"" + getTypeLetterCode() + "\" id=\"" + Integer.toString(id) + "\" name=\"" + name + "\" length=\"" + Math.round(5280*length) + "\" lanes=\"" + Double.toString(lanes) + "\" record=\"" + ss + "\">");
-		if (predecessors.size() > 0)
-			out.print("<begin node_id=\"" + Integer.toString(predecessors.firstElement().getId()) + "\"/>");
-		if (successors.size() > 0)
-			out.print("<end node_id=\"" + Integer.toString(successors.firstElement().getId()) + "\"/>");
-		out.print("<dynamics type=\"" + myDynamics.getTypeLetterCode() + "\"/>");
-		//out.print("<density>" + density.toStringWithInverseWeights(((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).getVehicleWeights(), false) + "</density>");
-		/*if (!demand.isEmpty()) {
-			out.print("<demand tp=\"" + Double.toString(demandTP) + "\" knob=\"" + getDemandKnobsAsString() + "\">");
-			out.print(getDemandVectorAsString());
-			out.print("</demand>");
-		}
-		if (!capacity.isEmpty()) {
-			out.print("<capacity tp=\"" + Double.toString(capacityTP) + "\">");
-			out.print(getCapacityVectorAsString());
-			out.print("</capacity>");
-		}*/
-		out.print("<qmax>" + Double.toString(qMax) + "</qmax>");
-		out.print("<fd densityCritical =\"" + densityCritical + "\" densityJam=\"" + densityJam + "\" flowMax=\"" + flowMaxRange.toString() + "\" capacityDrop=\"" + capacityDrop + "\"/>");
-		//myPosition.xmlDump(out);
+		out.print("<link type=\"" + getTypeLetterCode() + "\" id=\"" + Integer.toString(id) + "\" name=\"" + name + "\" length=\"" + Math.round(5280*length) + "\" lanes=\"" + Double.toString(lanes) + "\" record=\"" + ss + "\">\n");
+		AbstractNode bn = getBeginNode();
+		int bid = id;
+		if (bn != null)
+			bid = bn.getId();
+		else if (terminalNode != null)
+			bid = terminalNode.getId();
+		out.print("  <begin node_id=\"" + bid + "\"/>\n");
+		AbstractNode en = getEndNode();
+		int eid = id;
+		if (en != null)
+			eid = en.getId();
+		else if (terminalNode != null)
+			eid = terminalNode.getId();
+		out.print("  <end node_id=\"" + eid + "\"/>\n");
+		out.print("  <dynamics type=\"" + myDynamics.getTypeLetterCode() + "\"/>\n");
+		out.print("  <qmax>" + Double.toString(qMax) + "</qmax>\n");
+		out.print("  <fd densityCritical =\"" + densityCritical + "\" densityJam=\"" + densityJam + "\" flowMax=\"" + flowMaxRange.toString() + "\" capacityDrop=\"" + capacityDrop + "\"/>\n");
 		out.print("</link>\n");
 		return;
 	}
@@ -722,6 +759,13 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 	 */
 	public final boolean isIWFUpperBoundFirst() {
 		return iwfUpperBoundFirst;
+	}
+	
+	/**
+	 * Returns terminal node.
+	 */
+	public final AbstractNodeHWC getTerminalNode() {
+		return terminalNode;
 	}
 	
 	/**
@@ -1868,6 +1912,7 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 			demand = lnk.getDemandVector();
 			capacityTP = lnk.getCapacityTP();
 			capacity = lnk.getCapacityVector();
+			terminalNode = lnk.getTerminalNode();
 		}
 		return res;
 	}

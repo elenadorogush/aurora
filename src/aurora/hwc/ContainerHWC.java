@@ -240,13 +240,14 @@ public final class ContainerHWC extends AbstractContainer {
 					res &= myNetwork.setContainer(this);
 					res &= myNetwork.initFromDOM(p.getChildNodes().item(i));
 				}
-				if (p.getChildNodes().item(i).getNodeName().equals("EventList") || p.getChildNodes().item(i).getNodeName().equals("EventSet")) {
-					res &= myEventManager.initFromDOM(p.getChildNodes().item(i));
-				}
 				if (p.getChildNodes().item(i).getNodeName().equals("DirectionsCache")) {
 					dircache = new GoogleDirectionsCache();
 					res &= dircache.initFromDOM(p.getChildNodes().item(i));
 				}
+			}
+			for (int i = 0; i < p.getChildNodes().getLength(); i++) {
+				if (p.getChildNodes().item(i).getNodeName().equals("EventList") || p.getChildNodes().item(i).getNodeName().equals("EventSet"))
+					res &= myEventManager.initFromDOM(p.getChildNodes().item(i));
 			}
 			for (int i = 0; i < p.getChildNodes().getLength(); i++) {
 				if (p.getChildNodes().item(i).getNodeName().equals("ControllerSet") || p.getChildNodes().item(i).getNodeName().equals("SplitRatioProfileSet"))
@@ -283,25 +284,25 @@ public final class ContainerHWC extends AbstractContainer {
 	 * @throws IOException
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
-		out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-		out.println("<scenario id=\"0\" name=\"" + name + "\">");
+		out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+		out.print("<scenario id=\"0\" name=\"" + name + "\">\n");
 		super.xmlDump(out);
-		out.print("\n<ControllerSet>");
+		out.print("\n\n<ControllerSet>");
 		((NodeHWCNetwork)myNetwork).xmlDumpControllerSet(out);
-		out.print("</ControllerSet>\n");
-		out.print("\n<InitialDensityProfile>\n");
+		out.print("\n</ControllerSet>\n");
+		out.print("\n\n<InitialDensityProfile>\n");
 		((NodeHWCNetwork)myNetwork).xmlDumpInitialDensityProfile(out);
 		out.print("</InitialDensityProfile>\n");
-		out.print("\n<DemandProfileSet>\n");
+		out.print("\n\n<DemandProfileSet>\n");
 		((NodeHWCNetwork)myNetwork).xmlDumpDemandProfileSet(out);
 		out.print("</DemandProfileSet>\n");
-		out.print("\n<SplitRatioProfileSet>\n");
+		out.print("\n\n<SplitRatioProfileSet>\n");
 		((NodeHWCNetwork)myNetwork).xmlDumpSplitRatioProfileSet(out);
 		out.print("</SplitRatioProfileSet>\n");
-		out.print("\n<CapacityProfileSet>\n");
+		out.print("\n\n<CapacityProfileSet>\n");
 		((NodeHWCNetwork)myNetwork).xmlDumpCapacityProfileSet(out);
 		out.print("</CapacityProfileSet>\n");
-		out.print("</scenario>\n");
+		out.print("\n</scenario>\n");
 		return;
 	}
 	

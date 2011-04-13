@@ -104,7 +104,7 @@ public abstract class AbstractControllerSimpleHWC extends AbstractControllerSimp
 	public void xmlDump(PrintStream out) throws IOException {
 		super.xmlDump(out);
 		if (limits.size() == 2)
-			out.print("<limits cmin=\"" + Double.toString((Double)limits.get(0))+ "\" cmax=\"" + Double.toString((Double)limits.get(1))+ "\" />");
+			out.print("<limits cmin=\"" + Double.toString((Double)limits.get(0))+ "\" cmax=\"" + Double.toString((Double)limits.get(1))+ "\" />\n");
 		if (myQController != null)
 			myQController.xmlDump(out);
 		return;
