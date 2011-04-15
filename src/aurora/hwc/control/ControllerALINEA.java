@@ -70,7 +70,7 @@ public final class ControllerALINEA extends AbstractControllerSimpleHWC {
 			if (p.hasChildNodes()) {
 				NodeList pp = p.getChildNodes();
 				for (int i = 0; i < pp.getLength(); i++) {
-					if (pp.item(i).getNodeName().equals("parameter")) {
+					if (pp.item(i).getNodeName().equals("parameter")) { // legacy
 						if (pp.item(i).getAttributes().getNamedItem("name").getNodeValue().equals("gain"))
 							gain = Double.parseDouble(pp.item(i).getAttributes().getNamedItem("value").getNodeValue());
 						if (pp.item(i).getAttributes().getNamedItem("name").getNodeValue().equals("upstream"))
@@ -81,6 +81,23 @@ public final class ControllerALINEA extends AbstractControllerSimpleHWC {
 							if (lk != null)
 								MLlinks.add(lk);
 						}
+					}
+					if (pp.item(i).getNodeName().equals("parameters")) {
+						NodeList pp2 = pp.item(i).getChildNodes();
+						for (int j = 0; j < pp2.getLength(); j++)
+							if (pp2.item(j).getNodeName().equals("parameter")) {
+								if (pp2.item(j).getAttributes().getNamedItem("name").getNodeValue().equals("gain"))
+									gain = Double.parseDouble(pp2.item(j).getAttributes().getNamedItem("value").getNodeValue());
+								if (pp2.item(j).getAttributes().getNamedItem("name").getNodeValue().equals("upstream"))
+									upstream = Boolean.parseBoolean(pp2.item(j).getAttributes().getNamedItem("value").getNodeValue());
+								if (pp2.item(j).getAttributes().getNamedItem("name").getNodeValue().equals("link")) {
+									int lid = Integer.parseInt(pp2.item(j).getAttributes().getNamedItem("value").getNodeValue());
+									AbstractLinkHWC lk = (AbstractLinkHWC)myLink.getMyNetwork().getTop().getLinkById(lid);
+									if (lk != null)
+										MLlinks.add(lk);
+								}
+							}
+						break;
 					}
 				}
 			}
@@ -124,10 +141,12 @@ public final class ControllerALINEA extends AbstractControllerSimpleHWC {
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
 		super.xmlDump(out);
-		out.println("<parameter name=\"upstream\" value=\"" + Boolean.toString(upstream) + "\"/>");
-		out.println("<parameter name=\"gain\" value=\"" + Double.toString(gain) + "\"/>");
+		out.print("\n<parameters>\n");
+		out.print("  <parameter name=\"upstream\" value=\"" + Boolean.toString(upstream) + "\"/>\n");
+		out.print("  <parameter name=\"gain\" value=\"" + Double.toString(gain) + "\"/>\n");
 		for (int i = 0; i < MLlinks.size(); i++)
-			out.println("<parameter name=\"link\" value=\"" + MLlinks.get(i).getId() + "\"/>");
+			out.print("  <parameter name=\"link\" value=\"" + MLlinks.get(i).getId() + "\"/>\n");
+		out.print("</parameters>\n");
 		out.print("</controller>");
 		return;
 	}

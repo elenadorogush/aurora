@@ -18,7 +18,7 @@ import aurora.hwc.TypesHWC;
 public abstract class AbstractEvent implements AuroraConfigurable, Serializable {
 	private static final long serialVersionUID = 4334310994251406284L;
 	
-	protected int id = 0;
+	
 	protected String description = "";
 	protected double tstamp = 0.0; // timestamp
 	protected AbstractNetworkElement myNE = null; // network element
@@ -49,9 +49,6 @@ public abstract class AbstractEvent implements AuroraConfigurable, Serializable 
 		if (p == null)
 			return !res;
 		try  {
-			Node myid_attr = p.getAttributes().getNamedItem("id");
-			if (myid_attr != null)
-				id = Integer.parseInt(myid_attr.getNodeValue());
 			Node id_attr = p.getAttributes().getNamedItem("network_id");
 			if (id_attr != null)
 				myNE = myManager.getContainer().getMyNetwork().getNetworkById(Integer.parseInt(id_attr.getNodeValue()));
@@ -123,7 +120,7 @@ public abstract class AbstractEvent implements AuroraConfigurable, Serializable 
 			buf = "node_id";
 		else if ((myNE.getType() & TypesHWC.MASK_SENSOR) > 0)
 			buf = "sensor_id";
-		out.print("\n<event id=\"" + id + "\" type=\"" + getTypeLetterCode() + "\" " + buf + "=\"" + myNE.getId() + "\" tstamp=\"" + Double.toString(3600*tstamp) + "\" enabled=\"" + Boolean.toString(enabled) + "\">");
+		out.print("\n<event type=\"" + getTypeLetterCode() + "\" " + buf + "=\"" + myNE.getId() + "\" tstamp=\"" + Double.toString(3600*tstamp) + "\" enabled=\"" + Boolean.toString(enabled) + "\">");
 		out.print("<description>" + description + "</description>");
 		return;
 	}

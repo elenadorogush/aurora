@@ -1,22 +1,24 @@
+/**
+ * @(#)IntersectionCache.java
+ */
+
 package aurora.hwc;
 
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.StringWriter;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
+import java.io.*;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Node;
-import aurora.AuroraConfigurable;
-import aurora.ExceptionConfiguration;
+import aurora.*;
 
-public class GoogleDirectionsCache  implements AuroraConfigurable {
 
+public class IntersectionCache  implements AuroraConfigurable, Serializable {
+	private static final long serialVersionUID = 2607920642308148578L;
+	
 	private String all;
 	
-	@Override
+	
+	// basic initialization
 	public boolean initFromDOM(Node p) throws ExceptionConfiguration {
 		boolean res = true;
 		if (p == null)
@@ -36,14 +38,13 @@ public class GoogleDirectionsCache  implements AuroraConfigurable {
 		return res;
 	}
 
-	@Override
+	// dump all
 	public void xmlDump(PrintStream out) throws IOException {
-		out.print(all+"\n");
+		out.print("\n" + all + "\n");
 	}
 
-	@Override
+	// no validation needed
 	public boolean validate() throws ExceptionConfiguration {
-		// TODO Auto-generated method stub
 		return true;
 	}
 

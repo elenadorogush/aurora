@@ -23,7 +23,6 @@ public abstract class AbstractController implements AuroraConfigurable, Serializ
 	protected int ts; // time step
 	protected boolean dependent = false;
 	protected boolean initialized = false;
-	protected int id = 0;
 	
 	
 	/**
@@ -36,9 +35,6 @@ public abstract class AbstractController implements AuroraConfigurable, Serializ
 		boolean res = true;
 		if (p == null)
 			return !res;
-		Node id_attr = p.getAttributes().getNamedItem("id");
-		if (id_attr != null)
-			id = Integer.parseInt(id_attr.getNodeValue());
 		Node dt_attr = p.getAttributes().getNamedItem("dt");
 		if (dt_attr == null)
 			dt_attr = p.getAttributes().getNamedItem("tp");
@@ -79,7 +75,7 @@ public abstract class AbstractController implements AuroraConfigurable, Serializ
 				buf = "link_id=\"";
 			buf += ne.getId() + "\"";
 		}
-		out.print("\n<controller id=\"" + id + "\" " + buf + " type=\"" + getTypeLetterCode() + "\" dt=\"" + Math.round(3600*tp) + "\">\n");
+		out.print("\n<controller " + buf + " type=\"" + getTypeLetterCode() + "\" dt=\"" + Math.round(3600*tp) + "\">\n");
 		return;
 	}
 	

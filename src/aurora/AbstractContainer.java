@@ -8,14 +8,12 @@ import java.io.*;
 import java.util.*;
 import org.w3c.dom.*;
 
-import aurora.hwc.GoogleDirectionsCache;
-
 
 /**
  * Base class for the top object that contains pointers
  * to all the Aurora system configuration.
  * @author Alex Kurzhanskiy
- * @version $Id: AbstractContainer.java 156 2011-03-29 03:37:11Z cratershine $
+ * @version $Id: $
  */
 public abstract class AbstractContainer implements AuroraConfigurable, Serializable {
 	private static final long serialVersionUID = 5225922999390390092L;
@@ -23,8 +21,7 @@ public abstract class AbstractContainer implements AuroraConfigurable, Serializa
 	protected String name = "";
 	protected AbstractNodeComplex myNetwork = null;
 	protected EventManager myEventManager = null;
-	protected SimulationSettings mySettings = null;	
-	protected GoogleDirectionsCache dircache = null;	
+	protected SimulationSettings mySettings = null;		
 	protected SimulationStatus myStatus = new SimulationStatus();
 	protected boolean isSim = true;
 	protected boolean isBatch = false;
@@ -53,11 +50,8 @@ public abstract class AbstractContainer implements AuroraConfigurable, Serializa
 	 * @throws IOException
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
-		if (mySettings != null) {
-			out.print("\n<settings>\n");
+		if (mySettings != null)
 			mySettings.xmlDump(out);
-			out.print("</settings>\n");
-		}
 		if (myEventManager != null) {
 			out.print("\n<EventSet>");
 			myEventManager.xmlDump(out);
@@ -65,9 +59,6 @@ public abstract class AbstractContainer implements AuroraConfigurable, Serializa
 		}
 		if (myNetwork != null)
 			myNetwork.xmlDump(out);
-		if(this.dircache!=null){
-			dircache.xmlDump(out);
-		}
 		return;
 	}
 	

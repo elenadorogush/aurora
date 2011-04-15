@@ -256,7 +256,7 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 					int i = -1;
 					while ((st1.hasMoreTokens()) && (++i < m)) {
 						String bufR = st1.nextToken();
-						StringTokenizer st2 = new StringTokenizer(bufR, ", ");
+						StringTokenizer st2 = new StringTokenizer(bufR, ", \t");
 						int j = -1;
 						while ((st2.hasMoreTokens()) && (++j < n)) {
 							String srvtxt = st2.nextToken();

@@ -53,8 +53,8 @@ public class PositionNode implements AuroraConfigurable, Serializable {
 							y = Double.parseDouble(nnm.getNamedItem("y").getNodeValue());
 						if (nnm.getNamedItem("z") != null)
 							z = Double.parseDouble(nnm.getNamedItem("z").getNodeValue());
-						if (nnm.getNamedItem("long") != null)
-							x = Double.parseDouble(nnm.getNamedItem("long").getNodeValue());
+						if (nnm.getNamedItem("lng") != null)
+							x = Double.parseDouble(nnm.getNamedItem("lng").getNodeValue());
 						if (nnm.getNamedItem("lat") != null)
 							y = Double.parseDouble(nnm.getNamedItem("lat").getNodeValue());
 						if (nnm.getNamedItem("elevation") != null)
@@ -82,7 +82,7 @@ public class PositionNode implements AuroraConfigurable, Serializable {
 		if (out == null)
 			out = System.out;
 		out.print("<position>");
-		out.print("<point lat=\"" + Double.toString(p.y) + "\" long=\"" + Double.toString(p.x) + "\" elevation=\"" + Double.toString(p.z) + "\"/>");
+		out.print("<point lat=\"" + Double.toString(p.y) + "\" lng=\"" + Double.toString(p.x) + "\" elevation=\"" + Double.toString(p.z) + "\"/>");
 		out.print("</position>");
 		return;
 	}

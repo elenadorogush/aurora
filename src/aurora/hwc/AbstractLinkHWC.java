@@ -117,6 +117,8 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 							bnd.addOutLink(this);
 						if (bnd.getType() == TypesHWC.NODE_TERMINAL) {
 							terminalNode = (AbstractNodeHWC)bnd;
+							myPosition = new PositionLink();
+							myPosition.setBegin(terminalNode.getPosition().get());
 							myNetwork.deleteNode(terminalNode);
 						}
 						else
@@ -131,6 +133,8 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 							end.addInLink(this);
 						if (end.getType() == TypesHWC.NODE_TERMINAL) {
 							terminalNode = (AbstractNodeHWC)end;
+							myPosition = new PositionLink();
+							myPosition.setEnd(terminalNode.getPosition().get());
 							myNetwork.deleteNode(terminalNode);
 						}
 						else

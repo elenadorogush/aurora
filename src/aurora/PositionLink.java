@@ -65,8 +65,8 @@ public class PositionLink implements AuroraConfigurable, Serializable {
 							y = Double.parseDouble(nnm.getNamedItem("y").getNodeValue());
 						if (nnm.getNamedItem("z") != null)
 							z = Double.parseDouble(nnm.getNamedItem("z").getNodeValue());
-						if (nnm.getNamedItem("long") != null)
-							x = Double.parseDouble(nnm.getNamedItem("long").getNodeValue());
+						if (nnm.getNamedItem("lng") != null)
+							x = Double.parseDouble(nnm.getNamedItem("lng").getNodeValue());
 						if (nnm.getNamedItem("lat") != null)
 							y = Double.parseDouble(nnm.getNamedItem("lat").getNodeValue());
 						if (nnm.getNamedItem("elevation") != null)
@@ -95,7 +95,7 @@ public class PositionLink implements AuroraConfigurable, Serializable {
 			out = System.out;
 		out.print("<position>");
 		for (int i = 0; i < pp.size(); i++)
-			out.print("<point lat=\"" + Double.toString(pp.get(i).y) + "\" long=\"" + Double.toString(pp.get(i).x) + "\" elevation=\"" + Double.toString(pp.get(i).z) + "\"/>");
+			out.print("<point lat=\"" + Double.toString(pp.get(i).y) + "\" lng=\"" + Double.toString(pp.get(i).x) + "\" elevation=\"" + Double.toString(pp.get(i).z) + "\"/>");
 		out.print("</position>");
 		return;
 	}

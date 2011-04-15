@@ -35,6 +35,7 @@ public class SimulationSettings implements AuroraConfigurable, Serializable {
 	protected int tsInitial = 0;
 	protected int timeout = 1000;
 	protected boolean isPred = false;
+	protected String myUnits = "US"; 
 	
 	
 	/**
@@ -49,6 +50,9 @@ public class SimulationSettings implements AuroraConfigurable, Serializable {
 			return !res;
 		try  {
 			if (p.hasChildNodes()) {
+				Node units_attr = p.getAttributes().getNamedItem("units");
+				if (units_attr != null)
+					myUnits = units_attr.getNodeValue();
 				NodeList pp = p.getChildNodes();
 				for (int i = 0; i < pp.getLength(); i++) {
 					if (pp.item(i).getNodeName().equals("display")) {
@@ -107,10 +111,11 @@ public class SimulationSettings implements AuroraConfigurable, Serializable {
 	public void xmlDump(PrintStream out) throws IOException {
 		if (out == null)
 			out = System.out;
+		out.print("\n<settings>\n  <units>" + myUnits + "</units>\n");
 		String modeBuf = "";
 		if (isPred)
 			modeBuf = " mode=\"P\"";
-		out.print("<display dt=\"" + Math.round(3600*displayTP) + "\" timeout=\"" + Integer.toString(timeout) + "\" timeInitial=\"" + Math.round(3600*timeInitial) + "\" timeMax=\"" + Math.round(3600*timeMax) + "\"" + modeBuf + " />\n");
+		out.print("  <display dt=\"" + Math.round(3600*displayTP) + "\" timeout=\"" + Integer.toString(timeout) + "\" timeInitial=\"" + Math.round(3600*timeInitial) + "\" timeMax=\"" + Math.round(3600*timeMax) + "\"" + modeBuf + " />\n");
 		return;
 	}
 	

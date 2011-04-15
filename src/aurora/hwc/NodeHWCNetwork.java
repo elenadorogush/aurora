@@ -28,6 +28,9 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 	private boolean resetAllSums = true;
 	private boolean qControl = true;
 	
+	protected DirectionsCache dircache = null;
+	protected IntersectionCache ixcache = null;
+	
 
 	public NodeHWCNetwork() { }
 	public NodeHWCNetwork(int id) { this.id = id; }
@@ -83,6 +86,19 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 				controlled = Boolean.parseBoolean(mlc_attr.getNodeValue());
 			if (qc_attr != null)
 				qControl = Boolean.parseBoolean(qc_attr.getNodeValue());
+		}
+		if (p.hasChildNodes()) {
+			NodeList pp = p.getChildNodes();
+			for (int i = 0; i < pp.getLength(); i++) {
+				if (p.getChildNodes().item(i).getNodeName().equals("DirectionsCache")) {
+					dircache = new DirectionsCache();
+					res &= dircache.initFromDOM(p.getChildNodes().item(i));
+				}
+				if (p.getChildNodes().item(i).getNodeName().equals("IntersectionCache")) {
+					ixcache = new IntersectionCache();
+					res &= ixcache.initFromDOM(p.getChildNodes().item(i));
+				}
+			}
 		}
 		return res;
 	}
@@ -181,6 +197,12 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 		out.print("\n<network id=\"" + id + "\" name=\"" + name + "\" ml_control=\"" + controlled + "\" q_control=\"" + qControl + "\"  dt=\"" + 3600*tp + "\">\n");
 		super.xmlDump(out);
 		out.print("</network>\n");
+		if (dircache != null) {
+			dircache.xmlDump(out);
+		}
+		if (ixcache != null) {
+			ixcache.xmlDump(out);
+		}
 		return;
 	}
 	

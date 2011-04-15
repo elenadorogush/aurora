@@ -98,10 +98,11 @@ public class SimulationSettingsHWC extends SimulationSettings {
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
 		super.xmlDump(out);
-		out.print("<VehicleTypes>\n");
+		out.print("  <VehicleTypes>\n");
 		for (int i = 0; i < vtypes.size(); i++)
-			out.print("<vtype name=\"" + vtypes.get(i) + "\" weight=\"" + weights.get(i) + "\" />\n");
-		out.print("</VehicleTypes>\n");
+			out.print("    <vtype name=\"" + vtypes.get(i) + "\" weight=\"" + weights.get(i) + "\" />\n");
+		out.print("  </VehicleTypes>\n");
+		out.print("</settings>\n");
 		return;
 	}
 	

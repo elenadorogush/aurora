@@ -6,6 +6,7 @@ package aurora.hwc;
 
 import java.io.*;
 import java.util.*;
+
 import org.w3c.dom.*;
 import aurora.*;
 import aurora.util.Util;
@@ -64,38 +65,67 @@ public final class EventSRM extends AbstractEvent {
 				NodeList pp = p.getChildNodes();
 				for (int i = 0; i < pp.getLength(); i++) {
 					if (pp.item(i).getNodeName().equals("srm")) {
+						boolean legacy = false;
+						int sz = ((SimulationSettingsHWC)getEventManager().getContainer().getMySettings()).countVehicleTypes();
 						if (pp.item(i).hasChildNodes()) {
 							NodeList pp2 = pp.item(i).getChildNodes();
 							int m = 0;
 							int n = 0;
 							for (int j = 0; j < pp2.getLength(); j++)
 								if (pp2.item(j).getNodeName().equals("splitratios")) {
+									legacy = true;
 									StringTokenizer st = new StringTokenizer(pp2.item(j).getTextContent(), ", \t");
 									if (st.countTokens() > n)
 										n = st.countTokens();
 									m++;
 								}
-							splitRatioMatrix = new AuroraIntervalVector[m][n];
-							int sz = ((SimulationSettingsHWC)getEventManager().getContainer().getMySettings()).countVehicleTypes();
-							m = 0;
-							for (int j = 0; j < pp2.getLength(); j++)
-								if (pp2.item(j).getNodeName().equals("splitratios")) {
-									StringTokenizer st = new StringTokenizer(pp2.item(j).getTextContent(), ", \t");
-									int mm = 0;
-									while (st.hasMoreTokens()) {
-										splitRatioMatrix[m][mm] = new AuroraIntervalVector(sz);
-										splitRatioMatrix[m][mm].setIntervalVectorFromString(st.nextToken());
-										mm++;
+							if (legacy) {
+								splitRatioMatrix = new AuroraIntervalVector[m][n];
+								m = 0;
+								for (int j = 0; j < pp2.getLength(); j++)
+									if (pp2.item(j).getNodeName().equals("splitratios")) {
+										StringTokenizer st = new StringTokenizer(pp2.item(j).getTextContent(), ", \t");
+										int mm = 0;
+										while (st.hasMoreTokens()) {
+											splitRatioMatrix[m][mm] = new AuroraIntervalVector(sz);
+											splitRatioMatrix[m][mm].setIntervalVectorFromString(st.nextToken());
+											mm++;
+										}
+										while (mm < n) {
+											splitRatioMatrix[m][mm] = new AuroraIntervalVector(sz);
+											mm++;
+										}
+										m++;
 									}
-									while (mm < n) {
-										splitRatioMatrix[m][mm] = new AuroraIntervalVector(sz);
-										mm++;
-									}
-									m++;
-								}
+							}
 						}
-						else
-							res = false;
+						if (!legacy) {
+							String bufM = pp.item(i).getTextContent();
+							StringTokenizer st = new StringTokenizer(bufM, ";");
+							int m = st.countTokens();
+							int n = 0;
+							int ii = -1;
+							while ((st.hasMoreTokens()) && (++ii < m)) {
+								String bufR = st.nextToken();
+								StringTokenizer st1 = new StringTokenizer(bufR, ", \t");
+								if (st1.countTokens() > n)
+									n = st1.countTokens();
+							}
+							splitRatioMatrix = new AuroraIntervalVector[m][n];
+							st = new StringTokenizer(bufM, ";");
+							ii = -1;
+							while ((st.hasMoreTokens()) && (++ii < m)) {
+								String bufR = st.nextToken();
+								StringTokenizer st1 = new StringTokenizer(bufR, ", \t");
+								int jj = -1;
+								while ((st1.hasMoreTokens()) && (++jj < n)) {
+									splitRatioMatrix[ii][jj] = new AuroraIntervalVector(sz);
+									splitRatioMatrix[ii][jj].setIntervalVectorFromString(st1.nextToken());
+								}
+								while (++jj < n)
+									splitRatioMatrix[ii][jj] = new AuroraIntervalVector(sz);
+							}
+						}
 					}
 				}
 			}
@@ -119,15 +149,17 @@ public final class EventSRM extends AbstractEvent {
 		super.xmlDump(out);
 		if (splitRatioMatrix != null) {
 			out.print("<srm>");
+			String buf = "";
 			for (int i = 0; i < splitRatioMatrix.length; i++) {
-				String buf = "";
+				if (i > 0)
+					buf += "; ";
 				for (int j = 0; j < splitRatioMatrix[0].length; j++) {
 					if (j > 0)
 						buf += ", ";
 					buf += splitRatioMatrix[i][j].toString();
 				}
-				out.print("<splitratios>" + buf + "</splitratios>");
 			}
+			out.print(buf);
 			out.print("</srm>");
 		}
 		out.print("</event>");

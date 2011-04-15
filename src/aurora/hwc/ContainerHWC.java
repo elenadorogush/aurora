@@ -17,11 +17,14 @@ import aurora.*;
  * Top object that contains pointers
  * to all the Aurora system configuration.
  * @author Alex Kurzhanskiy
- * @version $Id: ContainerHWC.java 156 2011-03-29 03:37:11Z cratershine $
+ * @version $Id: $
  */
 public final class ContainerHWC extends AbstractContainer {
 	private static final long serialVersionUID = 2277054116304494673L;
 
+	private static String schemaVersion = "1.0.0";
+	
+	
 	public ContainerHWC() { }
 	public ContainerHWC(AbstractNodeComplex ntwk) { myNetwork = ntwk; }
 	public ContainerHWC(EventManager emgr) { myEventManager = emgr; }
@@ -240,10 +243,6 @@ public final class ContainerHWC extends AbstractContainer {
 					res &= myNetwork.setContainer(this);
 					res &= myNetwork.initFromDOM(p.getChildNodes().item(i));
 				}
-				if (p.getChildNodes().item(i).getNodeName().equals("DirectionsCache")) {
-					dircache = new GoogleDirectionsCache();
-					res &= dircache.initFromDOM(p.getChildNodes().item(i));
-				}
 			}
 			for (int i = 0; i < p.getChildNodes().getLength(); i++) {
 				if (p.getChildNodes().item(i).getNodeName().equals("EventList") || p.getChildNodes().item(i).getNodeName().equals("EventSet"))
@@ -285,7 +284,7 @@ public final class ContainerHWC extends AbstractContainer {
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
 		out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-		out.print("<scenario id=\"0\" name=\"" + name + "\">\n");
+		out.print("<scenario id=\"0\" name=\"" + name + "\" schemaVersion=\"" + schemaVersion + "\">\n");
 		super.xmlDump(out);
 		out.print("\n\n<ControllerSet>");
 		((NodeHWCNetwork)myNetwork).xmlDumpControllerSet(out);
