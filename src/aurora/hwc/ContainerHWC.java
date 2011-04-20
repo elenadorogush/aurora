@@ -44,10 +44,15 @@ public final class ContainerHWC extends AbstractContainer {
 			NodeList pp = p.getChildNodes();
 			for (int j = 0; j < pp.getLength(); j++) {
 				if (pp.item(j).getNodeName().equals("demand")) {
+					double demandST = 0.0;
 					Node id_attr = pp.item(j).getAttributes().getNamedItem("link_id");
 					if (id_attr == null)
 						id_attr = pp.item(j).getAttributes().getNamedItem("id");
 					int lkid = Integer.parseInt(id_attr.getNodeValue());
+					Node st_attr = pp.item(j).getAttributes().getNamedItem("start_time");
+					if (st_attr != null) {
+						demandST = Double.parseDouble(st_attr.getNodeValue()) / 3600;
+					}
 					Node dt_attr = pp.item(j).getAttributes().getNamedItem("dt");
 					if (dt_attr == null)
 						dt_attr = pp.item(j).getAttributes().getNamedItem("tp");
@@ -58,6 +63,7 @@ public final class ContainerHWC extends AbstractContainer {
 					AbstractLinkHWC lk = (AbstractLinkHWC)myNetwork.getLinkById(lkid);
 					if (lk != null) {
 						lk.setDemandKnobs(demandKnob);
+						lk.setDemandStartTime(demandST);
 						lk.setDemandTP(demandTP);
 						lk.setDemandVector(pp.item(j).getTextContent());
 					}
@@ -156,10 +162,15 @@ public final class ContainerHWC extends AbstractContainer {
 			NodeList pp = p.getChildNodes();
 			for (int j = 0; j < pp.getLength(); j++) {
 				if (pp.item(j).getNodeName().equals("capacity")) {
+					double capacityST = 0.0;
 					Node id_attr = pp.item(j).getAttributes().getNamedItem("link_id");
 					if (id_attr == null)
 						id_attr = pp.item(j).getAttributes().getNamedItem("id");
 					int lkid = Integer.parseInt(id_attr.getNodeValue());
+					Node st_attr = pp.item(j).getAttributes().getNamedItem("start_time");
+					if (st_attr != null) {
+						capacityST = Double.parseDouble(st_attr.getNodeValue()) / 3600;
+					}
 					Node dt_attr = pp.item(j).getAttributes().getNamedItem("dt");
 					if (dt_attr == null)
 						dt_attr = pp.item(j).getAttributes().getNamedItem("tp");
@@ -168,6 +179,7 @@ public final class ContainerHWC extends AbstractContainer {
 						capacityTP = capacityTP/3600;
 					AbstractLinkHWC lk = (AbstractLinkHWC)myNetwork.getLinkById(lkid);
 					if (lk != null) {
+						lk.setCapacityStartTime(capacityST);
 						lk.setCapacityTP(capacityTP);
 						lk.setCapacityVector(pp.item(j).getTextContent());
 					}

@@ -70,11 +70,13 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 	protected Vector<AuroraIntervalVector> demand = new Vector<AuroraIntervalVector>(); // demand profile (values in vph)
 	protected Vector<AuroraIntervalVector> procDemand = new Vector<AuroraIntervalVector>(); // demand profile (values in vph)
 	protected double demandTP = 1.0/12.0; // demand value change period (default: 1/12 hour)
+	protected double demandST = 0.0; // start time for demand profile
 	protected double[] demandKnobs = new double[1]; //coefficients by which the demand values must be multiplied
 	protected AuroraIntervalVector extDemandVal = null; // demand value that can be set externally, say, by a monitor
 	
 	protected Vector<AuroraInterval> capacity = new Vector<AuroraInterval>(); // capacity profile (values in vph)
 	protected double capacityTP = 1.0/12.0;  // capacity value change period (default: 1/12 hour)
+	protected double capacityST = 0.0; // start time for capacity profile
 	protected AuroraInterval extCapVal = null; // capacity value that can be set externally, say, by a monitor
 	
 	protected DynamicsHWC myDynamics = new DynamicsCTM();
@@ -260,7 +262,7 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 		if (out == null)
 			out = System.out;
 		if ((getBeginNode() == null) && (!demand.isEmpty())) {
-			out.print("<demand link_id=\"" + id + "\" dt=\"" + Math.round(3600*demandTP) + "\" knob=\"" + getDemandKnobsAsString() + "\">");
+			out.print("<demand link_id=\"" + id + "\" start_time=\"" + Math.round(3600*demandST) + "\" dt=\"" + Math.round(3600*demandTP) + "\" knob=\"" + getDemandKnobsAsString() + "\">");
 			out.print(getDemandVectorAsString());
 			out.println("</demand>");
 		}
@@ -277,7 +279,7 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 		if (out == null)
 			out = System.out;
 		if ((getEndNode() == null) && (!capacity.isEmpty())) {
-			out.print("<capacity link_id=\"" + id + "\" dt=\"" + Math.round(3600*capacityTP) + "\">");
+			out.print("<capacity link_id=\"" + id + "\" start_time=\"" + Math.round(3600*capacityST) + "\" dt=\"" + Math.round(3600*capacityTP) + "\">");
 			out.print(getCapacityVectorAsString());
 			out.println("</capacity>");
 		}
@@ -1003,9 +1005,10 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 			return dmnd;
 		}
 		double t = myNetwork.getSimTime(); // simulation time (in hours)
+		t -= demandST;  // adjust for demand prof
 		int idx = (int)Math.floor(t/demandTP);
 		int n = procDemand.size() - 1; // max index of the demand profile
-		if (n < 0) //empty
+		if ((idx < 0) || (n < 0)) //empty
 			return new AuroraIntervalVector();
 		if ((idx < 0) || (idx > n))
 			idx = n;
@@ -1173,6 +1176,13 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 	}
 	
 	/**
+	 * Returns the start time of the demand profile in hours.
+	 */
+	public final double getDemandStartTime() {
+		return demandST;
+	}
+	
+	/**
 	 * Returns the demand value set by external entity.
 	 */
 	public final AuroraIntervalVector getExternalDemandValue() {
@@ -1191,9 +1201,10 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 		if (extCapVal != null)
 			return getMaxFlowRange();
 		double t = myNetwork.getSimTime(); // simulation time (in hours)
+		t -= capacityST; // adjust by capacity profile start time
 		int idx = (int)Math.floor(t/capacityTP);
 		int n = capacity.size() - 1; // max index of the capacity profile
-		if ((idx < 0) || (idx > n))
+		if (idx > n)
 			idx = n;
 		if ((idx < 0) || (getEndNode() != null))
 			return getMaxFlowRange();
@@ -1228,6 +1239,13 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 	 */
 	public final double getCapacityTP() {
 		return capacityTP;
+	}
+	
+	/**
+	 * Returns the start time of the capacity profile in hours.
+	 */
+	public final double getCapacityStartTime() {
+		return capacityST;
 	}
 	
 	/**
@@ -1771,6 +1789,18 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 	}
 	
 	/**
+	 * Sets start time for demand profile.<br>
+	 * @param x start time in hours.
+	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
+	 */
+	public synchronized boolean setDemandStartTime(double x) {
+		if ((x < 0) || (x > 24))
+			return false;
+		demandST = x;
+		return true;
+	}
+	
+	/**
 	 * Sets external demand value.
 	 * @param x external demand value.
 	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
@@ -1829,6 +1859,18 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 		if (x < myNetwork.getTP())
 			return false;
 		capacityTP = x;
+		return true;
+	}
+	
+	/**
+	 * Sets start time for capacity profile.<br>
+	 * @param x start time in hours.
+	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
+	 */
+	public synchronized boolean setCapacityStartTime(double x) {
+		if ((x < 0) || (x > 24))
+			return false;
+		capacityST = x;
 		return true;
 	}
 	

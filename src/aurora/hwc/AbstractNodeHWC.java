@@ -29,6 +29,7 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 	protected AuroraIntervalVector[][] splitRatioMatrix0 = null;
 	protected Vector<AuroraIntervalVector[][]> srmProfile = new Vector<AuroraIntervalVector[][]>();
 	protected double srTP = 1.0/12.0; // split ratio matrix change period (default: 1/12 hour)
+	protected double srST = 0.0; // start time for split ratio profile
 	
 		
 	/**
@@ -240,6 +241,10 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 		if ((p == null) || (!p.hasChildNodes()) || (m <= 0) || (n <= 0))
 			return !res;
 		try {
+			Node st_attr = p.getAttributes().getNamedItem("start_time");
+			if (st_attr != null) {
+				srST = Double.parseDouble(st_attr.getNodeValue()) / 3600;
+			}
 			Node dt_attr = p.getAttributes().getNamedItem("dt");
 			if (dt_attr == null)
 				dt_attr = p.getAttributes().getNamedItem("tp");
@@ -323,7 +328,7 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 	public void xmlDumpSplitRatioProfile(PrintStream out) throws IOException {
 		if (out == null)
 			out = System.out;
-		out.print("<splitratios node_id=\"" + id + "\" dt=\"" + Math.round(3600*srTP) + "\">\n");
+		out.print("<splitratios node_id=\"" + id + "\" start_time=\"" + Math.round(3600*srST) + "\" dt=\"" + Math.round(3600*srTP) + "\">\n");
 		if (srmProfile != null)
 			out.print(getSplitRatioProfileAsXML());
 		else
@@ -401,16 +406,27 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 		if (!res)
 			return res;
 		//
-		// Set current split ratio matrix
+		// start up
 		//
-		int idx = Math.max(0, (int)Math.floor(myNetwork.getSimTime()/srTP));
-		if (splitRatioMatrix0 != null)
-			setSplitRatioMatrix(splitRatioMatrix0);
-		else if (!srmProfile.isEmpty())
-			setSplitRatioMatrix(srmProfile.get(Math.min(idx, srmProfile.size()-1)));
 		int nIn = predecessors.size(); // number of inputs
 		int nOut = successors.size(); // number of outputs
 		int nTypes = ((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).countVehicleTypes();  // number of vehicle types
+		//
+		// Set current split ratio matrix
+		//
+		double t = myNetwork.getSimTime(); // current simulation time
+		t -= srST;
+		int idx = (int)Math.floor(t/srTP);
+		if (splitRatioMatrix0 != null)
+			setSplitRatioMatrix(splitRatioMatrix0);
+		else if ((!srmProfile.isEmpty()) && (idx >= 0))
+			setSplitRatioMatrix(srmProfile.get(Math.min(idx, srmProfile.size()-1)));
+		else {
+			splitRatioMatrix = new AuroraIntervalVector[nIn][nOut];
+			for (int i = 0; i < nIn; i++)
+				for (int j = 0; j < nOut; j++)
+					splitRatioMatrix[i][j] = new AuroraIntervalVector(nTypes);
+		}
 		//
 		// Initialize input demands
 		//
@@ -704,16 +720,27 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 		if (!res)
 			return res;
 		//
-		// Set current split ratio matrix
+		// start up
 		//
-		int idx = Math.max(0, (int)Math.floor(myNetwork.getSimTime()/srTP));
-		if (splitRatioMatrix0 != null)
-			setSplitRatioMatrix(splitRatioMatrix0);
-		else if (!srmProfile.isEmpty())
-			setSplitRatioMatrix(srmProfile.get(Math.min(idx, srmProfile.size()-1)));
 		int nIn = predecessors.size(); // number of inputs
 		int nOut = successors.size(); // number of outputs
 		int nTypes = ((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).countVehicleTypes();  // number of vehicle types
+		//
+		// Set current split ratio matrix
+		//
+		double t = myNetwork.getSimTime(); // current simulation time
+		t -= srST;
+		int idx = (int)Math.floor(t/srTP);
+		if (splitRatioMatrix0 != null)
+			setSplitRatioMatrix(splitRatioMatrix0);
+		else if ((!srmProfile.isEmpty()) && (idx >= 0))
+			setSplitRatioMatrix(srmProfile.get(Math.min(idx, srmProfile.size()-1)));
+		else {
+			splitRatioMatrix = new AuroraIntervalVector[nIn][nOut];
+			for (int i = 0; i < nIn; i++)
+				for (int j = 0; j < nOut; j++)
+					splitRatioMatrix[i][j] = new AuroraIntervalVector(nTypes);
+		}
 		//
 		// Initialize input demands
 		//
@@ -1221,6 +1248,13 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 	}
 	
 	/**
+	 * Returns split ratio profile start time in hours.
+	 */
+	public double getSplitRatioStartTime() {
+		return srST;
+	}
+	
+	/**
 	 * Returns the split ration for given pair of input and output Links.
 	 * @param in input Link.
 	 * @param out output Link.
@@ -1354,10 +1388,21 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
 	 */
 	public synchronized boolean setSplitRatioTP(double x) {
-		if (x >= myNetwork.getTP())
-			srTP = x;
-		else
+		if (x < myNetwork.getTP())
 			return false;
+		srTP = x;
+		return true;
+	}
+	
+	/**
+	 * Sets split ratio matrix profile start time.<br>
+	 * @param x start time in hours.
+	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
+	 */
+	public synchronized boolean setSplitRatioStartTime(double x) {
+		if ((x < 0) || (x > 24))
+			return false;
+		srST = x;
 		return true;
 	}
 	
