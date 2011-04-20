@@ -5,6 +5,7 @@
 package aurora.util;
 
 import java.text.NumberFormat;
+import java.util.StringTokenizer;
 import java.util.Vector;
 import org.jfree.data.time.Day;
 import org.jfree.data.time.Hour;
@@ -283,7 +284,7 @@ public class Util {
 
 	/**
 	 * Generates a comma separated representation of a vector.
-	 * @param int n indentation level.
+	 * @param int x vector of values.
 	 * @return <code>String</code> whitespace string. 
 	 */
 	public static String csvstringint(Vector<Integer> x) {
@@ -299,7 +300,7 @@ public class Util {
 
 	/**
 	 * Generates a comma separated representation of a vector.
-	 * @param int n indentation level.
+	 * @param int x vector of values.
 	 * @return <code>String</code> whitespace string. 
 	 */
 	public static String csvstringbool(Vector<Boolean> x) {
@@ -331,6 +332,26 @@ public class Util {
 			else
 				z = z.concat("," + x.get(i).toString());
 		return z;
+	}
+	
+	/**
+	 * Parses 'name1:value1, ..., nameK:valueK' strings.
+	 * @param buf text buffer.
+	 * @param nv vector of names.
+	 * @return vector of values given as strings. 
+	 */
+	public static Vector<String> parseNameValuePairs(String buf, Vector<String> nv) {
+		if ((buf == null) || (nv == null))
+			return null;
+		Vector<String> vv = new Vector<String>();
+		for (int i = 0; i < nv.size(); i++) {
+			int idx = buf.indexOf(nv.get(i));
+			StringTokenizer st = new StringTokenizer(buf.substring(idx), ", \t");
+			StringTokenizer st2 = new StringTokenizer(st.nextToken(), ":");
+			st2.nextToken();
+			vv.add(st2.nextToken());
+		}
+		return vv;
 	}
 
 }

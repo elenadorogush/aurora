@@ -11,6 +11,7 @@ import org.w3c.dom.*;
 
 import aurora.*;
 import aurora.hwc.*;
+import aurora.util.Util;
 
 
 /**
@@ -63,14 +64,34 @@ public class ControllerTR extends AbstractControllerSimpleHWC {
 		try  {
 			if (p.hasChildNodes()) {
 				NodeList pp = p.getChildNodes();
+				Vector<String> names = new Vector<String>();
+				names.add("id");
+				names.add("density");
+				names.add("flow");
+				names.add("speed");
+				names.add("rate");
 				for (int i = 0; i < pp.getLength(); i++) {
-					if (pp.item(i).getNodeName().equals("level")) {
-						int id = Integer.parseInt(pp.item(i).getAttributes().getNamedItem("id").getNodeValue());
-						double density = Double.parseDouble(pp.item(i).getAttributes().getNamedItem("density").getNodeValue());
-						double flow = Double.parseDouble(pp.item(i).getAttributes().getNamedItem("flow").getNodeValue());
-						double speed = Double.parseDouble(pp.item(i).getAttributes().getNamedItem("speed").getNodeValue());
-						double rate = Double.parseDouble(pp.item(i).getAttributes().getNamedItem("rate").getNodeValue());
+					if (pp.item(i).getNodeName().equals("level")) { //legacy
+						int id = Integer.parseInt(pp.item(i).getAttributes().getNamedItem(names.get(0)).getNodeValue());
+						double density = Double.parseDouble(pp.item(i).getAttributes().getNamedItem(names.get(1)).getNodeValue());
+						double flow = Double.parseDouble(pp.item(i).getAttributes().getNamedItem(names.get(2)).getNodeValue());
+						double speed = Double.parseDouble(pp.item(i).getAttributes().getNamedItem(names.get(3)).getNodeValue());
+						double rate = Double.parseDouble(pp.item(i).getAttributes().getNamedItem(names.get(4)).getNodeValue());
 						insertEntry(id, density, flow, speed, rate);
+					}
+					if (pp.item(i).getNodeName().equals("table")) {
+						StringTokenizer st = new StringTokenizer(pp.item(i).getTextContent(), ";");
+						while (st.hasMoreTokens()) {
+							Vector<String> values = Util.parseNameValuePairs(st.nextToken(), names);
+							if (values.size() == 5) {
+								int id = Integer.parseInt(values.get(0));
+								double density = Double.parseDouble(values.get(1));
+								double flow = Double.parseDouble(values.get(2));
+								double speed = Double.parseDouble(values.get(3));
+								double rate = Double.parseDouble(values.get(4));
+								insertEntry(id, density, flow, speed, rate);
+							}
+						}
 					}
 				}
 			}
@@ -92,9 +113,13 @@ public class ControllerTR extends AbstractControllerSimpleHWC {
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
 		super.xmlDump(out);
-		for (int i = 0; i < t_dns.size(); i++)
-			out.println("<level id=\"" + i + "\" density=\"" + t_dns.get(i) + "\" flow=\"" + t_flw.get(i) + "\" speed=\"" + t_spd.get(i) + "\" rate=\"" + rate.get(i) + "\" />");
-		out.print("</controller>");
+		out.print("<table>\n");
+		for (int i = 0; i < t_dns.size(); i++) {
+			if (i > 0)
+				out.print(";\n");
+			out.print("id:" + i + ", density:" + t_dns.get(i) + ", flow:" + t_flw.get(i) + ", speed:" + t_spd.get(i) + ", rate:" + rate.get(i));
+		}
+		out.print("\n</table>\n</controller>");
 		return;
 	}
 

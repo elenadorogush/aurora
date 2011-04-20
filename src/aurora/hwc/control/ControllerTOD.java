@@ -6,10 +6,12 @@ package aurora.hwc.control;
 
 import java.io.*;
 import java.util.*;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import aurora.*;
 import aurora.hwc.*;
+import aurora.util.Util;
 
 
 /**
@@ -36,11 +38,14 @@ public class ControllerTOD extends AbstractControllerSimpleHWC {
 		try  {
 			if (p.hasChildNodes()) {
 				NodeList pp = p.getChildNodes();
+				Vector<String> names = new Vector<String>();
+				names.add("time");
+				names.add("rate");
 				for (int i = 0; i < pp.getLength(); i++) {
-					if (pp.item(i).getNodeName().equals("todrate")) {
-						double time = Double.parseDouble(pp.item(i).getAttributes().getNamedItem("time").getNodeValue());
-						double rate = Double.parseDouble(pp.item(i).getAttributes().getNamedItem("rate").getNodeValue());
-						boolean done = false;
+					boolean done = false;
+					if (pp.item(i).getNodeName().equals("todrate")) { // legacy
+						double time = Double.parseDouble(pp.item(i).getAttributes().getNamedItem(names.get(0)).getNodeValue());
+						double rate = Double.parseDouble(pp.item(i).getAttributes().getNamedItem(names.get(1)).getNodeValue());
 						for (int j = 0; j < todTable.size(); j++){
 							if(todTable.get(j).getTime() > time){
 								todTable.insertElementAt(new TODdataRow(time, rate), j);
@@ -50,6 +55,25 @@ public class ControllerTOD extends AbstractControllerSimpleHWC {
 						}
 						if(!done)
 							todTable.add(new TODdataRow(time, rate));
+					}
+					if (pp.item(i).getNodeName().equals("table")) {
+						StringTokenizer st = new StringTokenizer(pp.item(i).getTextContent(), ";");
+						while (st.hasMoreTokens()) {
+							Vector<String> values = Util.parseNameValuePairs(st.nextToken(), names);
+							if (values.size() == 2) {
+								double time = Double.parseDouble(values.get(0)) / 3600;
+								double rate = Double.parseDouble(values.get(1));
+								for (int j = 0; j < todTable.size(); j++){
+									if(todTable.get(j).getTime() > time){
+										todTable.insertElementAt(new TODdataRow(time, rate), j);
+										done = true;
+										break;
+									}	
+								}
+								if(!done)
+									todTable.add(new TODdataRow(time, rate));
+							}
+						}
 					}
 				}
 			}
@@ -71,9 +95,13 @@ public class ControllerTOD extends AbstractControllerSimpleHWC {
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
 		super.xmlDump(out);
-		for (int i = 0; i < todTable.size(); i++)
-			out.print("<todrate time=\"" + todTable.get(i).getTime() + "\" rate=\"" + todTable.get(i).getRate() + "\"/>");
-		out.print("</controller>");
+		out.print("<table>\n");
+		for (int i = 0; i < todTable.size(); i++) {
+			if (i > 0)
+				out.print(";\n");
+			out.print("  time:" + Math.round(3600*todTable.get(i).getTime()) + ", rate:" + todTable.get(i).getRate());
+		}
+		out.print("\n</table>\n</controller>");
 		return;
 	}
 
