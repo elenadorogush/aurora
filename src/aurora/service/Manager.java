@@ -1,5 +1,5 @@
 /**
- * Classes for using aurora simulator as a service back-end.
+ * @(#)Manager.java
  */
 package aurora.service;
 
@@ -17,12 +17,11 @@ import aurora.hwc.*;
  *
  */
 public class Manager {
-	/**
-	 * 
-	 */
+	
 	public Manager() {
 		// TODO Auto-generated constructor stub
 	}
+	
 	
 	public String run_once(String input_xml, String outfile, String[] output_xml, Updatable updater, int period) {
 		ContainerHWC mySystem = new ContainerHWC();
@@ -66,7 +65,7 @@ public class Manager {
 				return "Simulation failed on time step " + ts + ": " + e.getMessage();
 			}
 			if (updater != null && ts % period == 0) {
-				updater.notify_update("step="+ts);
+				updater.notify_update(ts);
 			}
 		}
 		if (!res)
@@ -88,6 +87,8 @@ public class Manager {
 		return("Done!");
 	}
 
+	
+	
 	/**
 	 * @param args
 	 */
@@ -100,6 +101,10 @@ public class Manager {
 		}
 	}
 	
+	
+	
+	
+	// not used in service
 	private static void runBatch(String infile, String outfile) {
 		File config = new File(infile);
 		ContainerHWC mySystem = new ContainerHWC();

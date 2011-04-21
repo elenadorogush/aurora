@@ -1,6 +1,7 @@
 /**
  * 
  */
+
 package aurora.service;
 
 /**
@@ -8,5 +9,5 @@ package aurora.service;
  *
  */
 public interface Updatable {
-	void notify_update(String update_info);
+	void notify_update(int percent_complete);
 }
