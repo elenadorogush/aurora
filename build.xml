@@ -8,6 +8,8 @@
 	<property name="lib.db.dir" value="${basedir}/libdbDerby" />
 	<property name="lib.gis.dir" value="${basedir}/libGIS" />
 	<property name="lib.gui.dir" value="${basedir}/libGUI" />
+	<property name="lib.pdf.dir" value="${basedir}/libPDF" />
+	<property name="lib.ppt.dir" value="${basedir}/libPPT" />
 	<property name="build.encoding" value="ISO-8859-1" />
 
 	<property name="javac.optimize" value="on" />
@@ -40,6 +42,12 @@
 		<fileset dir="${lib.gis.dir}">
 			<include name="**/*.jar" />
 			<exclude name="**/excluded/" />
+		</fileset>
+		<fileset dir="${lib.pdf.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+		<fileset dir="${lib.ppt.dir}">
+			<include name="**/*.jar" />
 		</fileset>
 	</path>
 
