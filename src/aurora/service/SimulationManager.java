@@ -5,6 +5,7 @@
 package aurora.service;
 
 import java.io.*;
+
 import javax.xml.parsers.*;
 import org.xml.sax.InputSource;
 import org.w3c.dom.*;
@@ -81,13 +82,21 @@ public class SimulationManager implements ProcessManager {
 			return "Simulation failed on time step " + ts;
 		mySystem.getMySettings().getTmpDataOutput().close();
 		if ((output_files != null) && (output_files.length > 1)) {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			PrintStream ps = new PrintStream(baos);
+			PrintStream ps = null;
 			try {
+				if ((output_files[1] != null) && (!output_files[1].isEmpty())) {
+					File o_file = new File(output_files[1]);
+					ps = new PrintStream(new FileOutputStream(o_file.getAbsolutePath()));
+				}
+				else {
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					ps = new PrintStream(baos);
+				}
 				mySystem.xmlDump(ps);
 			}
 			catch(Exception e) {
-				ps.close();
+				if (ps != null)
+					ps.close();
 				return "Error: Failed to generate configuration file";
 			}
 			output_files[1] = ps.toString();
