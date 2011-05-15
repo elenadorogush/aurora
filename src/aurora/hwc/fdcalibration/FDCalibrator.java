@@ -1,56 +1,49 @@
 package aurora.hwc.fdcalibration;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Vector;
-
+import java.net.*;
+import java.io.*;
+import java.util.*;
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.w3c.dom.Document;
+import aurora.*;
+import aurora.hwc.*;
+import aurora.service.*;
 
-import aurora.AbstractLink;
-import aurora.AbstractNetworkElement;
-import aurora.AbstractNode;
-import aurora.AbstractSensor;
-import aurora.hwc.AbstractLinkHWC;
-import aurora.hwc.ContainerHWC;
-import aurora.hwc.SensorLoopDetector;
 
 public class FDCalibrator {
+	protected File configfile;
+	protected ArrayList<URL> datafile;
+	protected String outputfile;
+	protected ContainerHWC mySystem = new ContainerHWC();
+	protected HashMap <Integer,FiveMinuteData> data = new HashMap <Integer,FiveMinuteData> ();
+	protected Vector<AbstractSensor> SensorList;
+	
+	protected Updatable updater = null;
 
-	private File configfile;
-	private ArrayList<File> datafile;
-	private String outputfile;
-	private ContainerHWC mySystem = new ContainerHWC();
-	private HashMap <Integer,FiveMinuteData> data = new HashMap <Integer,FiveMinuteData> ();
-	private Vector<AbstractSensor> SensorList;
-
-	public FDCalibrator(String cfile,ArrayList<String> dfile,String ofile){
+	public FDCalibrator(String cfile, ArrayList<String> dfile, String ofile){
 		configfile = new File(cfile);
-		datafile = new ArrayList<File>();
-		for(int i=0;i<dfile.size();i++)
-			datafile.add(new File(dfile.get(i)));
-		outputfile = ofile;	
+		datafile = new ArrayList<URL>();
+		try {
+			for (int i = 0; i < dfile.size(); i++)
+				datafile.add(new URL(dfile.get(i)));
+		}
+		catch(Exception e) { }
+		outputfile = ofile;
 	}
 
 	// execution .................................
 	public void run() throws Exception{
 		openfile();										// 1. read the original network file 
 		readtrafficdata();								// 2. read pems 5 minute file
-		for(int i=0;i<SensorList.size();i++){			// 3. run calibration routine
+		for (int i = 0; i < SensorList.size(); i++) {			// 3. run calibration routine
 			SensorLoopDetector S = (SensorLoopDetector) SensorList.get(i);
-			if(S.getVDS()!=0 & S.getLink()!=null)
+			if ((S.getVDS() != 0) && (S.getLink() != null))
 				calibrate(S);
 		}
 		propagate();									// 4. extend parameters to the rest of the network
 		export(); 										// 5. export to configuration file
 	}
-	
+
 	// step 1
 	private void openfile() throws Exception{
 		if (configfile.getName().endsWith("xml")) { 
@@ -64,42 +57,32 @@ public class FDCalibrator {
 			throw(new Exception("invalid config file extension"));
 		}
 	}
-	
+
 	// step 2
-	private void readtrafficdata() throws Exception{
-		
-		int i,j;
-		
+	public void readtrafficdata() throws Exception{
 		// construct list of stations to extract from datafile 
 		SensorList = mySystem.getMyNetwork().getSensors();
 		ArrayList<Integer> vdslist = new ArrayList<Integer>();
 		ArrayList<ArrayList<Integer>> vdslanes = new ArrayList<ArrayList<Integer>>();
-		for(i=0;i<SensorList.size();i++){
+		for(int i = 0; i < SensorList.size(); i++) {
 			SensorLoopDetector S = (SensorLoopDetector) SensorList.get(i);
-			if(S.getVDS()!=0 & S.getLink()!=null){
+			if ((S.getVDS() != 0) && (S.getLink() != null)) {
 				vdslist.add(S.getVDS());
 				ArrayList<Integer> templanes = new ArrayList<Integer>();
-				for(j=1;j<=S.getLanes();j++)	
+				for (int j = 1; j <= S.getLanes(); j++)
 					templanes.add(j);		// THIS IS TEMPORARY, EVENTUALLY THE LOOP<->LANES MAP SHOULD BE SPECIFIED IN NE
 				vdslanes.add(templanes);
-				data.put(S.getVDS(),new FiveMinuteData(S.getVDS()));
+				data.put(S.getVDS(), new FiveMinuteData(S.getVDS()));
+			}
 		}
-		}
-
 		// Read 5 minute data to "data"
 		PeMSClearinghouseInterpreter P = new PeMSClearinghouseInterpreter(datafile);
-		P.Read5minData(vdslist,vdslanes,data);		
-		
-		FiveMinuteData D = data.get(400958);
-		
-		
-		
-System.out.println(D.dty.size());
+		P.Read5minData(vdslist, vdslanes, data, updater);
 	}
-	
+
 	// step 3
 	@SuppressWarnings("unchecked")
-	private void calibrate(SensorLoopDetector S){
+	public void calibrate(SensorLoopDetector S) {
 		int i;
 		int vds = S.getVDS();
 
@@ -116,30 +99,30 @@ System.out.println(D.dty.size());
 		float nom_w_max = 19;
 		float nom_w = 15;
 		float nom_Qmax = 2000;
-		
+
 		// get data
 		FiveMinuteData D = data.get(vds);
 		int numdatapoints = D.time.size();
-		
+
 		// degenerate case
 		if(numdatapoints==0){
 			S.setFD(nom_vf,nom_w,nom_Qmax,nom_Qmax/nom_vf+nom_Qmax/nom_w,nom_Qmax/nom_vf);
 			return;  
 		}
-		
+
 		// organize into an array of DataPoint
 		ArrayList<DataPoint> datavec = new ArrayList<DataPoint>();
 		for(i=0;i<numdatapoints;i++)
 			datavec.add(new DataPoint(D.dty.get(i),D.flw.get(i),D.spd.get(i)));
   
 		// Find free-flow velocity ...............................
-		
+
 		// maximum flow and its corresponding density
 		DataPoint maxflw = new DataPoint(0f,Float.NEGATIVE_INFINITY,0f);
 		for(i=0;i<numdatapoints;i++)
 			if(datavec.get(i).flw>maxflw.flw)
 				maxflw.setval(datavec.get(i));
-		
+
 		q_max = maxflw.flw;
 
 		// split data into congested and freeflow regimes ...............
@@ -150,10 +133,10 @@ System.out.println(D.dty.size());
 				congestion.add(datavec.get(i));
 			else
 				freeflow.add(datavec.get(i));
-		
+
 		vf = percentile("spd",freeflow,0.5f);
 		rho_crit = q_max/vf;
-		
+
 		// BINNING
 		ArrayList<DataPoint> supercritical = new ArrayList<DataPoint>(); 	// data points above rho_crit
 		for(i=0;i<numdatapoints;i++)
@@ -206,16 +189,16 @@ System.out.println(D.dty.size());
 		    w  = nom_w;
 		    rj = q_max*(vf + nom_w)/(vf*nom_w);
 		}
-		
+
 		// store parameters in sensor
 		S.setFD(vf,w,q_max,rj,rho_crit);
 	}
   
 	// step 4
-	private void propagate(){
+	public void propagate(){
 		int i;
 		boolean done = false;
-		
+
 		// populate the grow network
 		ArrayList<GrowLink> arraygrownetwork = new ArrayList<GrowLink>();
 		HashMap<Integer,GrowLink> hashgrownetwork = new HashMap<Integer,GrowLink>();
@@ -226,7 +209,7 @@ System.out.println(D.dty.size());
 			hashgrownetwork.put(L.getId(),G);
 			arraygrownetwork.add(G);
 		}
-		
+
 		// initialize the grow network with sensored links 
 		for(i=0;i<SensorList.size();i++){
 			SensorLoopDetector S = (SensorLoopDetector) SensorList.get(i);
@@ -238,38 +221,38 @@ System.out.println(D.dty.size());
 				G.isgrowable = true;
 			}
 		}
-		
+
 		// repeatedly traverse network until all assigned links cannot be grown
-		while(!done){	
+		while(!done){
 			done = true;
-			
+
 			// step through all links
 			for(i=0;i<arraygrownetwork.size();i++) {
-				
+
 				GrowLink G = arraygrownetwork.get(i);
-				
+
 				// continue if G is assigned and not growable, or if G is unassigned
 				if( (G.isassigned & !G.isgrowable) | !G.isassigned)
 					continue;
-				
+
 				done = false;
-					
+
 				// so G is assigned and growable, expand to its upstream and downstream links
 				growout("up",G,hashgrownetwork);
 				growout("dn",G,hashgrownetwork);
 				G.isgrowable = false;
 			}
 		}
-		
+
 		// copy parameters to the links
 		for(i=0;i<arraygrownetwork.size();i++){
 			GrowLink G = arraygrownetwork.get(i);
 			if(G.isassigned)
 				((AbstractLinkHWC) G.link).setFD(G.sensor.q_max,G.sensor.rho_crit,G.sensor.rj,0.0);
 		}
-		
+
 	}
-	
+
 	// step 5
 	private void export() throws Exception{
 		PrintStream oos = new PrintStream(new FileOutputStream(outputfile));
@@ -277,6 +260,19 @@ System.out.println(D.dty.size());
 		oos.close();
 	}
 	
+	
+	// routines called from service.....................
+	
+	public synchronized void setMySystem(ContainerHWC my_sys) {
+		mySystem = my_sys;
+		return;
+	}
+	
+	public synchronized void setUpdater(Updatable upd) {
+		updater = upd;
+		return;
+	}
+
 	// private routines.................................
 
 	// compute the p'th percentile qty (p in [0,1])
@@ -292,21 +288,21 @@ System.out.println(D.dty.size());
 		if(qty.equals("dty"))
 			for(int i=0;i<numdata;i++)
 				values.add(x.get(i).dty);
-		
+
 		Collections.sort(values);
-		
+
 		if(p==0)
 			return values.get(0);
 		if(p==1)
 			return values.get(numdata-1);
-		
+
 		int z = (int) Math.floor(numdata*p);
 		if(numdata*p==z)
 			return (values.get(z-1)+values.get(z))/2f;
 		else
 			return values.get(z);
 	}
-	
+
 	private void growout(String upordn,GrowLink G,HashMap<Integer,GrowLink> H){
 		AbstractNode node;
 		Vector<AbstractNetworkElement> newlinks = null;
@@ -320,10 +316,10 @@ System.out.println(D.dty.size());
 			if(node!=null)
 				newlinks = node.getSuccessors();
 		}
-		
+
 		if(newlinks==null)
 			return;
-					
+
 		for(int i=0;i<newlinks.size();i++){
 			GrowLink nG = H.get( ((AbstractLink) newlinks.get(i)).getId() );
 			// propagate if nG is unassigned and of the same type as G
@@ -334,7 +330,7 @@ System.out.println(D.dty.size());
 			}
 		}
 	}
-	
+
 	// internal classes ...............................
 	public class DataPoint implements Comparable {
 		float dty;
@@ -376,45 +372,53 @@ System.out.println(D.dty.size());
 
 	// main function .................................
 	public static void main(String[] args) {
-		
-		try{
 
+		try {
 			String configfilename,outputfilename;
 			ArrayList<String> datafilename = new ArrayList<String>();
-			if(args.length>0)
-				configfilename = args[0];
-			else
-				configfilename = "C:\\Gabriel\\PATH_TOPL\\680hot\\aurora-export7.xml";
-
-			if(args.length>1)
-				datafilename.add(args[1]);
-			else{
-				datafilename.add("C:\\Gabriel\\PATH_TOPL\\680hot\\d04_text_station_5min_2010_12_07.txt");
-				datafilename.add("C:\\Gabriel\\PATH_TOPL\\680hot\\d04_text_station_5min_2010_12_08.txt");
-				datafilename.add("C:\\Gabriel\\PATH_TOPL\\680hot\\d04_text_station_5min_2010_12_09.txt");
+			if(args.length < 3){
+				System.out.println("Arguments:");
+				System.out.println("1) Configuration file name.");
+				System.out.println("2) List of PeMS Clearinghouse 5-minute data files: {file1,file2,...}.");
+				System.out.println("3) Output file name.");
+				return;
 			}
-			
-			if(args.length>2)
-				outputfilename = args[2];
-			else
-				outputfilename = "C:\\Gabriel\\PATH_TOPL\\680hot\\aurora-export8c.xml";
-
-			if(args.length>3){
+			if (args.length > 13)
 				throw(new Exception("too many input arguments"));
+			configfilename = args[0];
+			outputfilename = args[2];
+			String z = args[1];
+			if (z.startsWith("{"))
+				z = z.substring(1);
+			if (z.endsWith("}"))
+				z = z.substring(0,z.length()-1);
+			String [] w = z.split(",");
+			for (int i = 0; i < w.length; i++)
+				datafilename.add(w[i].trim());
+			// basic checks
+			if(!configfilename.endsWith(".xml")) {
+				System.out.println("Invalid configuration file extension.");
+				return;
 			}
-
-			FDCalibrator calibrator = new FDCalibrator(configfilename,datafilename,outputfilename);
+			for (int i = 0; i < datafilename.size(); i++) {
+				if (!datafilename.get(i).endsWith(".txt")) {
+					System.out.println("Invalid data file file extension.");
+					return;
+				}
+			}
+			if (!outputfilename.endsWith(".xml")) {
+				System.out.println("Invalid output file extension.");
+				return;
+			}
+			FDCalibrator calibrator = new FDCalibrator(configfilename, datafilename, outputfilename);
 			calibrator.run();
-
 		}
 		catch(Exception e){
 			System.out.println(e);
 			System.exit(1);
 		}
-		
-		System.out.println("done");
-		System.exit(0);	
-		
+		System.out.println("Done!");
+		System.exit(0);
 	}
 
 }
