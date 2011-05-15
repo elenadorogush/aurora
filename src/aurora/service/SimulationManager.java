@@ -87,19 +87,20 @@ public class SimulationManager implements ProcessManager {
 				if ((output_files[1] != null) && (!output_files[1].isEmpty())) {
 					File o_file = new File(output_files[1]);
 					ps = new PrintStream(new FileOutputStream(o_file.getAbsolutePath()));
+					mySystem.xmlDump(ps);
 				}
 				else {
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 					ps = new PrintStream(baos);
+					mySystem.xmlDump(ps);
+					output_files[1] = baos.toString();
 				}
-				mySystem.xmlDump(ps);
 			}
 			catch(Exception e) {
 				if (ps != null)
 					ps.close();
 				return "Error: Failed to generate configuration file";
 			}
-			output_files[1] = ps.toString();
 			ps.close();
 		}
 		return("Done!");
