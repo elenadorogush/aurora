@@ -5,8 +5,12 @@
 package aurora.hwc;
 
 import java.io.*;
+import java.util.*;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import aurora.*;
+import aurora.hwc.fdcalibration.*;
 
 /**
  * Implementation of loop detector.
@@ -40,6 +44,10 @@ public final class SensorLoopDetector extends AbstractSensor {
 	private AbstractLinkHWC myHWCLink = null;
 	//private AbstractNode bnd;
 	//private AbstractNode end;
+	
+	// data files
+	protected double start_time = 0.0;
+	protected Vector<HistoricalDataSource> data_files = new Vector<HistoricalDataSource>();
 	
 	// calibrated parameters
 	public float vf;
@@ -191,41 +199,78 @@ public final class SensorLoopDetector extends AbstractSensor {
 			return !res;
 		res &= super.initFromDOM(p);
 		try  {
-			
-			Node pp;
-			pp = p.getAttributes().getNamedItem("length");
-			if(pp!=null)
+			Node pp = p.getAttributes().getNamedItem("length");
+			if (pp != null)
 				looplength = Double.parseDouble(pp.getNodeValue()) / 5280.0;
-			if(myLink!=null)
+			if (myLink != null)
 				myHWCLink = (AbstractLinkHWC) myLink;
-
 			pp = p.getAttributes().getNamedItem("data_id");
-			if(pp!=null)
+			if (pp != null)
 				data_id = pp.getNodeValue();
-
 			pp = p.getAttributes().getNamedItem("vds");
-			if(pp!=null)
+			if (pp != null)
 				vds = Integer.parseInt(pp.getNodeValue());
-			
 			pp = p.getAttributes().getNamedItem("hwy_name");
-			if(pp!=null)
+			if (pp != null)
 				hwy_name = pp.getNodeValue();
-
 			pp = p.getAttributes().getNamedItem("hwy_dir");
-			if(pp!=null)
+			if (pp != null)
 				hwy_dir = pp.getNodeValue();
-
 			pp = p.getAttributes().getNamedItem("postmile");
-			if(pp!=null)
+			if (pp != null)
 				postmile = pp.getNodeValue();
-
 			pp = p.getAttributes().getNamedItem("lanes");
-			if(pp!=null)
+			if (pp != null)
 				lanes = Integer.parseInt(pp.getNodeValue());	
-			
 			pp = p.getAttributes().getNamedItem("link_type");
-			if(pp!=null)
+			if (pp != null)
 				link_type = pp.getNodeValue();
+			// new schema
+			if (p.hasChildNodes()) {
+				NodeList cl = p.getChildNodes();
+				for (int i = 0; i < cl.getLength(); i++) {
+					if (cl.item(i).getNodeName().equals("parameters"))
+						if (cl.item(i).hasChildNodes()) {
+							NodeList cc = cl.item(i).getChildNodes();
+							for (int j = 0; j < cc.getLength(); j++)
+								if (cc.item(j).getNodeName().equals("parameter")) {
+									Node name_attr = cc.item(j).getAttributes().getNamedItem("name");
+									Node value_attr = cc.item(j).getAttributes().getNamedItem("value");
+									if ((name_attr != null) && (value_attr != null)) {
+										if (name_attr.getNodeValue().equals("data_id"))
+											data_id = value_attr.getNodeValue();
+										if (name_attr.getNodeValue().equals("vds"))
+											vds = Integer.parseInt(value_attr.getNodeValue());
+										if (name_attr.getNodeValue().equals("hwy_name"))
+											hwy_name = value_attr.getNodeValue();
+										if (name_attr.getNodeValue().equals("hwy_dir"))
+											hwy_dir = value_attr.getNodeValue();
+										if (name_attr.getNodeValue().equals("postmile"))
+											postmile = value_attr.getNodeValue();
+										if (name_attr.getNodeValue().equals("offset_in_link"))
+											offset_in_link = Float.parseFloat(value_attr.getNodeValue());
+										if (name_attr.getNodeValue().equals("length"))
+											looplength = Double.parseDouble(value_attr.getNodeValue()) / 5280;
+										if (name_attr.getNodeValue().equals("lanes"))
+											lanes = Integer.parseInt(value_attr.getNodeValue());
+										if (name_attr.getNodeValue().equals("start_time"))
+											start_time = Double.parseDouble(value_attr.getNodeValue()) / 3600;
+									}
+									; //TODO
+								}
+						}
+					if (cl.item(i).getNodeName().equals("data_sources"))
+						if (cl.item(i).hasChildNodes()) {
+							NodeList cc = cl.item(i).getChildNodes();
+							for (int j = 0; j < cc.getLength(); j++)
+								if (cc.item(j).getNodeName().equals("source")) {
+									HistoricalDataSource hdc = new HistoricalDataSource();
+									hdc.initFromDOM(cc.item(j));
+									data_files.add(hdc);
+								}
+						}
+				}
+			}
 		}
 		catch(Exception e) {
 			res = false;
@@ -257,54 +302,42 @@ public final class SensorLoopDetector extends AbstractSensor {
 		if (out == null)
 			out = System.out;
 		out.print("<sensor type=\"" + getTypeLetterCode() + "\" id=\"" + id + "\"");
-		
-		//if(name!=null)
-		//	out.print(" name=\"" + name + "\"");
-		
-		if(data_id!=null)
-			out.print(" data_id=\"" + data_id + "\"");
-					
-		if(link_type!=null)
-			out.print(" link_type=\""  + link_type + "\"");
-		
-		if( !Float.isNaN(offset_in_link) )
-			out.print(" offset_in_link=\"" + offset_in_link + "\"");
-
-		if( !Double.isNaN(looplength))
-			out.print(" length=\"" + looplength*5280 + "\"");
-
-		if(description!=null)
-			out.print(" description=\"" + description + "\"");
-		
-		if(display_lat!=null)
-			out.print(" display_lat=\"" + display_lat + "\"");
-		
-		if(display_lng!=null)
-			out.print(" display_lng=\"" + display_lng + "\"");
-
-		if(vds!=0)
-			out.print(" vds=\"" + vds + "\"");
-		
-		if(hwy_name!=null)
-			out.print(" hwy_name=\"" + hwy_name + "\"");
-		
-		if(hwy_dir!=null)
-			out.print(" hwy_dir=\"" + hwy_dir + "\"");
-		
-		if(postmile!=null)
-			out.print(" postmile=\"" + postmile + "\"");
-		
-		if(lanes!=0)
-			out.print(" lanes=\"" + lanes + "\"");
-		
+		if (link_type != null)
+			out.print(" link_type=\"" + link_type + "\"");
 		out.print(">\n");
-
+		if (description != null)
+			out.print("  <description>" + description + "</description>\n");
+		if (myLink != null)
+			out.print("  <links>" + myLink.getId()  + "</links>\n");
+		out.print("  <parameters>\n");
+		if (data_id != null)
+			out.print("    <parameter name=\"data_id\" value=\"" + data_id + "\" />\n");
+		if (vds != 0)
+			out.print("    <parameter name=\"vds\" value=\"" + vds + "\" />\n");
+		if (hwy_name != null)
+			out.print("    <parameter name=\"hwy_name\" value=\"" + hwy_name + "\" />\n");
+		if (hwy_dir != null)
+			out.print("    <parameter name=\"hwy_dir\" value=\"" + hwy_dir + "\" />\n");
+		if (postmile != null)
+			out.print("    <parameter name=\"postmile\" value=\"" + postmile + "\" />\n");
+		if (!Float.isNaN(offset_in_link))
+			out.print("    <parameter name=\"offset_in_link\" value=\"" + offset_in_link + "\" />\n");
+		if (!Double.isNaN(looplength))
+			out.print("    <parameter name=\"length\" value=\"" + 5280*looplength + "\" />\n");
+		if (lanes != 0)
+			out.print("    <parameter name=\"lanes\" value=\"" + lanes + "\" />\n");
+		out.print("    <parameter name=\"start_time\" value=\"" + (int)Math.round(3600*start_time) + "\" />\n");
+		out.print("  </parameters>\n");
+		out.print("  <data_sources>\n");
+		for (int i = 0; i < data_files.size(); i++) {
+			out.print("    ");
+			data_files.get(i).xmlDump(out);
+		}
+		out.print("  </data_sources>\n");
+		if ((display_lat != null) && (display_lng != null))
+			out.print("  <display_position><point lat=\"" + display_lat + "\" lng=\"" + display_lng + "\" elevation=\"\"/></display_position>\n  ");
 		position.xmlDump(out);
-		
-		if(myLink!=null)
-			out.print("\t<links>" + myLink.getId()  + "</links>\n");
-		
-		out.print("</sensor>\n"); 
+		out.print("\n</sensor>\n"); 
 		return;
 	}
 	
