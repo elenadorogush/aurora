@@ -27,6 +27,11 @@ public class SimulationManager implements ProcessManager {
 	 * @return <code>Done!</code> if successful, otherwise string starting with <code>Error:</code>.
 	 */
 	public String run_application(String[] input_files, String[] output_files, Updatable updater, int period) {
+		double initial_time, max_time;
+		if ((input_files == null) || (input_files.length < 1))
+			return "Error: No input files!";
+		if ((output_files == null) || (output_files.length < 1))
+			return "Error: No output files specified!";
 		ContainerHWC mySystem = new ContainerHWC();
 		mySystem.batchMode();
 		try {
@@ -35,6 +40,18 @@ public class SimulationManager implements ProcessManager {
 			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
 			mySystem.initFromDOM(doc.getChildNodes().item(0));
 			mySystem.validate();
+			initial_time = mySystem.getMySettings().getTimeInitial();
+			max_time = mySystem.getMySettings().getTimeMax();
+			if (input_files.length > 1) {
+				is.setCharacterStream(new StringReader(input_files[1]));
+				Node trp = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is).getChildNodes().item(0);
+				Node bt_attr = trp.getAttributes().getNamedItem("begin_time");
+				if (bt_attr != null)
+					initial_time = Math.max(initial_time, Double.parseDouble(bt_attr.getNodeValue())/3600.0);
+				Node dur_attr = trp.getAttributes().getNamedItem("duration");
+				if (dur_attr != null)
+					max_time = initial_time + (Double.parseDouble(dur_attr.getNodeValue()) / 3600.0);
+			}
 		}
 		catch(Exception e) {
 			return "Error: Failed to parse xml: " + e.getMessage();
@@ -49,6 +66,13 @@ public class SimulationManager implements ProcessManager {
 		catch(Exception e) {
 			return "Error: Failed to open data output file: " + e.getMessage();
 		}
+		if (output_files.length > 1) { // warm-up run
+			mySystem.getMySettings().setTimeMax(initial_time);
+		}
+		else { // normal run
+			mySystem.getMySettings().setTimeMax(max_time);
+			mySystem.getMySettings().setTimeInitial(initial_time);
+		}
 		try {
 			mySystem.initialize();
 		}
@@ -61,7 +85,7 @@ public class SimulationManager implements ProcessManager {
 		mySystem.getMyStatus().setSaved(false);
 		int ts = mySystem.getMyNetwork().getTS();
 		int start_ts = ts;
-		double total_sim_time = mySystem.getMySettings().getTimeMax() - mySystem.getMyNetwork().getSimTime();
+		double total_sim_time = Math.max(0, mySystem.getMySettings().getTimeMax() - mySystem.getMyNetwork().getSimTime());
 		long curr_sys_time = System.currentTimeMillis();
 		long lst_updt_time = curr_sys_time;
 		while ((!mySystem.getMyStatus().isStopped()) && res) {
