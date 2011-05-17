@@ -580,42 +580,66 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 	 * Returns vector of Sensors.
 	 */
 	public final Vector<AbstractSensor> getSensors() {
-		return sensors;
+		Vector<AbstractSensor> ss = new Vector<AbstractSensor>();
+		ss.addAll(sensors);
+		for (int i = 0; i < networks.size(); i++)
+			ss.addAll(networks.get(i).getSensors());
+		return ss;
 	}
 	
 	/**
 	 * Returns vector of Monitors.
 	 */
 	public final Vector<AbstractMonitor> getMonitors() {
-		return monitors;
+		Vector<AbstractMonitor> mm = new Vector<AbstractMonitor>();
+		mm.addAll(monitors);
+		for (int i = 0; i < networks.size(); i++)
+			mm.addAll(networks.get(i).getMonitors());
+		return mm;
 	}
 	
 	/**
 	 * Returns vector of Complex Controllers.
 	 */
 	public final Vector<AbstractControllerComplex> getControllers() {
-		return controllers;
+		Vector<AbstractControllerComplex> cc = new Vector<AbstractControllerComplex>();
+		cc.addAll(controllers);
+		for (int i = 0; i < networks.size(); i++)
+			cc.addAll(networks.get(i).getControllers());
+		return cc;
 	}
 	
 	/**
 	 * Returns vector of Networks.
 	 */
 	public final Vector<AbstractNodeComplex> getNetworks() {
-		return networks;
+		Vector<AbstractNodeComplex> tt = new Vector<AbstractNodeComplex>();
+		tt.addAll(networks);
+		for (int i = 0; i < networks.size(); i++)
+			tt.addAll(networks.get(i).getNetworks());
+		return tt;
 	}
 	
 	/**
 	 * Returns vector of Nodes.
 	 */
 	public final Vector<AbstractNodeSimple> getNodes() {
-		return nodes;
+		Vector<AbstractNodeSimple> nn = new Vector<AbstractNodeSimple>();
+		nn.addAll(nodes);
+		for (int i = 0; i < networks.size(); i++)
+			nn.addAll(networks.get(i).getNodes());
+		return nn;
 	}
 	
 	/**
 	 * Returns vector of Links.
 	 */
 	public final Vector<AbstractLink> getLinks() {
-		return links;
+		Vector<AbstractLink> ll = new Vector<AbstractLink>();
+		ll.addAll(links);
+		for (int i = 0; i < networks.size(); i++)
+			ll.addAll(networks.get(i).getLinks());
+		return ll;
 	}
 	
 	/**
@@ -673,7 +697,11 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 	 * Returns list of ODs.
 	 */
 	public final Vector<OD> getODList() {
-		return odList;
+		Vector<OD> odl = new Vector<OD>();
+		odl.addAll(odList);
+		for (int i = 0; i < networks.size(); i++)
+			odl.addAll(networks.get(i).getODList());
+		return odl;
 	}
 	
 	/**
