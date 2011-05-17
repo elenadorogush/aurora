@@ -335,7 +335,7 @@ public final class SensorLoopDetector extends AbstractSensor {
 		}
 		out.print("  </data_sources>\n");
 		if ((display_lat != null) && (display_lng != null))
-			out.print("  <display_position><point lat=\"" + display_lat + "\" lng=\"" + display_lng + "\" elevation=\"\"/></display_position>\n  ");
+			out.print("  <display_position><point lat=\"" + display_lat + "\" lng=\"" + display_lng + "\" elevation=\"0.0\"/></display_position>\n  ");
 		position.xmlDump(out);
 		out.print("\n</sensor>\n"); 
 		return;
