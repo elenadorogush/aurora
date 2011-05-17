@@ -238,9 +238,10 @@ public class PerformanceCalculator {
 
 			// construct legend
 			e.legend.clear();
-			for(j=0;j<e.legend_text.size();j++)
-				if(e.legend_units!=null)
-					e.legend.add( String.format(e.legend_text.get(j) + " (%." + e.legend_precision + "f " + e.legend_units + ")", e.legendval.get(j)) );
+			for (j = 0; j < e.legend_text.size(); j++)
+				if (e.legend_units!=null) {
+					e.legend.add(String.format(e.legend_text.get(j) + " (%." + e.legend_precision + "f " + e.legend_units + ")", j<e.legendval.size() ? e.legendval.get(j):-1));
+				}
 				else
 					e.legend.add( String.format(e.legend_text.get(j)) );
 		}
