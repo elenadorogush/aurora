@@ -297,6 +297,14 @@ public final class SensorLoopDetector extends AbstractSensor {
 	public final String getTypeString() {
 		return "Loop Detector";
 	}
+	
+	/**
+	 * Return data source liSt.
+	 */
+	public Vector<HistoricalDataSource> getDataSources() {
+		return data_files;
+	}
+	
 //	-------------------------------------------------------------------------
 	public void xmlDump(PrintStream out) throws IOException {
 		if (out == null)

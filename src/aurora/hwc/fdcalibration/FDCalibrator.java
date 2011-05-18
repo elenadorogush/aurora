@@ -13,6 +13,7 @@ import aurora.service.*;
 public class FDCalibrator {
 	protected File configfile;
 	protected ArrayList<URL> datafile;
+	protected ArrayList<String> datafilerefs;
 	protected String outputfile;
 	protected ContainerHWC mySystem = new ContainerHWC();
 	protected HashMap <Integer,FiveMinuteData> data = new HashMap <Integer,FiveMinuteData> ();
@@ -22,6 +23,7 @@ public class FDCalibrator {
 
 	public FDCalibrator(String cfile, ArrayList<String> dfile, String ofile){
 		configfile = new File(cfile);
+		datafilerefs = dfile;
 		datafile = new ArrayList<URL>();
 		try {
 			for (int i = 0; i < dfile.size(); i++)
@@ -73,6 +75,14 @@ public class FDCalibrator {
 					templanes.add(j);		// THIS IS TEMPORARY, EVENTUALLY THE LOOP<->LANES MAP SHOULD BE SPECIFIED IN NE
 				vdslanes.add(templanes);
 				data.put(S.getVDS(), new FiveMinuteData(S.getVDS()));
+				Vector<HistoricalDataSource> dsrc = S.getDataSources();
+				for (int j = 0; j < dsrc.size(); j++) {
+					if (datafilerefs.indexOf(dsrc.get(j).getURL()) < 0) {
+						datafile.add(new URL(dsrc.get(j).getURL()));
+						datafilerefs.add(dsrc.get(j).getURL());
+						System.err.println(dsrc.get(j).getURL());
+					}
+				}
 			}
 		}
 		// Read 5 minute data to "data"
