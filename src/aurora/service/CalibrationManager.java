@@ -29,6 +29,10 @@ public class CalibrationManager implements ProcessManager {
 	 * @return <code>Done!</code> if successful, otherwise string starting with <code>Error:</code>.
 	 */
 	public String run_application(String[] input_files, String[] output_files, Updatable updater, int period) {
+		if ((input_files == null) || (input_files.length < 1))
+			return "Error: No input files!";
+		if ((output_files == null) || (output_files.length < 1))
+			return "Error: No output files specified!";
 		ContainerHWC mySystem = new ContainerHWC();
 		// 1: read configuration and validate
 		try {
@@ -52,7 +56,7 @@ public class CalibrationManager implements ProcessManager {
 			fdc.readtrafficdata();
 		}
 		catch(Exception e){
-			return "Error reading data files: " + e.getMessage();
+			return "Error: Failed to parse data files: " + e.getMessage();
 		}
 		// 3: run calibration routine
 		Vector<AbstractSensor> SensorList = mySystem.getMyNetwork().getSensors();
@@ -94,7 +98,7 @@ public class CalibrationManager implements ProcessManager {
 			}
 			ps.close();
 		}
-		return("Done!");
+		return "Done!";
 	}
 
 	/**

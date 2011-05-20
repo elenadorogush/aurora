@@ -5,6 +5,7 @@
 package aurora.hwc.report;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
@@ -43,8 +44,11 @@ public class AuroraCSVFile {
 		
 		header.clear();
 
-		try{
-			BufferedReader br = new BufferedReader( new FileReader(filename));
+		try {
+			URL data_url = new URL(filename);
+			URLConnection uc = data_url.openConnection();
+			BufferedReader br = new BufferedReader(new InputStreamReader(uc.getInputStream()));
+			// FIXME - to be removed: BufferedReader br = new BufferedReader( new FileReader(filename));
 			String strLine = "";
 			Vector<String> vecstr = new Vector<String>();
 			
@@ -148,7 +152,9 @@ public class AuroraCSVFile {
 
 	public void loadData(Vector<Quantity> getq,String foldername,String filename,Vector<String> subsetlinkids,PerformanceCalculator p){
 		
-		File outfile = new File(gui_mainpanel.homePath + "\\tempfiles\\" + foldername + "_" + filename + ".xml");
+		//File outfile = new File(gui_mainpanel.homePath + "\\tempfiles\\" + foldername + "_" + filename + ".xml");
+		File outfile = new File(p.cfg.getTempDir() + "/" + p.cfg.datafiles.indexOf(filename) + ".xml");
+		
 
 		// check whether the xml version exists, if so read and return
 		if(outfile.exists()){
@@ -175,7 +181,8 @@ public class AuroraCSVFile {
 
 	public void loadDataScatter(String foldername,String filename,Vector<String> subsetlinkids,PerformanceCalculator p){
 		
-		File outfile = new File(gui_mainpanel.homePath + "\\tempfiles\\" + foldername + "_" + filename + ".xml");
+		//File outfile = new File(gui_mainpanel.homePath + "\\tempfiles\\" + foldername + "_" + filename + ".xml");
+		File outfile = new File(p.cfg.getTempDir() + "/" + p.cfg.datafiles.indexOf(filename) + ".xml");
 
 		// check whether the xml version exists, if so read and return
 		if(outfile.exists()){
@@ -215,7 +222,6 @@ public class AuroraCSVFile {
 	}
 
 	public void readData(String foldername,String filename,Configuration cfg){
-
 		boolean ready = false;
 		int numtime = 0;
 		float newtime;
@@ -227,12 +233,15 @@ public class AuroraCSVFile {
 		Vector<String> qlimit	= new Vector<String>();
 		String strLine = "";
 		
-		String inputfile = gui_mainpanel.homePath + "\\files\\" + foldername + "\\" + filename;
+		// FIXME - to be removed: String inputfile = gui_mainpanel.homePath + "\\files\\" + foldername + "\\" + filename;
 		
-		try{
-			readHeader(inputfile);
-			BufferedReader br1 = new BufferedReader( new FileReader(inputfile));
-			BufferedReader br2 = new BufferedReader( new FileReader(inputfile));
+		try {
+			readHeader(filename);
+			URL data_url = new URL(filename);
+			URLConnection uc1 = data_url.openConnection();
+			URLConnection uc2 = data_url.openConnection();
+			BufferedReader br1 = new BufferedReader(new InputStreamReader(uc1.getInputStream()));
+			BufferedReader br2 = new BufferedReader(new InputStreamReader(uc2.getInputStream()));
 			
  			while( (strLine = br1.readLine())!=null){
 
@@ -345,10 +354,8 @@ public class AuroraCSVFile {
 
 		try {
 			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse("file:" + outputfile.getAbsolutePath());
-
 			time.clear();
 			data.clear();
-			
 			// convert link ids to vector indices
 			Vector<Integer> subsetlinkindex = new Vector<Integer>();
 			for(i=0;i<subsetlinkids.size();i++)
@@ -518,12 +525,12 @@ public class AuroraCSVFile {
 		Utils.writeToConsole("\t+ Comparing networks.");
 
 		for(i=0;i<cfg.scenarios.size();i++){
-			String filename = gui_mainpanel.homePath + "\\files\\" + cfg.scenarios.get(i) + "\\" + cfg.datafiles.get(i);				
+			// FIXME - to be removed: String filename = gui_mainpanel.homePath + "\\files\\" + cfg.scenarios.get(i) + "\\" + cfg.datafiles.get(i);				
 			Utils.writeToConsole("\t\t+ " + cfg.datafiles.get(i));
 			if(i==0)
-				firstFile.readHeader(filename);
+				firstFile.readHeader(cfg.datafiles.get(i));
 			else{
-				newFile.readHeader(filename);
+				newFile.readHeader(cfg.datafiles.get(i));
 				if( !newFile.header.equals( firstFile.header ) )
 					return false;
 			}

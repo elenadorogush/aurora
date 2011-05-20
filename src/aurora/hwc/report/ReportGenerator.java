@@ -7,6 +7,7 @@ package aurora.hwc.report;
 import java.io.*;
 import java.util.Vector;
 import aurora.hwc.TypesHWC;
+import aurora.service.Updatable;
 
 
 /**
@@ -14,15 +15,19 @@ import aurora.hwc.TypesHWC;
  * @author Gabriel Gomes
  */
 public class ReportGenerator {
-	
-	private Configuration cfg;
-	private Vector<ReportSection> report = new Vector<ReportSection>();
-	private AuroraCSVHeader header = new AuroraCSVHeader();
+	protected Configuration cfg;
+	protected Updatable updater = null;
+	protected int update_period = 5;
+	protected Vector<ReportSection> report = new Vector<ReportSection>();
+	protected AuroraCSVHeader header = new AuroraCSVHeader();
 
-	private Vector<Integer> MLlinktypes = new Vector<Integer>();
-	private Vector<Integer> ORlinktypes = new Vector<Integer>();
-	private Vector<Integer> FRlinktypes = new Vector<Integer>();
-	private Vector<Integer> STlinktypes = new Vector<Integer>();
+	protected Vector<Integer> MLlinktypes = new Vector<Integer>();
+	protected Vector<Integer> ORlinktypes = new Vector<Integer>();
+	protected Vector<Integer> FRlinktypes = new Vector<Integer>();
+	protected Vector<Integer> STlinktypes = new Vector<Integer>();
+	
+	protected File reportfile = new File(System.getProperty("user.home") + "\\ARG\\tempfiles\\detailed.xml");
+	
 
 	public ReportGenerator(Configuration c){
 		cfg = c;
@@ -39,51 +44,59 @@ public class ReportGenerator {
 		STlinktypes.add(TypesHWC.LINK_STREET);
 	}
 	
-	public static void run(Configuration c){
-		
-		int i,j,k;
-		
-		ReportGenerator rg = new ReportGenerator(c);
-			
+	public void run(Configuration c){
 		// create xml description of the report
 		try {
-			PerformanceCalculator perfcalc = new PerformanceCalculator(rg.cfg,rg.header);							
-
+			PerformanceCalculator perfcalc = new PerformanceCalculator(cfg, header);							
 			// Compile a high level description of the report
 			Utils.writeToConsole("\t+ Compiling slide list.");
-			rg.GenerateHighLevel();
+			GenerateHighLevel();
 
 			Utils.writeToConsole("\t+ Computing performance measures.");
 
 			// Apply the performance calculator to each element
-			PrintStream xml = new PrintStream(new FileOutputStream(gui_mainpanel.reportfile));
+			PrintStream xml = new PrintStream(new FileOutputStream(reportfile));
 			xml.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 			xml.print("<Aurora_2_0_Report>\n");
 			xml.print("\t<ActualData>\n");
-			for(i=0;i<rg.report.size();i++){
-				xml.print("\t\t<Section title=\"" + rg.report.get(i).title + "\">\n");
-				for(j=0;j<rg.report.get(i).slides.size();j++){
-					Utils.writeToConsole("\t\t+ Slide " + rg.report.get(i).slides.get(j).id);
-					for(k=0;k<rg.report.get(i).slides.get(j).plots.size();k++){
+			if (updater != null)
+				updater.notify_update(10);
+			int total_slides = 0;
+			int slide_count = 0;
+			for (int i = 0; i < report.size(); i++)
+				total_slides += report.get(i).slides.size();
+			long sys_curr_time = System.currentTimeMillis();
+			long sys_lst_time = sys_curr_time;
+			for (int i = 0; i < report.size(); i++) {
+				xml.print("\t\t<Section title=\"" + report.get(i).title + "\">\n");
+				for (int j = 0; j < report.get(i).slides.size(); j++) {
+					Utils.writeToConsole("\t\t+ Slide " + report.get(i).slides.get(j).id);
+					for (int k = 0; k < report.get(i).slides.get(j).plots.size(); k++) {
 						Utils.writeToConsole("\t\t\t+ Plot " + k);
-						Plot thisplot = rg.report.get(i).slides.get(j).plots.get(k);
-						thisplot.showlegend = rg.cfg.cbx_dolegend;
+						Plot thisplot = report.get(i).slides.get(j).plots.get(k);
+						thisplot.showlegend = cfg.cbx_dolegend;
 						thisplot.showlegend &= thisplot.elements.get(0).type!=PlotElement.Type.contour;
 						thisplot.makelabels(thisplot.elements.get(0));
 						perfcalc.processElements(thisplot.elements);
 					}
-					rg.report.get(i).slides.get(j).xmlDump(xml);
+					report.get(i).slides.get(j).xmlDump(xml);
+					slide_count++;
+					sys_curr_time = System.currentTimeMillis();
+					if ((sys_curr_time - sys_lst_time) >= 1000*update_period) {
+						sys_lst_time = sys_curr_time;
+						if (updater != null)
+							updater.notify_update(10 + Math.round(90*(float)slide_count/total_slides));
+					}
 				}
-				rg.report.get(i).slides.clear();
+				report.get(i).slides.clear();
 				xml.print("\t\t</Section>\n");	
 			}
 			xml.print("\t</ActualData>\n");
 			xml.print("</Aurora_2_0_Report>\n");
 			xml.close();
 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -162,7 +175,7 @@ public class ReportGenerator {
 			}
 			report.add(new ReportSection("Individual link state.",slides));
 		}
-			
+
 		// System performance over time ........................................
 		if(cfg.cbx_sysperf){
 
@@ -236,7 +249,6 @@ public class ReportGenerator {
 			}
 			report.add(new ReportSection("System performance.",slides));
 		}
-		
 		
 		// On-ramp performance over time ........................................
 		if(cfg.cbx_orperf_time){
@@ -418,7 +430,6 @@ public class ReportGenerator {
 			report.add(new ReportSection("Route performance over time.",slides));
 		}
 		
-
 		// Route performance over space ........................................
 		if(cfg.cbx_routeperf_space){
 
@@ -478,7 +489,6 @@ public class ReportGenerator {
 
 		}
 		
-
 		// Route performance contour ........................................
 		if(cfg.cbx_routeperf_contour){
 			
@@ -528,7 +538,6 @@ public class ReportGenerator {
 			report.add(new ReportSection("Route performance contours.",slides));
 		}
 		
-
 		// route travel time over time ........................................
 		if(cfg.cbx_routetraveltime){
 			
@@ -557,7 +566,6 @@ public class ReportGenerator {
 			}
 			report.add(new ReportSection("Route travel time.",slides));
 		}
-		
 
 		// route travel time contour  ........................................
 		if(cfg.cbx_routetrajectories){
@@ -698,5 +706,23 @@ public class ReportGenerator {
 					out.add(R.linkids.get(j));
 			}
 		}
+	}
+	
+	/**
+	 * Sets report file.
+	 */
+	public synchronized void setReportFile(File rf) {
+		if (rf != null)
+			reportfile = rf;
+		return;
+	}
+	
+	/**
+	 * Sets progress updater.
+	 */
+	public synchronized void setUpdater(Updatable upd, int prd) {
+		updater = upd;
+		update_period = Math.max(1, prd);
+		return;
 	}
 }

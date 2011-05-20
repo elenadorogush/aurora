@@ -56,6 +56,8 @@ public class Configuration implements AuroraConfigurable {
 	public int cmb_yaxis_quantity_selected;
 	public Vector<String> cmb_yaxis_quantity = new Vector<String>();
 	public Vector<String> chk_tree = new Vector<String>();
+	
+	protected String tempDir = System.getProperty("user.home") + "\\ARG\\tempfiles";
 
 	public Quantity get_cmb_yaxis_quantity(){
 		String str = cmb_yaxis_quantity.get(cmb_yaxis_quantity_selected);
@@ -81,83 +83,85 @@ public class Configuration implements AuroraConfigurable {
 	
 	@Override
 	public boolean initFromDOM(Node p) throws ExceptionConfiguration {
-
-		int i,j;
 		String nodename,str;
 		Node n1;
 				
 		if ((p == null) || (!p.hasChildNodes()))
 			return false;
 		try {
-			
-			for (i=0; i<p.getChildNodes().getLength(); i++){
+			for (int i = 0; i < p.getChildNodes().getLength(); i++) {
 				nodename = p.getChildNodes().item(i).getNodeName();
 				n1 = p.getChildNodes().item(i);
-
 				if (nodename.equals("cmb_export"))
 					exporttype = Utils.exportString2Type.get(n1.getTextContent());
-				
 				if (nodename.equals("cmb_reporttype"))
 					reporttype = Utils.reportString2Type.get(n1.getTextContent());
-
 				if (nodename.equals("chk_tree"))
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),chk_tree);	
-
 				if (nodename.equals("scenarios"))
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),scenarios);	
-				
 				if (nodename.equals("datafiles"))
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),datafiles);	
-
+				if (nodename.equals("BatchList")) {
+					Node pp = p.getChildNodes().item(i);
+					if (pp.hasChildNodes())
+						for (int j = 0; j < pp.getChildNodes().getLength(); j++) {
+							if (pp.getChildNodes().item(j).getNodeName().equals("batch")) {
+								Node cl = pp.getChildNodes().item(j);
+								Node name_attr = cl.getAttributes().getNamedItem("name");
+								String batch_name = "";
+								if (name_attr != null)
+									batch_name = name_attr.getNodeValue();
+								if (cl.hasChildNodes())
+									for (int jj = 0; jj < cl.getChildNodes().getLength(); jj++) {
+										if (cl.getChildNodes().item(jj).getNodeName().equals("data_file")) {
+											Node url_attr = cl.getChildNodes().item(jj).getAttributes().getNamedItem("url");
+											if (url_attr != null) {
+												scenarios.add(batch_name);
+												datafiles.add(url_attr.getNodeValue());
+											}
+										}
+									}
+							}
+						}
+				}
 				if (nodename.equals("txt_outputfile"))
 					txt_outputfile = n1.getTextContent();
 
-				if (nodename.equals("txt_timefrom")){
+				if (nodename.equals("txt_timefrom")) {
 					str = n1.getTextContent();
 					if(Utils.isNumber(str))
 						timefrom = Float.parseFloat(str);
 					else
 						timefrom = Float.NaN;
 				}
-
-				if (nodename.equals("txt_timeto")){
+				if (nodename.equals("txt_timeto")) {
 					str = n1.getTextContent();
 					if(Utils.isNumber(str))
 						timeto = Float.parseFloat(str);
 					else
 						timefrom = Float.NaN;
 				}
-
 				if (nodename.equals("cbx_linkstate"))
 					cbx_linkstate = Boolean.parseBoolean(n1.getTextContent());
-
 				if (nodename.equals("cbx_sysperf"))
 					cbx_sysperf = Boolean.parseBoolean(n1.getTextContent());
-
 				if (nodename.equals("cbx_orperf_time"))
 					cbx_orperf_time = Boolean.parseBoolean(n1.getTextContent());
-
 				if (nodename.equals("cbx_orperf_space"))
 					cbx_orperf_space = Boolean.parseBoolean(n1.getTextContent());
-
 				if (nodename.equals("cbx_orperf_contour"))
 					cbx_orperf_contour = Boolean.parseBoolean(n1.getTextContent());
-
 				if (nodename.equals("cbx_routeperf_time"))
 					cbx_routeperf_time = Boolean.parseBoolean(n1.getTextContent());
-
 				if (nodename.equals("cbx_routeperf_space"))
 					cbx_routeperf_space = Boolean.parseBoolean(n1.getTextContent());
-
 				if (nodename.equals("cbx_routeperf_contour"))
 					cbx_routeperf_contour = Boolean.parseBoolean(n1.getTextContent());
-
 				if (nodename.equals("cbx_routetraveltime"))
 					cbx_routetraveltime = Boolean.parseBoolean(n1.getTextContent());
-
 				if (nodename.equals("cbx_routetrajectories"))
 					cbx_routetrajectories = Boolean.parseBoolean(n1.getTextContent());
-				
 				if (nodename.equals("txt_congspeed")){
 					str = n1.getTextContent();
 					if(Utils.isNumber(str))
@@ -165,7 +169,6 @@ public class Configuration implements AuroraConfigurable {
 					else
 						congspeed = Float.NaN;
 				}
-
 				if (nodename.equals("txt_maxpointspercurve")){
 					str = n1.getTextContent();
 					if(Utils.isInteger(str))
@@ -173,20 +176,16 @@ public class Configuration implements AuroraConfigurable {
 					else
 						maxpointspercurve = Integer.MAX_VALUE;
 				}
-				
 				if (nodename.equals("cbx_dolegend"))
 					cbx_dolegend = Boolean.parseBoolean(n1.getTextContent());
-
 				if (nodename.equals("cbx_dofill"))
 					cbx_dofill = Boolean.parseBoolean(n1.getTextContent());
-
 				if (nodename.equals("colors"))
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),colors);	
-
 				if (nodename.equals("tbl_scenariogroups")){
 					table_scenariogroups_group.clear();
 					table_scenariogroups_scenario.clear();
-					for(j=0;j<n1.getChildNodes().getLength();j++){
+					for (int j = 0; j < n1.getChildNodes().getLength(); j++) {
 						Node n2 = n1.getChildNodes().item(j);
 						if(n2.getNodeName().equals("entry")){
 							table_scenariogroups_group.add(n2.getAttributes().getNamedItem("group").getNodeValue());
@@ -194,13 +193,12 @@ public class Configuration implements AuroraConfigurable {
 						}
 					}
 				}
-				
-				if (nodename.equals("tbl_groups")){
+				if (nodename.equals("tbl_groups")) {
 					table_groups_group.clear();
 //					table_groups_marker.clear();
 //					table_groups_markersize.clear();
 					table_groups_xvalue.clear();
-					for(j=0;j<n1.getChildNodes().getLength();j++){
+					for (int j = 0; j < n1.getChildNodes().getLength(); j++) {
 						Node n2 = n1.getChildNodes().item(j);
 						if(n2.getNodeName().equals("entry")){
 							table_groups_group.add(n2.getAttributes().getNamedItem("group").getNodeValue());
@@ -210,28 +208,22 @@ public class Configuration implements AuroraConfigurable {
 						}						
 					}
 				}
-
 				if (nodename.equals("txt_customxaxis"))
 					txt_customxaxis = n1.getTextContent();
-
 				if (nodename.equals("cbx_boxplot"))
 					cbx_boxplot = Boolean.parseBoolean(n1.getTextContent());
-
 				if (nodename.equals("cmb_xaxis_subnetwork")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_xaxis_subnetwork) ;
 					cmb_xaxis_subnetwork_selected = Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
 				}
-
 				if (nodename.equals("cmb_xaxis_quantity")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_xaxis_quantity) ;
 					cmb_xaxis_quantity_selected =  Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
 				}
-
 				if (nodename.equals("cmb_yaxis_subnetwork")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_yaxis_subnetwork) ;
 					cmb_yaxis_subnetwork_selected = Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());;
 				}
-
 				if (nodename.equals("cmb_yaxis_quantity")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_yaxis_quantity) ;
 					cmb_yaxis_quantity_selected =  Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
@@ -246,8 +238,6 @@ public class Configuration implements AuroraConfigurable {
 	
 	@Override
 	public void xmlDump(PrintStream out) throws IOException {
-		int i;
-
 		out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<guidata>\n");
 		out.print("\t<cmb_export>" + Utils.exportType2String.get(exporttype) +  "</cmb_export>\n");
 		out.print("\t<cmb_reporttype>" + Utils.reportType2String.get(reporttype) +  "</cmb_reporttype>\n");
@@ -272,7 +262,7 @@ public class Configuration implements AuroraConfigurable {
 		out.print("\t<cbx_boxplot>" + cbx_boxplot +  "</cbx_boxplot>\n");
 		out.print("\t<colors>" + Utils.writeMatlabFormattedVector(colors) + "</colors>\n");
 		out.print("\t<tbl_groups>\n");
-		for(i=0;i<table_groups_group.size();i++){
+		for (int i = 0; i < table_groups_group.size(); i++) {
 			out.print("\t\t<entry ");
 			out.print("group=\"" + table_groups_group.get(i) + "\" ");
 //			out.print("marker=\"" + table_groups_marker.get(i) + "\" ");
@@ -283,7 +273,7 @@ public class Configuration implements AuroraConfigurable {
 		out.print("\t</tbl_groups>\n");
 
 		out.print("\t<tbl_scenariogroups>\n");
-		for(i=0;i<table_scenariogroups_scenario.size();i++){
+		for (int i = 0; i < table_scenariogroups_scenario.size(); i++) {
 			out.print("\t\t<entry ");
 			out.print("scenario=\"" + table_scenariogroups_scenario.get(i) + "\" ");
 			out.print("group=\"" + table_scenariogroups_group.get(i) + "\" ");
@@ -308,9 +298,25 @@ public class Configuration implements AuroraConfigurable {
 		out.print("</cmb_yaxis_quantity>\n");
 
 		out.print("\t<chk_tree>" + Utils.writeMatlabFormattedVector(chk_tree) + "</chk_tree>\n");
+		/* FIXME: to be removed
 		out.print("\t<scenarios>" + Utils.writeMatlabFormattedVector(scenarios) + "</scenarios>\n");
-		out.print("\t<datafiles>" + Utils.writeMatlabFormattedVector(datafiles) + "</datafiles>\n");
-
+		out.print("\t<datafiles>" + Utils.writeMatlabFormattedVector(datafiles) + "</datafiles>\n"); */
+		int j = 0;
+		String batch_name = "";
+		if (!scenarios.isEmpty())
+			batch_name = scenarios.firstElement();
+		out.print("\t<BatchList>\n");
+		out.print("\t\t<batch name=\"" + batch_name + "\">\n");
+		while (j < datafiles.size()) {
+			if (!scenarios.get(j).equals(batch_name)) {
+				out.print("\t\t</batch>\n");
+				batch_name = scenarios.get(j);
+				out.print("\t\t<batch name=\"" + batch_name + "\">\n");
+			}
+			out.print("\t\t\t<data_file url=\"" + datafiles.get(j) + "\" />\n");
+		}
+		out.print("\t\t</batch>\n");
+		out.print("\t</BatchList>\n");
 		out.print("</guidata>\n");			
 	}
 	
@@ -363,5 +369,21 @@ public class Configuration implements AuroraConfigurable {
 	public boolean validate() throws ExceptionConfiguration {
 		// TODO Auto-generated method stub
 		return true;
+	}
+	
+	/**
+	 * Return temporary directory name.
+	 */
+	public String getTempDir() {
+		return tempDir;
+	}
+	
+	/**
+	 * Set temporary directory name.
+	 */
+	public synchronized void setTempDir(String tmp) {
+		if ((tmp != null) && (!tmp.isEmpty()))
+			tempDir = tmp;
+		return;
 	}
 }

@@ -14,7 +14,7 @@ import javax.swing.tree.*;
  */
 public class Utils {
 	
-	public static boolean verbose = true;
+	public static boolean verbose = false;
 	public static String outfilename = null;
 	public static enum ExporterType {pdf,ppt,xls};
 	

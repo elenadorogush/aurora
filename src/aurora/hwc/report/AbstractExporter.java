@@ -9,11 +9,14 @@ import java.util.Vector;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 
+
 /**
  * Base class for making report exporters
  * @author Gabriel Gomes
  */
 public abstract class AbstractExporter {
+	protected File reportfile = new File(System.getProperty("user.home") + "\\ARG\\tempfiles\\detailed.xml");
+	
 
 	protected void openFile(File file){};
 
@@ -27,7 +30,7 @@ public abstract class AbstractExporter {
 	 * Access function used to export the entire report to a file
 	 */
 	final public void export(File outfile){
-		Vector<ReportSection> report = readxml(gui_mainpanel.reportfile);
+		Vector<ReportSection> report = readxml(reportfile);
 		openFile(outfile);
 		int i,j;
 		for(i=0;i<report.size();i++){

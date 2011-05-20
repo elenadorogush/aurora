@@ -80,7 +80,6 @@ public class FDCalibrator {
 					if (datafilerefs.indexOf(dsrc.get(j).getURL()) < 0) {
 						datafile.add(new URL(dsrc.get(j).getURL()));
 						datafilerefs.add(dsrc.get(j).getURL());
-						System.err.println(dsrc.get(j).getURL());
 					}
 				}
 			}

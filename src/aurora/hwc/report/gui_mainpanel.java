@@ -27,7 +27,6 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 
 	public static String homePath = System.getProperty("user.home") + "\\ARG";
 	public static String tempPath = homePath + "\\tempfiles";
-	public static File reportfile = new File(tempPath + "\\detailed.xml");
 	
 	private Configuration config = new Configuration();
 	private Vector<String> colors = new Vector<String>();
@@ -138,8 +137,8 @@ public class gui_mainpanel extends JPanel implements ActionListener {
         	loadconfigfile(configfile);
         
         Utils.writeToConsole("Welcome to the TOPL Report Generator.");
-
 	}
+	
 
 	////////////////////////////////////////////////////////////////////////
 	// Panels
@@ -974,9 +973,9 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 				return;
 			}	
 		}
-		String ext = "." + C.exporttype.toString();
+		/*String ext = "." + C.exporttype.toString();
 		if (!Utils.outfilename.endsWith(ext))
-			Utils.outfilename += ext;
+			Utils.outfilename += ext; FIXME: remove */
 		
 		// create the export file
 		File exportfile = new File(Utils.outfilename);
@@ -984,10 +983,12 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 		// clean out old files
 		gui_mainpanel.cleantempfolder();
 
-		// generate the report			
-		ReportGenerator.run(C);
+		// generate the report
+		ReportGenerator rg = new ReportGenerator(C);
+		rg.setReportFile(new File(Utils.outfilename));
+		rg.run(C);
 		
-		// export
+		/*/ export
 		AbstractExporter exporter = null;
 		switch(C.exporttype){
 		case pdf:
@@ -1000,7 +1001,7 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 			exporter = new Export_XLS();
 			break;
 		}
-		exporter.export(exportfile);
+		exporter.export(exportfile); FIXME */
 	}
 	
 	////////////////////////////////////////////////////////////////////////
