@@ -1,1 +1,4 @@
 bin/
+build/aurora
+build/aurora.jar
+build/mySerializableTest.class
