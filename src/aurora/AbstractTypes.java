@@ -19,4 +19,7 @@ public abstract class AbstractTypes {
 	public final static int MASK_MONITOR_ZIPPER = MASK_MONITOR | 16777216;
 	public final static int MASK_SENSOR  = 8388608;
 	
+	// generic simple nodes
+	public final static int NODE_TERMINAL = MASK_NODE | 1;
+	
 }

@@ -106,7 +106,8 @@ public abstract class AbstractNodeComplex extends AbstractNode {
 					nd.setMyNetwork(this);
 					res &= nd.initFromDOM(pp2.item(j));
 					addNode(nd);
-					domnodes.add(pp2.item(j));
+					if (nd.getType() != AbstractTypes.NODE_TERMINAL)
+						domnodes.add(pp2.item(j));
 				}
 				if (pp2.item(j).getNodeName().equals("include")) {
 					Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(pp2.item(j).getAttributes().getNamedItem("uri").getNodeValue());

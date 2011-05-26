@@ -17,7 +17,6 @@ public final class TypesHWC extends AbstractTypes {
 	public final static int NETWORK_HWC = MASK_NETWORK | 1;
 	
 	// Simple Nodes
-	public final static int NODE_TERMINAL = MASK_NODE | 1;
 	public final static int NODE_FREEWAY = MASK_NODE | 2;
 	public final static int NODE_HIGHWAY = MASK_NODE | 4;
 	public final static int NODE_SIGNAL = MASK_NODE | 8;
