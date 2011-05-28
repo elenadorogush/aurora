@@ -102,10 +102,4 @@ public class Export_PDF extends AbstractExporter {
 		}
 	}
 
-	public static void main(String[] args) {
-		AbstractExporter pdf = new Export_PDF();
-		pdf.export(new File("outfile.pdf"));
-		System.out.println("done");		
-	}
-
 }

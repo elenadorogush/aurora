@@ -90,4 +90,12 @@ public abstract class AbstractExporter {
 		}
 	}
 	
+	/**
+	 * Set destination for the report file.
+	 */
+	public synchronized void setReportFile(File f) {
+		if (f != null)
+			reportfile = f;
+		return;
+	}
 }

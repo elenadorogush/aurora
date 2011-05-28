@@ -166,9 +166,4 @@ public class Export_XLS extends AbstractExporter {
 		wb.createSheet(S.title);
 	}
 
-	public static void main(String[] args) {
-		AbstractExporter xls = new Export_XLS();
-		xls.export(new File("outfile.xls"));
-		System.out.println("done");		
-	}
 }

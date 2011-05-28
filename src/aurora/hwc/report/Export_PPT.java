@@ -93,12 +93,5 @@ public class Export_PPT extends AbstractExporter {
 			e.printStackTrace();
 		}
 	}
-	
-	public static void main(String[] args) {
-		AbstractExporter ppt = new Export_PPT();
-		ppt.export(new File("outfile.ppt"));
-		System.out.println("done");		
-	}
-
 
 }
