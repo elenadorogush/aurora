@@ -19,7 +19,7 @@ public interface ProcessManager {
 	 * @param period time in seconds indicating how often the updates must be sent.
 	 * @return exit text.
 	 */
-	public String run_application(String[] input_files, String[] output_files, Updatable updater, int period);
+	public String run_application(String[] input_files, String[] output_files, Updatable updater, int period) throws Exception;
 
 	public String whatIsMyProcess();
 }

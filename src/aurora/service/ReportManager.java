@@ -25,27 +25,27 @@ public class ReportManager implements ProcessManager {
 	 * @param output_files [0] contains name of the output file. 
 	 * @param updater 
 	 * @param period
-	 * @return <code>Done!</code> if successful, otherwise string starting with <code>Error:</code>.
+	 * @return <code>Done!</code> if successful, otherwise throw exception.
 	 */
-	public String run_application(String[] input_files, String[] output_files, Updatable updater, int period) {
+	public String run_application(String[] input_files, String[] output_files, Updatable updater, int period) throws Exception {
 		if ((input_files == null) || (input_files.length < 1))
-			return "Error: No input files!";
+			throw new Exception("Error: No input files!");
 		if ((output_files == null) || (output_files.length < 1))
-			return "Error: No output files specified!";
+			throw new Exception("Error: No output files specified!");
 		Configuration config = new Configuration();
 		File temp = null;
 		// 1: create temporary folder
 		try {
 			temp = File.createTempFile(".AuroraReport", Long.toString(System.nanoTime()));
 			if (!temp.delete())
-				return "Error: Failed to create temporary folder";
+				throw new Exception("Error: Failed to create temporary folder");
 			if (!temp.mkdir())
-				return "Error: Failed to create temporary folder";
+				throw new Exception("Error: Failed to create temporary folder");
 			temp.deleteOnExit();
 			config.setTempDir(temp.getAbsolutePath());
 		}
 		catch (Exception e) {
-			return "Error: Failed to create temporary folder";
+			throw new Exception("Error: Failed to create temporary folder");
 		}
 		// 2: parse and validate report request
 		try {
@@ -54,20 +54,20 @@ public class ReportManager implements ProcessManager {
 			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
 			config.initFromDOM(doc.getChildNodes().item(0));
 			if (!config.xmlValidate())
-				return "Error: Failed to parse request";
+				throw new Exception("Error: Failed to parse request");
 		}
 		catch(Exception e) {
-			return "Error: Failed to parse xml: " + e.getMessage();
+			throw new Exception("Error: Failed to parse xml: " + e.getMessage());
 		}
 		// 3: check report request for consistency
 		if (!(((config.reporttype != ReportType.vehicletypes) && (config.datafiles.size() > 0))
 				|| ((config.reporttype == ReportType.vehicletypes) && (config.datafiles.size() == 1))))
-			return "Error: Consistency check of the reuest failed";
+			throw new Exception("Error: Consistency check of the reuest failed");
 		try {
 			config.check();
 		}
 		catch(Exception e) {
-			return "Error: Consistency check of the reuest failed";
+			throw new Exception("Error: Consistency check of the reuest failed");
 		}
 		// 4: generate report
 		if ((output_files[0] != null) && (!output_files[0].isEmpty())) {

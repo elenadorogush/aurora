@@ -24,14 +24,14 @@ public class SimulationManager implements ProcessManager {
 	 * @param output_files [0] contains name of the output file; [1] (optional) place holder for configuration XML dumped on exit. 
 	 * @param updater 
 	 * @param period
-	 * @return <code>Done!</code> if successful, otherwise string starting with <code>Error:</code>.
+	 * @return <code>Done!</code> if successful, otherwise throw exception.
 	 */
-	public String run_application(String[] input_files, String[] output_files, Updatable updater, int period) {
+	public String run_application(String[] input_files, String[] output_files, Updatable updater, int period) throws Exception {
 		double initial_time, max_time;
 		if ((input_files == null) || (input_files.length < 1))
-			return "Error: No input files!";
+			throw new Exception("Error: No input files!");
 		if ((output_files == null) || (output_files.length < 1))
-			return "Error: No output files specified!";
+			throw new Exception("Error: No output files specified!");
 		ContainerHWC mySystem = new ContainerHWC();
 		mySystem.batchMode();
 		try {
@@ -54,17 +54,17 @@ public class SimulationManager implements ProcessManager {
 			}
 		}
 		catch(Exception e) {
-			return "Error: Failed to parse xml: " + e.getMessage();
+			throw new Exception("Error: Failed to parse xml: " + e.getMessage());
 		}
 		File data = null;
 		try {
 			data = new File(output_files[0]);
 			if ((!mySystem.getMySettings().setTmpDataFile(data)) || (!mySystem.getMySettings().createDataHeader())) {
-				return "Error: Failed to open data output file!";
+				throw new Exception("Error: Failed to open data output file!");
 			}
 		}
 		catch(Exception e) {
-			return "Error: Failed to open data output file: " + e.getMessage();
+			throw new Exception("Error: Failed to open data output file: " + e.getMessage());
 		}
 		if (output_files.length > 1) { // warm-up run
 			mySystem.getMySettings().setTimeMax(initial_time);
@@ -78,7 +78,7 @@ public class SimulationManager implements ProcessManager {
 		}
 		catch(Exception e) {
 			mySystem.getMySettings().getTmpDataOutput().close();
-			return "Error: Failed to initialize: " + e.getMessage();
+			throw new Exception("Error: Failed to initialize: " + e.getMessage());
 		}
 		boolean res = true;
 		mySystem.getMyStatus().setStopped(false);
@@ -94,7 +94,7 @@ public class SimulationManager implements ProcessManager {
 			}
 			catch(Exception e) {
 				mySystem.getMySettings().getTmpDataOutput().close();
-				return "Simulation failed on time step " + ts + ": " + e.getMessage();
+				throw new Exception("Simulation failed on time step " + ts + ": " + e.getMessage());
 			}
 			curr_sys_time = System.currentTimeMillis();
 			if ((updater != null) && (((curr_sys_time-lst_updt_time)/1000) >= period)) {
@@ -103,7 +103,7 @@ public class SimulationManager implements ProcessManager {
 			}
 		}
 		if (!res)
-			return "Simulation failed on time step " + ts;
+			throw new Exception("Simulation failed on time step " + ts);
 		mySystem.getMySettings().getTmpDataOutput().close();
 		if ((output_files != null) && (output_files.length > 1)) {
 			PrintStream ps = null;
@@ -123,7 +123,7 @@ public class SimulationManager implements ProcessManager {
 			catch(Exception e) {
 				if (ps != null)
 					ps.close();
-				return "Error: Failed to generate configuration file";
+				throw new Exception("Error: Failed to generate configuration file");
 			}
 			ps.close();
 		}

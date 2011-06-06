@@ -26,13 +26,13 @@ public class CalibrationManager implements ProcessManager {
 	 * @param output_files [0] contains name of the output file. 
 	 * @param updater 
 	 * @param period
-	 * @return <code>Done!</code> if successful, otherwise string starting with <code>Error:</code>.
+	 * @return <code>Done!</code> if successful, otherwise throw exception.
 	 */
-	public String run_application(String[] input_files, String[] output_files, Updatable updater, int period) {
+	public String run_application(String[] input_files, String[] output_files, Updatable updater, int period) throws Exception {
 		if ((input_files == null) || (input_files.length < 1))
-			return "Error: No input files!";
+			throw new Exception("Error: No input files!");
 		if ((output_files == null) || (output_files.length < 1))
-			return "Error: No output files specified!";
+			throw new Exception("Error: No output files specified!");
 		ContainerHWC mySystem = new ContainerHWC();
 		// 1: read configuration and validate
 		try {
@@ -43,7 +43,7 @@ public class CalibrationManager implements ProcessManager {
 			mySystem.validate();
 		}
 		catch(Exception e) {
-			return "Error: Failed to parse xml: " + e.getMessage();
+			throw new Exception("Error: Failed to parse xml: " + e.getMessage());
 		}
 		// 2: create calibrator and read data
 		ArrayList<String> input_urls = new ArrayList<String>();
@@ -56,7 +56,7 @@ public class CalibrationManager implements ProcessManager {
 			fdc.readtrafficdata();
 		}
 		catch(Exception e){
-			return "Error: Failed to parse data files: " + e.getMessage();
+			throw new Exception("Error: Failed to parse data files: " + e.getMessage());
 		}
 		// 3: run calibration routine
 		Vector<AbstractSensor> SensorList = mySystem.getMyNetwork().getSensors();
@@ -94,7 +94,7 @@ public class CalibrationManager implements ProcessManager {
 			catch(Exception e) {
 				if (ps != null)
 					ps.close();
-				return "Error: Failed to generate configuration file";
+				throw new Exception("Error: Failed to generate configuration file");
 			}
 			ps.close();
 		}
