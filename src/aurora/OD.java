@@ -60,8 +60,9 @@ public abstract class OD implements AuroraConfigurable, Serializable {
 	 * @throws ExceptionConfiguration
 	 */
 	public boolean validate() throws ExceptionConfiguration {
-		AbstractLink lk;
+		//AbstractLink lk;
 		boolean res = true;
+		/* FIXME: to be removed
 		for (int i = 0; i < pathList.size(); i++) {
 			lk = pathList.get(i).getBegin();
 			if (lk.getBeginNode() != null)
@@ -77,7 +78,7 @@ public abstract class OD implements AuroraConfigurable, Serializable {
 				res = destination.equals(lk.getBeginNode());
 			if (!res)
 				throw new ExceptionConfiguration("Path (" + pathList.get(i).toString() + ") has wrong end Link (" + pathList.get(i).getEnd().getId() + ").");
-		}
+		}*/
 		return res;
 	}
 	
