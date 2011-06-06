@@ -15,12 +15,13 @@ import aurora.hwc.report.*;
 /**
  * Process manager for report generation. 
  * @author Alex Kurzhanskiy
+ * @version $Id: $
  */
 public class ReportManager implements ProcessManager {
 	
 	/**
 	 * Run report generator with progress reports at required frequency.
-	 * @param input_files [0] contains buffered XML configuration; [index > 0] contain URLs to data files.
+	 * @param input_files [0] contains buffered XML report request.
 	 * @param output_files [0] contains name of the output file. 
 	 * @param updater 
 	 * @param period

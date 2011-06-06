@@ -20,7 +20,7 @@ public class SimulationManager implements ProcessManager {
 	
 	/**
 	 * Run simulation with progress reports at required frequency.
-	 * @param input_files [0] contains buffered XML configuration.
+	 * @param input_files [0] contains buffered XML configuration; [1] contains buffered XML time range specification.
 	 * @param output_files [0] contains name of the output file; [1] (optional) place holder for configuration XML dumped on exit. 
 	 * @param updater 
 	 * @param period

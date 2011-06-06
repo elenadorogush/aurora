@@ -87,7 +87,7 @@ public class Export_PPT extends AbstractExporter {
 	protected void openFile(File file){
 		try {
 			out = new FileOutputStream(file.getAbsolutePath());
-			ppt = new SlideShow(new HSLFSlideShow("ppttemplate.pot"));
+			ppt = new SlideShow(new HSLFSlideShow(System.getenv("AURORA_CLASS_PREFIX") + "/ppttemplate.pot"));
 			masters = ppt.getSlidesMasters();	
 		} catch (IOException e) {
 			e.printStackTrace();

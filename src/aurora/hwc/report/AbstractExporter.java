@@ -4,10 +4,11 @@
 
 package aurora.hwc.report;
 
-import java.io.File;
+import java.io.*;
 import java.util.Vector;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
+import aurora.service.*;
 
 
 /**
@@ -15,7 +16,9 @@ import org.w3c.dom.*;
  * @author Gabriel Gomes
  */
 public abstract class AbstractExporter {
-	protected File reportfile = new File(System.getProperty("user.home") + "\\ARG\\tempfiles\\detailed.xml");
+	protected String reportURL = "file:" + System.getProperty("user.home") + "/ARG/tempfiles/detailed.xml";
+	protected Updatable updater = null;
+	protected int update_period = 5;
 	
 
 	protected void openFile(File file){};
@@ -30,29 +33,39 @@ public abstract class AbstractExporter {
 	 * Access function used to export the entire report to a file
 	 */
 	final public void export(File outfile){
-		Vector<ReportSection> report = readxml(reportfile);
+		Vector<ReportSection> report = readxml();
 		openFile(outfile);
-		int i,j;
-		for(i=0;i<report.size();i++){
+		int total_slides = 0;
+		int slide_count = 0;
+		for (int i = 0; i < report.size(); i++)
+			total_slides += report.get(i).slides.size();
+		long sys_curr_time = System.currentTimeMillis();
+		long sys_lst_time = sys_curr_time;
+		for (int i = 0; i < report.size(); i++) {
 			exportSectionHeader(report.get(i));
-			for(j=0;j<report.get(i).slides.size();j++)
+			for (int j = 0; j < report.get(i).slides.size(); j++) {
 				exportSlide(report.get(i).slides.get(j));
+				slide_count++;
+				sys_curr_time = System.currentTimeMillis();
+				if ((sys_curr_time - sys_lst_time) >= 1000*update_period) {
+					sys_lst_time = sys_curr_time;
+					if (updater != null)
+						updater.notify_update(Math.round(100*(float)slide_count/total_slides));
+				}
+			}
 		}
 		closeFile();
 	}
 	
-	final public static Vector<ReportSection> readxml(File configfile){
-
+	final public Vector<ReportSection> readxml(){
 		Vector<ReportSection> report = new Vector<ReportSection>();
 		int i,j,k;
 		String name1;
-		String configURI = "file:" + configfile.getAbsolutePath();
 		try {
-			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configURI);
+			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(reportURL);
 			Node p = doc.getChildNodes().item(0);
 			if ((p == null) || (!p.hasChildNodes()))
 				return null;
-			
 			report = new Vector<ReportSection>();
 			for (i=0; i<p.getChildNodes().getLength(); i++){
 				name1 = p.getChildNodes().item(i).getNodeName();
@@ -91,11 +104,20 @@ public abstract class AbstractExporter {
 	}
 	
 	/**
-	 * Set destination for the report file.
+	 * Set destination for the report URL.
 	 */
-	public synchronized void setReportFile(File f) {
-		if (f != null)
-			reportfile = f;
+	public synchronized void setReportURL(String fn) {
+		if ((fn != null) && (!fn.isEmpty()))
+			reportURL = fn;
+		return;
+	}
+	
+	/**
+	 * Sets progress updater.
+	 */
+	public synchronized void setUpdater(Updatable upd, int prd) {
+		updater = upd;
+		update_period = Math.max(1, prd);
 		return;
 	}
 }

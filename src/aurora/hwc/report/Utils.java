@@ -4,6 +4,7 @@
 
 package aurora.hwc.report;
 
+import java.io.File;
 import java.util.*;
 import javax.swing.tree.*;
 
@@ -414,5 +415,19 @@ public class Utils {
 		for(int i=0;i<A.size();i++)
 			z += A.get(i);
 		return z;
+	}
+	
+	/**
+	 * Return file extension.
+	 */
+	public static String getExtension(File f) {
+		String ext = null;
+		String s = f.getName();
+		int i = s.lastIndexOf('.');
+		if ((i > 0) && (i < (s.length() - 1)))
+			ext = s.substring(i+1).toLowerCase();
+		if (ext == null)
+			return "";
+		return ext;
 	}
 }
