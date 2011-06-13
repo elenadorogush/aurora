@@ -5,6 +5,12 @@
 package aurora.service;
 
 import java.io.*;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+
 import aurora.hwc.report.*;
 
 
@@ -28,6 +34,17 @@ public class ExportManager implements ProcessManager {
 			throw new Exception("Error: No input files!");
 		if ((output_files == null) || (output_files.length < 1))
 			throw new Exception("Error: No output files specified!");
+		String report_url = null;
+		try {
+	        InputSource is = new InputSource();
+	        is.setCharacterStream(new StringReader(input_files[0]));
+	        Node nd = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is).getChildNodes().item(0);
+	        report_url = nd.getTextContent();
+		}
+		catch(Exception e) {
+			throw new Exception("Error: Failed to parse input: " + e.getMessage());
+		}
+
 		File output_file = new File(output_files[0]);
 		String type = Utils.getExtension(output_file);
 		AbstractExporter exporter = null;
@@ -39,7 +56,7 @@ public class ExportManager implements ProcessManager {
 			exporter = new Export_PDF();
 		if (exporter != null) {
 			exporter.setUpdater(updater, period);
-			exporter.setReportURL(input_files[0]);
+			exporter.setReportURL(report_url);
 			exporter.export(output_file);
 		} 
 		else {
