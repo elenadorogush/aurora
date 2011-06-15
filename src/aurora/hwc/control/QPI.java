@@ -7,6 +7,7 @@ package aurora.hwc.control;
 import java.io.*;
 import java.text.NumberFormat;
 import org.w3c.dom.*;
+
 import aurora.*;
 import aurora.hwc.*;
 
@@ -46,6 +47,18 @@ public final class QPI extends AbstractQueueController implements Serializable, 
 						if (pp.item(i).getAttributes().getNamedItem("name").getNodeValue().equals("ki")) 
 							Ki = Double.parseDouble(pp.item(i).getAttributes().getNamedItem("value").getNodeValue());
 					}
+					if (pp.item(i).getNodeName().equals("parameters"))
+						if (pp.item(i).hasChildNodes()) {
+							NodeList pp2 = pp.item(i).getChildNodes();
+							for (int j = 0; j < pp2.getLength(); j++) {
+								if (pp2.item(j).getNodeName().equals("parameter")) {
+									if (pp2.item(j).getAttributes().getNamedItem("name").getNodeValue().equals("kp")) 
+										Kp = Double.parseDouble(pp2.item(j).getAttributes().getNamedItem("value").getNodeValue());
+									if (pp2.item(j).getAttributes().getNamedItem("name").getNodeValue().equals("ki")) 
+										Ki = Double.parseDouble(pp2.item(j).getAttributes().getNamedItem("value").getNodeValue());
+								}
+							}
+						}
 				}
 			}
 			else
@@ -66,8 +79,8 @@ public final class QPI extends AbstractQueueController implements Serializable, 
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
 		super.xmlDump(out);
-		out.print("<parameter name=\"kp\" value=\"" + Double.toString(Kp) + "\"/>");
-		out.print("<parameter name=\"ki\" value=\"" + Double.toString(Ki) + "\"/>");
+		out.print("<parameters><parameter name=\"kp\" value=\"" + Double.toString(Kp) + "\"/>");
+		out.print("<parameter name=\"ki\" value=\"" + Double.toString(Ki) + "\"/></parameters>");
 		out.print("</qcontroller>");
 		return;
 	}

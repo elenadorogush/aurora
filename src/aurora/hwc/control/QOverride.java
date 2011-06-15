@@ -41,6 +41,15 @@ public final class QOverride extends AbstractQueueController implements Serializ
 					if (pp.item(i).getNodeName().equals("parameter"))
 						if (pp.item(i).getAttributes().getNamedItem("name").getNodeValue().equals("delta"))
 							delta = Double.parseDouble(pp.item(i).getAttributes().getNamedItem("value").getNodeValue());
+					if (pp.item(i).getNodeName().equals("parameters"))
+						if (pp.item(i).hasChildNodes()) {
+							NodeList pp2 = pp.item(i).getChildNodes();
+							for (int j = 0; j < pp2.getLength(); j++) {
+								if (pp2.item(j).getNodeName().equals("parameter"))
+									if (pp2.item(j).getAttributes().getNamedItem("name").getNodeValue().equals("delta"))
+										delta = Double.parseDouble(pp2.item(j).getAttributes().getNamedItem("value").getNodeValue());
+							}
+						}
 				}
 			}
 			else
@@ -61,7 +70,7 @@ public final class QOverride extends AbstractQueueController implements Serializ
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
 		super.xmlDump(out);
-		out.print("<parameter name=\"delta\" value=\"" + Double.toString(delta) + "\"/>");
+		out.print("<parameters><parameter name=\"delta\" value=\"" + Double.toString(delta) + "\"/></parameters>");
 		out.print("</qcontroller>");
 		return;
 	}

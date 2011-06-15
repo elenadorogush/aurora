@@ -7,6 +7,7 @@ package aurora.hwc.control;
 import java.io.*;
 import java.text.NumberFormat;
 import org.w3c.dom.*;
+
 import aurora.*;
 import aurora.hwc.*;
 
@@ -40,10 +41,18 @@ public final class QProportional extends AbstractQueueController implements Seri
 			if (p.hasChildNodes()) {
 				NodeList pp = p.getChildNodes();
 				for (int i = 0; i < pp.getLength(); i++) {
-					if (pp.item(i).getNodeName().equals("parameter")) {
+					if (pp.item(i).getNodeName().equals("parameter"))
 						if (pp.item(i).getAttributes().getNamedItem("name").getNodeValue().equals("kp")) 
 							kp = Double.parseDouble(pp.item(i).getAttributes().getNamedItem("value").getNodeValue());
-					}
+					if (pp.item(i).getNodeName().equals("parameters"))
+						if (pp.item(i).hasChildNodes()) {
+							NodeList pp2 = pp.item(i).getChildNodes();
+							for (int j = 0; j < pp2.getLength(); j++) {
+								if (pp2.item(j).getNodeName().equals("parameter"))
+									if (pp2.item(j).getAttributes().getNamedItem("name").getNodeValue().equals("kp")) 
+										kp = Double.parseDouble(pp2.item(j).getAttributes().getNamedItem("value").getNodeValue());
+							}
+						}
 				}
 			}
 			else
@@ -64,7 +73,7 @@ public final class QProportional extends AbstractQueueController implements Seri
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
 		super.xmlDump(out);
-		out.print("<parameter name=\"kp\" value=\"" + Double.toString(kp) + "\"/>");
+		out.print("<parameters><parameter name=\"kp\" value=\"" + Double.toString(kp) + "\"/></parameters>");
 		out.print("</qcontroller>");
 		return;
 	}
