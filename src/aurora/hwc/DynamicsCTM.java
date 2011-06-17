@@ -219,7 +219,7 @@ public class DynamicsCTM implements DynamicsHWC, Serializable {
 			for (int i = 0; i < flow.size(); i++)
 				flow.get(i).setLowerBound(lbc * flow.get(i).getLowerBound());
 		int count = 0;
-		while ((ubc < 1) && (count < flow.size())) {
+		while ((ubc < (1 - Util.EPSILON)) && (count < flow.size())) {
 			double ns = 0;
 			count = 0;
 			for (int i = 0; i < flow.size(); i++) {
