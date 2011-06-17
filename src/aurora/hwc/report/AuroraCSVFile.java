@@ -10,7 +10,6 @@ import java.util.*;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 
-
 /**
  * Class for reading and processing Aurora CSV files.
  * @author Gabriel Gomes
@@ -152,9 +151,7 @@ public class AuroraCSVFile {
 
 	public void loadData(Vector<Quantity> getq,String foldername,String filename,Vector<String> subsetlinkids,PerformanceCalculator p){
 		
-		//File outfile = new File(gui_mainpanel.homePath + "\\tempfiles\\" + foldername + "_" + filename + ".xml");
-		File outfile = new File(p.cfg.getTempDir() + "/" + p.cfg.datafiles.indexOf(filename) + ".xml");
-		
+		File outfile = new File(Configuration.getTempDir() + "/" + p.cfg.datafiles.indexOf(filename) + ".xml");
 
 		// check whether the xml version exists, if so read and return
 		if(outfile.exists()){
@@ -181,8 +178,7 @@ public class AuroraCSVFile {
 
 	public void loadDataScatter(String foldername,String filename,Vector<String> subsetlinkids,PerformanceCalculator p){
 		
-		//File outfile = new File(gui_mainpanel.homePath + "\\tempfiles\\" + foldername + "_" + filename + ".xml");
-		File outfile = new File(p.cfg.getTempDir() + "/" + p.cfg.datafiles.indexOf(filename) + ".xml");
+		File outfile = new File(Configuration.getTempDir() + "/" + p.cfg.datafiles.indexOf(filename) + ".xml");
 
 		// check whether the xml version exists, if so read and return
 		if(outfile.exists()){
@@ -232,8 +228,6 @@ public class AuroraCSVFile {
 		Vector<String> fd		= new Vector<String>();
 		Vector<String> qlimit	= new Vector<String>();
 		String strLine = "";
-		
-		// FIXME - to be removed: String inputfile = gui_mainpanel.homePath + "\\files\\" + foldername + "\\" + filename;
 		
 		try {
 			readHeader(filename);
@@ -525,7 +519,6 @@ public class AuroraCSVFile {
 		Utils.writeToConsole("\t+ Comparing networks.");
 
 		for(i=0;i<cfg.scenarios.size();i++){
-			// FIXME - to be removed: String filename = gui_mainpanel.homePath + "\\files\\" + cfg.scenarios.get(i) + "\\" + cfg.datafiles.get(i);				
 			Utils.writeToConsole("\t\t+ " + cfg.datafiles.get(i));
 			if(i==0)
 				firstFile.readHeader(cfg.datafiles.get(i));
@@ -640,12 +633,13 @@ public class AuroraCSVFile {
 		 */
 		public Vector<Vector<Float>> evaluateSpeed(int ind,Vector<Boolean> issource){
 			Vector<Vector<Float>> v = Utils.divide(OutFlow.get(ind),Density.get(ind));
-			// Speed does not apply to source links
+
 			int i,j;
 			for(i=0;i<v.size();i++){
-				if(issource.get(i)){
-					for(j=0;j<v.get(i).size();j++){
-						v.get(i).set(j,Float.NaN);
+				for(j=0;j<v.get(i).size();j++){
+					// Set speed to vf at onramps and empty links
+					if(issource.get(i) || Density.get(ind).get(i).get(j)==0){
+						v.get(i).set(j,65f);					// GG FIX INSERT REAL VF HERE!
 					}
 				}
 			}
@@ -655,8 +649,8 @@ public class AuroraCSVFile {
 		/**
 		 * Compute freeflow speed over space and time, in [mph]
 		 */
-		public Vector<Vector<Float>> evaluateFreeflowSpeed(int ind){
-			return Utils.divide(Capacity,Density.get(ind));	
+		public Vector<Vector<Float>> evaluateFreeflowSpeed(){
+			return Utils.divide(Capacity,Critical_Density);	
 		}
 		
 		/**
@@ -677,7 +671,7 @@ public class AuroraCSVFile {
 		 * Compute number of delayed vehicles per link, per time step
 		 */
 		public Vector<Vector<Float>> evaluateDelayedVehicles(int ind,Vector<Float> subsetlinklength){
-			Vector<Vector<Float>> FoverVf = Utils.divide(OutFlow.get(ind),evaluateFreeflowSpeed(ind));
+			Vector<Vector<Float>> FoverVf = Utils.divide(OutFlow.get(ind),evaluateFreeflowSpeed());
 			Vector<Vector<Float>> z = Utils.subtract(Density.get(ind),FoverVf);
 			Utils.boundbelow(z,0f);
 			return Utils.multiplyoverspace(z,subsetlinklength);
