@@ -107,6 +107,8 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 				saveState = 3;
 			if (lanes < 1.0)
 				lanes = 1.0;
+			density0 = new AuroraIntervalVector(((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).countVehicleTypes());
+			density = new AuroraIntervalVector(((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).countVehicleTypes());
 			if (p.hasChildNodes()) {
 				NodeList pp = p.getChildNodes();
 				for (int i = 0; i < pp.getLength(); i++) {
@@ -336,7 +338,7 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 			if ((ts - initTS == 1) || (((ts - tsV) * myNetwork.getTop().getTP()) >= myNetwork.getTop().getContainer().getMySettings().getDisplayTP())) {
 				tsV = ts;
 				resetAllSums = true;
-				if (saveState == 3)
+				if ((saveState == 3) || (myNetwork.getContainer().isBatch()))
 					os = myNetwork.getContainer().getMySettings().getTmpDataOutput();
 			}
 			tsCount++;
@@ -1009,7 +1011,7 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 		int idx = (int)Math.floor(t/demandTP);
 		int n = procDemand.size() - 1; // max index of the demand profile
 		if ((idx < 0) || (n < 0)) //empty
-			return new AuroraIntervalVector();
+			return new AuroraIntervalVector(((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).countVehicleTypes());
 		if ((idx < 0) || (idx > n))
 			idx = n;
 		dmnd.copy(procDemand.get(idx));
