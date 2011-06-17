@@ -10,16 +10,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 import aurora.service.*;
 
-
 /**
  * Base class for making report exporters
  * @author Gabriel Gomes
  */
 public abstract class AbstractExporter {
-	protected String reportURL = "file:" + System.getProperty("user.home") + "/ARG/tempfiles/detailed.xml";
+	protected String reportURL = "file:" + Configuration.getTempDir() + "/detailed.xml";
 	protected Updatable updater = null;
 	protected int update_period = 5;
-	
 
 	protected void openFile(File file){};
 

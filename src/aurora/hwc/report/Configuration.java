@@ -9,13 +9,15 @@ import java.util.Vector;
 import org.w3c.dom.Node;
 import aurora.*;
 
-
 /**
  * AuroraConfigurable class for exporting the GUI configuration data.
  * @author Gabriel Gomes
  */
 public class Configuration implements AuroraConfigurable {
 
+	private static String tempDir = System.getProperty("user.home") + "\\ARG\\tempfiles";
+	private static String filesDir = System.getProperty("user.home") + "\\ARG\\files";
+	
 	public Utils.ExporterType exporttype;
 	public ReportType reporttype;
 	public int maxpointspercurve;
@@ -56,8 +58,6 @@ public class Configuration implements AuroraConfigurable {
 	public int cmb_yaxis_quantity_selected;
 	public Vector<String> cmb_yaxis_quantity = new Vector<String>();
 	public Vector<String> chk_tree = new Vector<String>();
-	
-	protected String tempDir = System.getProperty("user.home") + "\\ARG\\tempfiles";
 
 	public Quantity get_cmb_yaxis_quantity(){
 		String str = cmb_yaxis_quantity.get(cmb_yaxis_quantity_selected);
@@ -97,11 +97,13 @@ public class Configuration implements AuroraConfigurable {
 				if (nodename.equals("cmb_reporttype"))
 					reporttype = Utils.reportString2Type.get(n1.getTextContent());
 				if (nodename.equals("chk_tree"))
-					Utils.readMatlabFormattedStringVector(n1.getTextContent(),chk_tree);	
+					Utils.readMatlabFormattedStringVector(n1.getTextContent(),chk_tree);
+				/*
 				if (nodename.equals("scenarios"))
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),scenarios);	
 				if (nodename.equals("datafiles"))
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),datafiles);	
+				*/
 				if (nodename.equals("BatchList")) {
 					Node pp = p.getChildNodes().item(i);
 					if (pp.hasChildNodes())
@@ -313,7 +315,8 @@ public class Configuration implements AuroraConfigurable {
 				batch_name = scenarios.get(j);
 				out.print("\t\t<batch name=\"" + batch_name + "\">\n");
 			}
-			out.print("\t\t\t<data_file url=\"" + datafiles.get(j) + "\" />\n");
+			out.print("\t\t\t<data_file url=\"file:" + Configuration.getFilesDir() + "\\" + batch_name + "\\" + datafiles.get(j) + "\" />\n");
+			j++;
 		}
 		out.print("\t\t</batch>\n");
 		out.print("\t</BatchList>\n");
@@ -374,16 +377,34 @@ public class Configuration implements AuroraConfigurable {
 	/**
 	 * Return temporary directory name.
 	 */
-	public String getTempDir() {
+	public static String getTempDir() {
 		return tempDir;
 	}
 	
 	/**
-	 * Set temporary directory name.
+	 * Return files directory name.
 	 */
-	public synchronized void setTempDir(String tmp) {
+	public static String getFilesDir() {
+		return filesDir;
+	}
+	
+	/**
+	 * Set temp directory name.
+	 */
+	public static synchronized void setTempDir(String tmp) {
 		if ((tmp != null) && (!tmp.isEmpty()))
 			tempDir = tmp;
+		return;
+	}
+
+	/**
+	 * Set root directory name.
+	 */
+	public static synchronized void setRootDir(String r) {
+		if ((r != null) && (!r.isEmpty())){
+			tempDir = r + "\\tempfiles";
+			filesDir = r + "\\files";
+		}
 		return;
 	}
 }

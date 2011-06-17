@@ -24,9 +24,6 @@ import org.w3c.dom.Document;
  */
 public class gui_mainpanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = -7405218897970299291L;
-
-	public static String homePath = System.getProperty("user.home") + "\\ARG";
-	public static String tempPath = homePath + "\\tempfiles";
 	
 	private Configuration config = new Configuration();
 	private Vector<String> colors = new Vector<String>();
@@ -183,7 +180,7 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 			// panel scenarios tree ................ 
 			JPanel paneltree = createBorderedPanel("Available simulation files");
 			DefaultMutableTreeNode top = new DefaultMutableTreeNode("Scenarios");
-		    File file = new File(homePath + "\\files");
+		    File file = new File(Configuration.getFilesDir());
 		    int i,j;
 		    if (file.isDirectory()) {
 		    	File [] list = file.listFiles();
@@ -937,7 +934,7 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 	}
 	
 	public static void cleantempfolder(){
-		File folder = new File(tempPath);
+		File folder = new File(Configuration.getTempDir());
 		File[] files = folder.listFiles();
 		for (File file : files)
 			file.delete();

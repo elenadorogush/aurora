@@ -42,7 +42,7 @@ public class ReportManager implements ProcessManager {
 			if (!temp.mkdir())
 				throw new Exception("Error: Failed to create temporary folder");
 			temp.deleteOnExit();
-			config.setTempDir(temp.getAbsolutePath());
+			Configuration.setTempDir(temp.getAbsolutePath());
 		}
 		catch (Exception e) {
 			throw new Exception("Error: Failed to create temporary folder");

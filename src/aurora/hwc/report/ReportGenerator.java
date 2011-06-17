@@ -26,8 +26,7 @@ public class ReportGenerator {
 	protected Vector<Integer> FRlinktypes = new Vector<Integer>();
 	protected Vector<Integer> STlinktypes = new Vector<Integer>();
 	
-	protected File reportfile = new File(System.getProperty("user.home") + "\\ARG\\tempfiles\\detailed.xml");
-	
+	protected File reportfile = new File(Configuration.getTempDir() + "\\detailed.xml");
 
 	public ReportGenerator(Configuration c){
 		cfg = c;
