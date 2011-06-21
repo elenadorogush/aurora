@@ -62,12 +62,12 @@ public class ReportManager implements ProcessManager {
 		// 3: check report request for consistency
 		if (!(((config.reporttype != ReportType.vehicletypes) && (config.datafiles.size() > 0))
 				|| ((config.reporttype == ReportType.vehicletypes) && (config.datafiles.size() == 1))))
-			throw new Exception("Error: Consistency check of the reuest failed");
+			throw new Exception("Error: Consistency check of the request failed");
 		try {
 			config.check();
 		}
 		catch(Exception e) {
-			throw new Exception("Error: Consistency check of the reuest failed");
+			throw new Exception("Error: Consistency check of the request failed");
 		}
 		// 4: generate report
 		if ((output_files[0] != null) && (!output_files[0].isEmpty())) {
