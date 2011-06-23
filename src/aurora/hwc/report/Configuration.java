@@ -95,7 +95,7 @@ public class Configuration implements AuroraConfigurable {
 				if (nodename.equals("cmb_export"))
 					exporttype = Utils.exportString2Type.get(n1.getTextContent());
 				if (nodename.equals("cmb_reporttype"))
-					reporttype = Utils.reportString2Type.get(n1.getTextContent());
+					reporttype = Utils.reportString2Type.get(n1.getTextContent().toLowerCase());
 				if (nodename.equals("chk_tree"))
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),chk_tree);	
 				if (nodename.equals("scenarios"))
