@@ -41,7 +41,6 @@ public class ExportManager implements ProcessManager {
 		catch(Exception e) {
 			throw new Exception("Error: Failed to parse input: " + e.getMessage());
 		}
-
 		File output_file = new File(output_files[0]);
 		String type = Utils.getExtension(output_file);
 		AbstractExporter exporter = null;
@@ -52,9 +51,9 @@ public class ExportManager implements ProcessManager {
 		else if (type.equals("pdf"))
 			exporter = new Export_PDF();
 		if (exporter != null) {
-			exporter.setUpdater(updater, period);
+			exporter.setUpdater(updater, period, 0, 100);
 			exporter.setReportURL(report_url);
-			exporter.export(output_file);
+			exporter.export(null, output_file);
 		} 
 		else {
 			throw new Exception("Error: Wrong output file extension!");

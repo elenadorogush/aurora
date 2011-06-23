@@ -973,35 +973,27 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 				return;
 			}	
 		}
-		/*String ext = "." + C.exporttype.toString();
-		if (!Utils.outfilename.endsWith(ext))
-			Utils.outfilename += ext; FIXME: remove */
 		
-		// create the export file
-		File exportfile = new File(Utils.outfilename);
+		// create the export files
+		File export_pdf = new File(Utils.outfilename + ".pdf");
+		File export_ppt = new File(Utils.outfilename + ".ppt");
+		File export_xls = new File(Utils.outfilename + ".xls");
+		File reportfile = new File(Utils.outfilename + ".xml");
 
 		// clean out old files
 		gui_mainpanel.cleantempfolder();
 
 		// generate the report
 		ReportGenerator rg = new ReportGenerator(C);
-		rg.setReportFile(new File(Utils.outfilename));
+		rg.setReportFile(reportfile);
 		rg.run(C);
 		
-		/*/ export
-		AbstractExporter exporter = null;
-		switch(C.exporttype){
-		case pdf:
-			exporter = new Export_PDF();
-			break;
-		case ppt:
-			exporter = new Export_PPT();
-			break;
-		case xls:
-			exporter = new Export_XLS();
-			break;
-		}
-		exporter.export(exportfile); FIXME */
+		// export
+		(new Export_PDF()).export(reportfile, export_pdf);
+		(new Export_PPT()).export(reportfile, export_ppt);
+		(new Export_XLS()).export(reportfile, export_xls);
+
+		return;
 	}
 	
 	////////////////////////////////////////////////////////////////////////

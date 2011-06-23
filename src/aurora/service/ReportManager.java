@@ -18,6 +18,7 @@ import aurora.hwc.report.*;
  * @version $Id: $
  */
 public class ReportManager implements ProcessManager {
+	private int rg_max_percent = 34;
 	
 	/**
 	 * Run report generator with progress reports at required frequency.
@@ -73,7 +74,7 @@ public class ReportManager implements ProcessManager {
 		if ((output_files[0] != null) && (!output_files[0].isEmpty())) {
 			ReportGenerator rg = new ReportGenerator(config);
 			rg.setReportFile(new File(output_files[0]));
-			rg.setUpdater(updater, period);
+			rg.setUpdater(updater, period, rg_max_percent);
 			rg.run(config);
 		}
 		// 5: clean up temporary files
@@ -81,6 +82,26 @@ public class ReportManager implements ProcessManager {
 		for (File file : files)
 			file.delete();
 		temp.delete();
+		//6: export report
+		int export_max_percent = Math.min((100 - rg_max_percent), (100 - rg_max_percent) / (output_files.length - 1));
+		for (int i = 1; i < output_files.length; i++) {
+			File export_file = new File(output_files[i]);
+			String type = Utils.getExtension(export_file);
+			AbstractExporter exporter = null;
+			if (type.equals("ppt"))
+				exporter = new Export_PPT();
+			else if (type.equals("xls"))
+				exporter = new Export_XLS();
+			else if (type.equals("pdf"))
+				exporter = new Export_PDF();
+			if (exporter != null) {
+				exporter.setUpdater(updater, period, (i-1)*export_max_percent+rg_max_percent, export_max_percent);
+				exporter.export(new File(output_files[0]), export_file);
+			} 
+			else {
+				throw new Exception("Error: Wrong output file extension: " + type + "!");
+			}
+		}
 		return "Done!";
 	}
 

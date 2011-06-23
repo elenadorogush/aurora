@@ -18,6 +18,7 @@ public class ReportGenerator {
 	protected Configuration cfg;
 	protected Updatable updater = null;
 	protected int update_period = 5;
+	protected int max_percent = 100;
 	protected Vector<ReportSection> report = new Vector<ReportSection>();
 	protected AuroraCSVHeader header = new AuroraCSVHeader();
 
@@ -60,7 +61,7 @@ public class ReportGenerator {
 			xml.print("<Aurora_2_0_Report>\n");
 			xml.print("\t<ActualData>\n");
 			if (updater != null)
-				updater.notify_update(10);
+				updater.notify_update((int)Math.round(10.0*(float)max_percent/100.0));
 			int total_slides = 0;
 			int slide_count = 0;
 			for (int i = 0; i < report.size(); i++)
@@ -85,7 +86,7 @@ public class ReportGenerator {
 					if ((sys_curr_time - sys_lst_time) >= 1000*update_period) {
 						sys_lst_time = sys_curr_time;
 						if (updater != null)
-							updater.notify_update(10 + Math.round(90*(float)slide_count/total_slides));
+							updater.notify_update((int)(Math.round(10.0*(float)max_percent/100.0) + Math.round(90*((float)max_percent/100.0)*((float)slide_count/total_slides))));
 					}
 				}
 				report.get(i).slides.clear();
@@ -720,9 +721,10 @@ public class ReportGenerator {
 	/**
 	 * Sets progress updater.
 	 */
-	public synchronized void setUpdater(Updatable upd, int prd) {
+	public synchronized void setUpdater(Updatable upd, int prd, int max_prgr) {
 		updater = upd;
 		update_period = Math.max(1, prd);
+		max_percent = max_prgr;
 		return;
 	}
 }
