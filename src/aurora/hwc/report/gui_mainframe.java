@@ -37,7 +37,7 @@ public class gui_mainframe extends JFrame {
 		File inputfile = null;
 		
 		// check usage
-		if(args.length%2!=0 | args.length>8){
+		if(args.length%2!=0 | args.length>12){
 			Utils.writeToConsole("Usage: java -jar arg.jar [-view <[on]|off>] [-config <filename>] [-verbose <[on],off>]");
 			return;
 		}
@@ -52,6 +52,10 @@ public class gui_mainframe extends JFrame {
 				Utils.verbose = args[2*i+1].equalsIgnoreCase("on");
 			if( args[2*i].equals("-saveto") )
 				Utils.outfilename = args[2*i+1];
+			if( args[2*i].equals("-tempdir") )
+				Configuration.setTempDir(args[2*i+1]);
+			if( args[2*i].equals("-rootdir") )
+				Configuration.setRootDir(args[2*i+1]);
 		}
 		
 		if(launchgui){
@@ -68,7 +72,6 @@ public class gui_mainframe extends JFrame {
 			}
 			
 			try {
-				
 				// load and validate the configuration file
 				Configuration config = new Configuration();
 				Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inputfile);
@@ -78,7 +81,7 @@ public class gui_mainframe extends JFrame {
 					Utils.writeToConsole("Invalid configuration file");
 					return;
 				}
-				
+
 				// if information is complete, start the run
 				if( gui_mainpanel.canstart(config))
 					gui_mainpanel.run(config);

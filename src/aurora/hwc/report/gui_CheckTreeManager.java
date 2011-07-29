@@ -83,7 +83,7 @@ public class gui_CheckTreeManager extends MouseAdapter implements TreeSelectionL
         			scenarios.add(new ScenarioFiles(scenarioname));
     				for(k=0;k<node.getChildAt(j).getChildCount();k++){
         				filename = node.getChildAt(j).getChildAt(k).toString();
-            			filename = "file:" + gui_mainpanel.homePath + "\\files\\" + scenarioname + "\\" + filename;
+            			filename = "file:" + Configuration.getFilesDir() + "\\" + scenarioname + "\\" + filename;
         				scenarios.lastElement().datafiles.add(filename);
         				numfiles++;
     				}
@@ -95,7 +95,7 @@ public class gui_CheckTreeManager extends MouseAdapter implements TreeSelectionL
     			scenarios.add(new ScenarioFiles(scenarioname));
     			for(j=0;j<node.getChildCount();j++){
     				filename = node.getChildAt(j).toString();
-        			filename = "file:" + gui_mainpanel.homePath + "\\files\\" + scenarioname + "\\" + filename;
+        			filename = "file:" + Configuration.getFilesDir() + "\\" + scenarioname + "\\" + filename;
     				scenarios.lastElement().datafiles.add(filename);
     				numfiles++;
     			}
@@ -103,7 +103,7 @@ public class gui_CheckTreeManager extends MouseAdapter implements TreeSelectionL
     		case 3:		// case file checked
     			scenarioname = checkedPaths[i].getPathComponent(1).toString();
     			filename = checkedPaths[i].getLastPathComponent().toString();
-    			filename = "file:" + gui_mainpanel.homePath + "\\files\\" + scenarioname + "\\" + filename;
+    			filename = "file:" + Configuration.getFilesDir() + "\\" + scenarioname + "\\" + filename;
     			
     			ind = -1;
     			for(j=0;j<scenarios.size();j++)

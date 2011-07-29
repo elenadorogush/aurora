@@ -936,9 +936,9 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 	public static void cleantempfolder(){
 		File folder = new File(Configuration.getTempDir());
 		File[] files = folder.listFiles();
-		for (File file : files)
+		for (File file : files){
 			file.delete();
-		
+		}
 	}
 	
 	public static void run(Configuration C){
@@ -950,7 +950,7 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 			Utils.writeToConsole(e.getMessage());
 			return;
 		}
-        
+		
 		// select an output file if not already specified
 		if(Utils.outfilename==null){
 			JFileChooser fc = new JFileChooser();
@@ -979,12 +979,13 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 
 		// clean out old files
 		gui_mainpanel.cleantempfolder();
-
+				
 		// generate the report
 		ReportGenerator rg = new ReportGenerator(C);
 		rg.setReportFile(new File(Utils.outfilename));
+
 		rg.run(C);
-		
+
 		/*/ export
 		AbstractExporter exporter = null;
 		switch(C.exporttype){
