@@ -214,19 +214,19 @@ public class Configuration implements AuroraConfigurable {
 					cbx_boxplot = Boolean.parseBoolean(n1.getTextContent());
 				if (nodename.equals("cmb_xaxis_subnetwork")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_xaxis_subnetwork) ;
-					cmb_xaxis_subnetwork_selected = Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
+					//FIXME: cmb_xaxis_subnetwork_selected = Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
 				}
 				if (nodename.equals("cmb_xaxis_quantity")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_xaxis_quantity) ;
-					cmb_xaxis_quantity_selected =  Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
+					//FIXME: cmb_xaxis_quantity_selected =  Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
 				}
 				if (nodename.equals("cmb_yaxis_subnetwork")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_yaxis_subnetwork) ;
-					cmb_yaxis_subnetwork_selected = Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());;
+					//FIXME: cmb_yaxis_subnetwork_selected = Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());;
 				}
 				if (nodename.equals("cmb_yaxis_quantity")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_yaxis_quantity) ;
-					cmb_yaxis_quantity_selected =  Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
+					//FIXME: cmb_yaxis_quantity_selected =  Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
 				}
 			}
 		}
