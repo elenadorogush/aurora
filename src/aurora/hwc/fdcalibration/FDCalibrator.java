@@ -12,8 +12,7 @@ import aurora.service.*;
 
 public class FDCalibrator {
 	protected File configfile;
-	protected ArrayList<URL> datafile;
-	protected ArrayList<String> datafilerefs;
+	protected HashSet<URL> uniquedatafile = new HashSet<URL>();
 	protected String outputfile;
 	protected ContainerHWC mySystem = new ContainerHWC();
 	protected HashMap <Integer,FiveMinuteData> data = new HashMap <Integer,FiveMinuteData> ();
@@ -21,15 +20,8 @@ public class FDCalibrator {
 	
 	protected Updatable updater = null;
 
-	public FDCalibrator(String cfile, ArrayList<String> dfile, String ofile){
+	public FDCalibrator(String cfile, String ofile){
 		configfile = new File(cfile);
-		datafilerefs = dfile;
-		datafile = new ArrayList<URL>();
-		try {
-			for (int i = 0; i < dfile.size(); i++)
-				datafile.add(new URL(dfile.get(i)));
-		}
-		catch(Exception e) { }
 		outputfile = ofile;
 	}
 
@@ -77,15 +69,12 @@ public class FDCalibrator {
 				data.put(S.getVDS(), new FiveMinuteData(S.getVDS()));
 				Vector<HistoricalDataSource> dsrc = S.getDataSources();
 				for (int j = 0; j < dsrc.size(); j++) {
-					if (datafilerefs.indexOf(dsrc.get(j).getURL()) < 0) {
-						datafile.add(new URL(dsrc.get(j).getURL()));
-						datafilerefs.add(dsrc.get(j).getURL());
-					}
+					uniquedatafile.add(new URL(dsrc.get(j).getURL()));
 				}
 			}
 		}
 		// Read 5 minute data to "data"
-		PeMSClearinghouseInterpreter P = new PeMSClearinghouseInterpreter(datafile);
+		PeMSClearinghouseInterpreter P = new PeMSClearinghouseInterpreter(uniquedatafile);
 		P.Read5minData(vdslist, vdslanes, data, updater);
 	}
 
@@ -384,42 +373,26 @@ public class FDCalibrator {
 
 		try {
 			String configfilename,outputfilename;
-			ArrayList<String> datafilename = new ArrayList<String>();
-			if(args.length < 3){
+			if(args.length < 2){
 				System.out.println("Arguments:");
 				System.out.println("1) Configuration file name.");
-				System.out.println("2) List of PeMS Clearinghouse 5-minute data files: {file1,file2,...}.");
-				System.out.println("3) Output file name.");
+				System.out.println("2) Output file name.");
 				return;
 			}
-			if (args.length > 13)
-				throw(new Exception("too many input arguments"));
 			configfilename = args[0];
-			outputfilename = args[2];
-			String z = args[1];
-			if (z.startsWith("{"))
-				z = z.substring(1);
-			if (z.endsWith("}"))
-				z = z.substring(0,z.length()-1);
-			String [] w = z.split(",");
-			for (int i = 0; i < w.length; i++)
-				datafilename.add(w[i].trim());
+			outputfilename = args[1];
+
 			// basic checks
 			if(!configfilename.endsWith(".xml")) {
 				System.out.println("Invalid configuration file extension.");
 				return;
 			}
-			for (int i = 0; i < datafilename.size(); i++) {
-				if (!datafilename.get(i).endsWith(".txt")) {
-					System.out.println("Invalid data file file extension.");
-					return;
-				}
-			}
+
 			if (!outputfilename.endsWith(".xml")) {
 				System.out.println("Invalid output file extension.");
 				return;
 			}
-			FDCalibrator calibrator = new FDCalibrator(configfilename, datafilename, outputfilename);
+			FDCalibrator calibrator = new FDCalibrator(configfilename, outputfilename);
 			calibrator.run();
 		}
 		catch(Exception e){

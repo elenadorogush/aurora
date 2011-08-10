@@ -31,7 +31,7 @@ public class SimulationSettings implements AuroraConfigurable, Serializable {
 	protected double displayTP = 1.0/12.0;
 	protected double timeMax = 24;
 	protected double timeInitial = 0;
-	protected int tsMax = 1000000000;
+	protected int tsMax = 99999;
 	protected int tsInitial = 0;
 	protected int timeout = 1000;
 	protected boolean isPred = false;

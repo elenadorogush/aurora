@@ -7,12 +7,11 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import aurora.service.*;
 
-
 public class PeMSClearinghouseInterpreter {
 
-	public ArrayList<URL> PeMSCH_5min;
+	public HashSet<URL> PeMSCH_5min;
 
-	public PeMSClearinghouseInterpreter(ArrayList<URL> f){
+	public PeMSClearinghouseInterpreter(HashSet<URL> f){
 		PeMSCH_5min=f;
 	}
 
@@ -31,8 +30,13 @@ public class PeMSClearinghouseInterpreter {
     	// step through data file
     	if (updater != null)
     		updater.notify_update(5);
-    	for (int i = 0; i < PeMSCH_5min.size(); i++) {
-    		URLConnection uc = PeMSCH_5min.get(i).openConnection();
+    	
+    	Iterator iter = PeMSCH_5min.iterator();
+    	int count = 0;
+    	while(iter.hasNext()){
+    		URL dataurl = (URL) iter.next();
+    		count++;
+    		URLConnection uc = dataurl.openConnection();
     		BufferedReader fin = new BufferedReader(new InputStreamReader(uc.getInputStream()));
             while ((line=fin.readLine()) != null) {
                 String f[] = line.split(",");
@@ -90,7 +94,7 @@ public class PeMSClearinghouseInterpreter {
             }
             fin.close();
             if (updater != null)
-            	updater.notify_update(Math.round(50*(((float)i+1)/PeMSCH_5min.size())));
+            	updater.notify_update(Math.round(50*(((float)count+1)/PeMSCH_5min.size())));
     	}
     	 
     }
