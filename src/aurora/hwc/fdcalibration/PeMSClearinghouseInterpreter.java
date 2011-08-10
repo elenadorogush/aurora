@@ -5,17 +5,18 @@ import java.io.*;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 import aurora.service.*;
 
 public class PeMSClearinghouseInterpreter {
 
-	public HashSet<URL> PeMSCH_5min;
+	public HashMap<String,DataSource> PeMSFileToVDS;
 
-	public PeMSClearinghouseInterpreter(HashSet<URL> f){
-		PeMSCH_5min=f;
+	public PeMSClearinghouseInterpreter(HashMap<String,DataSource> f){
+		PeMSFileToVDS=f;
 	}
 
-    public void Read5minData(ArrayList<Integer> selectedvds,ArrayList<ArrayList<Integer>> selectedlanes,HashMap <Integer,FiveMinuteData> data, Updatable updater) throws Exception {
+    public void Read5minData(HashMap <Integer,FiveMinuteData> data, Updatable updater) throws Exception {
 		int lane;
     	String line,str;
     	int indexof;
@@ -30,11 +31,10 @@ public class PeMSClearinghouseInterpreter {
     	// step through data file
     	if (updater != null)
     		updater.notify_update(5);
-    	
-    	Iterator iter = PeMSCH_5min.iterator();
+    
     	int count = 0;
-    	while(iter.hasNext()){
-    		URL dataurl = (URL) iter.next();
+    	for(DataSource datasource : PeMSFileToVDS.values()){
+    		URL dataurl = datasource.getUrl();
     		count++;
     		URLConnection uc = dataurl.openConnection();
     		BufferedReader fin = new BufferedReader(new InputStreamReader(uc.getInputStream()));
@@ -42,14 +42,14 @@ public class PeMSClearinghouseInterpreter {
                 String f[] = line.split(",");
                 int vds = Integer.parseInt(f[1]);
 
-                indexof = selectedvds.indexOf(vds);
+                indexof = datasource.getFor_vds().indexOf(vds);
                 if(indexof<0)
                 	continue;
                 
         		calendar.setTime(ConvertTime(f[0]));
         		time = calendar.getTime().getTime()/1000;
         
-                lanes = selectedlanes.get(indexof);
+                lanes = datasource.getFor_vdslanes().get(indexof);
             	laneflw.clear();
             	laneocc.clear();
             	lanespd.clear();
@@ -94,7 +94,7 @@ public class PeMSClearinghouseInterpreter {
             }
             fin.close();
             if (updater != null)
-            	updater.notify_update(Math.round(50*(((float)count+1)/PeMSCH_5min.size())));
+            	updater.notify_update(Math.round(50*(((float)count+1)/ PeMSFileToVDS.size())));
     	}
     	 
     }

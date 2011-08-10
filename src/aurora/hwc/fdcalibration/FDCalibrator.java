@@ -1,6 +1,5 @@
 package aurora.hwc.fdcalibration;
 
-import java.net.*;
 import java.io.*;
 import java.util.*;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -9,10 +8,9 @@ import aurora.*;
 import aurora.hwc.*;
 import aurora.service.*;
 
-
 public class FDCalibrator {
 	protected File configfile;
-	protected HashSet<URL> uniquedatafile = new HashSet<URL>();
+	protected HashMap<String,DataSource> datasourcemap = new HashMap<String,DataSource>();
 	protected String outputfile;
 	protected ContainerHWC mySystem = new ContainerHWC();
 	protected HashMap <Integer,FiveMinuteData> data = new HashMap <Integer,FiveMinuteData> ();
@@ -54,28 +52,38 @@ public class FDCalibrator {
 
 	// step 2
 	public void readtrafficdata() throws Exception{
+		
+		ArrayList<String> uniqueurls  = new ArrayList<String>();
+		
 		// construct list of stations to extract from datafile 
 		SensorList = mySystem.getMyNetwork().getSensors();
-		ArrayList<Integer> vdslist = new ArrayList<Integer>();
-		ArrayList<ArrayList<Integer>> vdslanes = new ArrayList<ArrayList<Integer>>();
 		for(int i = 0; i < SensorList.size(); i++) {
 			SensorLoopDetector S = (SensorLoopDetector) SensorList.get(i);
 			if ((S.getVDS() != 0) && (S.getLink() != null)) {
-				vdslist.add(S.getVDS());
-				ArrayList<Integer> templanes = new ArrayList<Integer>();
+				
+				int thisvds = S.getVDS();
+				ArrayList<Integer> thisvdslanes = new ArrayList<Integer>();
 				for (int j = 1; j <= S.getLanes(); j++)
-					templanes.add(j);		// THIS IS TEMPORARY, EVENTUALLY THE LOOP<->LANES MAP SHOULD BE SPECIFIED IN NE
-				vdslanes.add(templanes);
-				data.put(S.getVDS(), new FiveMinuteData(S.getVDS()));
+					thisvdslanes.add(j);		// THIS IS TEMPORARY, EVENTUALLY THE LOOP<->LANES MAP SHOULD BE SPECIFIED IN NE
+				
+				data.put(thisvds, new FiveMinuteData(thisvds));
+				
 				Vector<HistoricalDataSource> dsrc = S.getDataSources();
 				for (int j = 0; j < dsrc.size(); j++) {
-					uniquedatafile.add(new URL(dsrc.get(j).getURL()));
+					String myurl =  dsrc.get(j).getURL();
+					if( uniqueurls.indexOf(myurl)<0 ){
+						datasourcemap.put(myurl,new DataSource(myurl));
+						uniqueurls.add(myurl);
+					}
+					DataSource thisdatasource = datasourcemap.get(myurl);
+					thisdatasource.add_to_for_vds(thisvds);
+					thisdatasource.add_to_for_vdslanes(thisvdslanes);
 				}
 			}
 		}
 		// Read 5 minute data to "data"
-		PeMSClearinghouseInterpreter P = new PeMSClearinghouseInterpreter(uniquedatafile);
-		P.Read5minData(vdslist, vdslanes, data, updater);
+		PeMSClearinghouseInterpreter P = new PeMSClearinghouseInterpreter(datasourcemap);
+		P.Read5minData(data, updater);
 	}
 
 	// step 3
