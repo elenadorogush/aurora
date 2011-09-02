@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+//import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -147,7 +147,6 @@ public class Export_XLS extends AbstractExporter {
 						colcount++;
 
 						for(m=0;m<xydataset.getItemCount(k);m++){
-							System.err.println(k + "\t" + m + "\t" + colcount + "\t" + xydataset.getItemCount(k)); //FIXME
 							xrow.createCell(colcount).setCellValue(xydataset.getX(k,m).toString());
 							yrow.createCell(colcount).setCellValue(xydataset.getY(k,m).toString());
 							colcount++;

@@ -977,7 +977,7 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 		// create the export files
 		File export_pdf = new File(Utils.outfilename + ".pdf");
 		File export_ppt = new File(Utils.outfilename + ".ppt");
-		File export_xls = new File(Utils.outfilename + ".xls");
+		File export_xls = new File(Utils.outfilename + ".xlsx");
 		File reportfile = new File(Utils.outfilename + ".xml");
 
 		// clean out old files

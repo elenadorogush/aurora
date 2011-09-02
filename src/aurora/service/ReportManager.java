@@ -88,9 +88,9 @@ public class ReportManager implements ProcessManager {
 			File export_file = new File(output_files[i]);
 			String type = Utils.getExtension(export_file);
 			AbstractExporter exporter = null;
-			if (type.equals("ppt"))
+			if (type.equals("ppt") || type.equals("pptx"))
 				exporter = new Export_PPT();
-			else if (type.equals("xls"))
+			else if (type.equals("xls") || type.equals("xlsx"))
 				exporter = new Export_XLS();
 			else if (type.equals("pdf"))
 				exporter = new Export_PDF();
