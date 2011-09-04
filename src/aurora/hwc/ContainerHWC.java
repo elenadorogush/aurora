@@ -296,7 +296,7 @@ public final class ContainerHWC extends AbstractContainer {
 	 */
 	public void xmlDump(PrintStream out) throws IOException {
 		out.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-		out.print("<scenario id=\"0\" name=\"" + name + "\" schemaVersion=\"" + schemaVersion + "\">\n");
+		out.print("<scenario id=\"-2011\" name=\"" + name + "\" schemaVersion=\"" + schemaVersion + "\">\n");
 		super.xmlDump(out);
 		out.print("\n\n<ControllerSet>");
 		((NodeHWCNetwork)myNetwork).xmlDumpControllerSet(out);
