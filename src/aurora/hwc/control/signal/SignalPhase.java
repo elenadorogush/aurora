@@ -29,7 +29,7 @@ public class SignalPhase implements Serializable {
 	private int myNEMAopposing;
 	private int myRingGroup;
 
-	public Vector<AbstractLinkHWC> links;
+	public Vector<AbstractLinkHWC> links = new Vector<AbstractLinkHWC>();
 	public Vector<Integer> myControlIndex;
 
 	// Basic characteristics
@@ -38,11 +38,12 @@ public class SignalPhase implements Serializable {
 	private boolean isthrough;
 	private boolean recall;
 	private boolean permissive;
+	private boolean lag = false;
 
 	// Signalling parameters
-	private float mingreen;
-	private float yellowtime;
-	private float redcleartime;
+	private float mingreen = 0; //-1;
+	private float yellowtime = 0; //-1;
+	private float redcleartime = 0; //-1;
 	public float actualyellowtime;
 	public float actualredcleartime;
 
@@ -79,10 +80,6 @@ public class SignalPhase implements Serializable {
 		protectd = false;
 		isthrough = false;
 	
-		mingreen = -1.0f;
-		yellowtime = -1.0f;
-		redcleartime = -1.0f;
-		
 		links = new Vector<AbstractLinkHWC>();
 		myControlIndex = new Vector<Integer>();
 		
@@ -263,134 +260,122 @@ public class SignalPhase implements Serializable {
 		}
 	}
 //	-------------------------------------------------------------------------
-	public void SetGreen()
-	{
-		if(!valid) 
+	public void SetGreen() {
+		if (!valid) 
 			return;
-		for(int i=0;i<links.size();i++)
+		for (int i = 0; i < links.size(); i++)
 			mySigMan.myController.setControlInput(myControlIndex.get(i), links.get(i).getCapacityValue().getCenter() );
 		bulbcolor = BulbColor.GREEN;
+		return;
 	}
 //	-------------------------------------------------------------------------
-	public void SetYellow()
-	{
-		if(!valid) 
+	public void SetYellow()	{
+		if (!valid) 
 			return;
-		for(int i=0;i<links.size();i++)
+		for (int i = 0; i < links.size(); i++)
 			mySigMan.myController.setControlInput(myControlIndex.get(i),links.get(i).getCapacityValue().getCenter() );
 		bulbcolor = BulbColor.YELLOW;
+		return;
 	}
 //	-------------------------------------------------------------------------
-	public void SetRed()
-	{
-		if(!valid) 
+	public void SetRed() {
+		if (!valid) 
 			return;
-		for(int i=0;i<links.size();i++)
+		for (int i = 0; i < links.size(); i++)
 			mySigMan.myController.setControlInput(myControlIndex.get(i),0.0);
 		bulbcolor = BulbColor.RED;
+		return;
 	}
 //	-------------------------------------------------------------------------
 	
 	public boolean initFromDOM(Node p) throws ExceptionConfiguration {
-
 		boolean res = true;
-		int i,j;
-		Node nodeattr;
-		String str;
-		
-		nodeattr = p.getAttributes().getNamedItem("protected");
-		if(nodeattr!=null)
+		Node nodeattr = p.getAttributes().getNamedItem("protected");
+		if (nodeattr != null)
 			protectd = Boolean.parseBoolean(nodeattr.getNodeValue());
-		
 		nodeattr = p.getAttributes().getNamedItem("permissive");
-		if(nodeattr!=null)
+		if (nodeattr != null)
 			permissive = Boolean.parseBoolean(nodeattr.getNodeValue());
-		
 		nodeattr = p.getAttributes().getNamedItem("recall");
-		if(nodeattr!=null)
+		if (nodeattr != null)
 			recall = Boolean.parseBoolean(nodeattr.getNodeValue());
-
-		nodeattr = p.getAttributes().getNamedItem("mingreen");
-		if(nodeattr!=null){
+		nodeattr = p.getAttributes().getNamedItem("lag");
+		if (nodeattr != null)
+			lag = Boolean.parseBoolean(nodeattr.getNodeValue());
+		String str;
+		nodeattr = p.getAttributes().getNamedItem("min_green_time");
+		if (nodeattr == null)
+			nodeattr = p.getAttributes().getNamedItem("mingreen");
+		if (nodeattr != null) {
 			str = nodeattr.getNodeValue();
-			if(!str.isEmpty())
+			if (!str.isEmpty())
 				mingreen = Float.parseFloat(str);
 		}
-
-		nodeattr = p.getAttributes().getNamedItem("yellowtime");
-		if(nodeattr!=null){
+		nodeattr = p.getAttributes().getNamedItem("yellow_time");
+		if (nodeattr == null)
+			nodeattr = p.getAttributes().getNamedItem("yellowtime");
+		if (nodeattr != null) {
 			str = nodeattr.getNodeValue();
-			if(!str.isEmpty())
+			if (!str.isEmpty())
 				yellowtime = Float.parseFloat(str);
 		}
-		
-		nodeattr = p.getAttributes().getNamedItem("redcleartime");
-		if(nodeattr!=null){
+		nodeattr = p.getAttributes().getNamedItem("red_clear_time");
+		if (nodeattr == null)
+			nodeattr = p.getAttributes().getNamedItem("redcleartime");
+		if (nodeattr != null) {
 			str = nodeattr.getNodeValue();
-			if(!str.isEmpty())
+			if (!str.isEmpty())
 				redcleartime = Float.parseFloat(str);
 		}
-		
-		boolean haslinks = false;
+		// process <links>
 		if (p.hasChildNodes()) {
 			NodeList pp = p.getChildNodes();
-			
-			for (i= 0; i<pp.getLength(); i++){
-				
+			for (int i = 0; i < pp.getLength(); i++) {
 				if (pp.item(i).getNodeName().equals("links")) {	
 					StringTokenizer st = new StringTokenizer(pp.item(i).getTextContent(), ", \t");
 					while (st.hasMoreTokens()) {
-						AbstractLinkHWC L = (AbstractLinkHWC) myNode.getMyNetwork().getLinkById(Integer.parseInt(st.nextToken()));
-						this.addLink(L);	// assign link to phase
-						haslinks = true;
+						AbstractLinkHWC L = (AbstractLinkHWC)myNode.getMyNetwork().getLinkById(Integer.parseInt(st.nextToken()));
+						if (L != null)
+							addLink(L);	// add link to phase
 					}	
 				}
-				
+				// detectors
 				if (pp.item(i).getNodeName().equals("detectorlist")) {
 					NodeList pp2 = pp.item(i).getChildNodes();
-					for (j= 0; j<pp2.getLength(); j++){
-
+					for (int j = 0; j < pp2.getLength(); j++) {
 						if (pp2.item(j).getNodeName().equals("detector")) {	
-							
 							String type = pp2.item(j).getAttributes().getNamedItem("type").getNodeValue();
 							StringTokenizer st = new StringTokenizer(pp2.item(j).getTextContent(), ", \t");
 							Vector<Integer> id = new Vector<Integer>();
-							while (st.hasMoreTokens()) {
+							while (st.hasMoreTokens())
 								id.add(Integer.parseInt(st.nextToken()));
-							}
-							DetectorStation d = new DetectorStation(myNode,myNEMA,type);
-							res &= addDetectorStation(d,id);
+							DetectorStation d = new DetectorStation(myNode, myNEMA, type);
+							res &= addDetectorStation(d, id);
 						}
 					}
 				}
 			}
 		}
-		
-		res &= haslinks;
-		
 		return res;
 		
 	}
 	
 //	-------------------------------------------------------------------------
 	public void xmlDump(PrintStream out) throws IOException {
-
 		int nemaid = myNEMA+1;
-		
-		if(!protectd && !permissive){
-			out.print("\n<phase nema=\"" + nemaid + "\" ></phase>");
+		if(!protectd && !permissive) {
+			out.print("  <phase nema=\"" + nemaid + "\" ></phase>");
 			return;
 		}
-		
-		out.print("\n<phase nema=\"" + nemaid + "\"");
-		out.print("\nprotected=\"" + protectd + "\"");
-		out.print("\npermissive=\"" + permissive + "\"");
-		out.print("\nrecall=\"" + recall + "\"");
-		out.print("\nmingreen=\"" + mingreen + "\"");
-		out.print("\nyellowtime=\"" + yellowtime + "\"");
-		out.print("\nredcleartime=\"" + redcleartime + "\"");
-		out.print(" ></phase>");
-
+		out.print("  <phase nema=\"" + nemaid + "\" lag=\"" + lag + "\" protected=\"" + protectd + "\" permissive=\"" + permissive + "\" recall=\"" + recall + "\" min_green_time=\"" + mingreen + "\" yellow_time=\"" + yellowtime + "\" red_clear_time=\"" + redcleartime + "\">\n");
+		out.print("    <links>");
+		for (int i = 0; i < links.size(); i++) {
+			if (i > 0)
+				out.print(",");
+			out.print(links.get(i).getId());
+		}
+		out.print("</links>\n");
+		out.print("  </phase>\n");
 		/*  GCG FIX THIS
 		out.print("\n<links> "  + link.getId() + " </links>");	
 			
@@ -401,8 +386,7 @@ public class SignalPhase implements Serializable {
 			out.print("<detector type=\"S\"> " + Util.csvstringint(StoplineStationIds) + " </detector>");
 		out.print("\n</detectorlist>"); 
 		
-		out.print("\n</phase>");
-*/
+		out.print("\n</phase>");*/
 		return;
 	}
 	
