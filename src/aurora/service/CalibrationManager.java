@@ -7,8 +7,10 @@ package aurora.service;
 import java.io.*;
 import java.util.*;
 import javax.xml.parsers.*;
+
 import org.xml.sax.InputSource;
 import org.w3c.dom.*;
+
 import aurora.*;
 import aurora.hwc.*;
 import aurora.hwc.fdcalibration.*;
@@ -46,10 +48,11 @@ public class CalibrationManager implements ProcessManager {
 			throw new Exception("Error: Failed to parse xml: " + e.getMessage());
 		}
 		// 2: create calibrator and read data
-		ArrayList<String> input_urls = new ArrayList<String>();
-		for (int i = 1; i < input_files.length; i++)
-			input_urls.add(input_files[i]);
-		FDCalibrator fdc = new FDCalibrator("", input_urls, "");
+		//ArrayList<String> input_urls = new ArrayList<String>();
+		//for (int i = 1; i < input_files.length; i++)
+		//	input_urls.add(input_files[i]);
+		//FDCalibrator fdc = new FDCalibrator("", input_urls, "");
+		FDCalibrator fdc = new FDCalibrator(input_files[0],output_files[0]);
 		fdc.setMySystem(mySystem);
 		fdc.setUpdater(updater);
 		try {
