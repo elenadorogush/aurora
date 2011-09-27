@@ -32,7 +32,7 @@ public class gui_mainframe extends JFrame {
 	
 	public static void main(String[] args) {	
 		
-		boolean launchgui = true;
+		Configuration.rgguilaunched = true;
 		File inputfile = null;
 		
 		// check usage
@@ -44,7 +44,7 @@ public class gui_mainframe extends JFrame {
 		// parse command
 		for(int i=0;i<args.length/2;i++){
 			if( args[2*i].equalsIgnoreCase("-view") )
-				launchgui = args[2*i+1].equalsIgnoreCase("on");
+				Configuration.rgguilaunched = args[2*i+1].equalsIgnoreCase("on");
 			if( args[2*i].equals("-config") )
 				inputfile = new File(args[2*i+1]);
 			if( args[2*i].equals("-verbose") )
@@ -56,11 +56,8 @@ public class gui_mainframe extends JFrame {
 			if( args[2*i].equals("-rootdir") )
 				Configuration.setRootDir(args[2*i+1]);
 		}
-
-		// run export if in gui mode
-		Configuration.doexport = launchgui;
 		
-		if(launchgui){
+		if(Configuration.rgguilaunched){
 		    JFrame.setDefaultLookAndFeelDecorated(true);
 			gui_mainframe window = new gui_mainframe(inputfile);
 			window.setVisible(true);

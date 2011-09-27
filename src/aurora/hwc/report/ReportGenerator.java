@@ -27,7 +27,7 @@ public class ReportGenerator {
 	protected Vector<Integer> FRlinktypes = new Vector<Integer>();
 	protected Vector<Integer> STlinktypes = new Vector<Integer>();
 	
-	protected File reportfile = new File(Configuration.getTempDir() + "\\detailed.xml");
+	protected File reportfile = null; //new File(Configuration.getTempDir() + "\\detailed.xml");
 
 	public ReportGenerator(Configuration c){
 		cfg = c;
@@ -45,6 +45,7 @@ public class ReportGenerator {
 	}
 	
 	public void run(Configuration c){
+		
 		// create xml description of the report
 		try {
 			PerformanceCalculator perfcalc = new PerformanceCalculator(cfg, header);							

@@ -974,51 +974,22 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 			}	
 		}
 		
-		// create the export files
+		// clean out old files
+		gui_mainpanel.cleantempfolder();
+		
+		// generate the report
+		File reportfile = new File(Utils.outfilename + ".xml");
+		ReportGenerator rg = new ReportGenerator(C);
+		rg.setReportFile(reportfile);
+		rg.run(C);
+		
+		// export
 		File export_pdf = new File(Utils.outfilename + ".pdf");
 		File export_ppt = new File(Utils.outfilename + ".ppt");
 		File export_xls = new File(Utils.outfilename + ".xlsx");
-		File reportfile = new File(Utils.outfilename + ".xml");
-
-		// clean out old files
-		gui_mainpanel.cleantempfolder();
-		// generate the report
-		ReportGenerator rg = new ReportGenerator(C);
-		//rg.setReportFile(new File(Utils.outfilename));	// The report file is not the same as the output file!
-
-		rg.run(C);
-		
-		// run exporter
-		/* KEEP THIS. It is used to export only the requested type. 
-		 * I will be used later 
-		if(Configuration.doexport){
-			String ext = "." + C.exporttype.toString();
-			if (!Utils.outfilename.endsWith(ext))
-				Utils.outfilename += ext; 
-			File output_file = new File(Utils.outfilename);
-			String type = Utils.getExtension(output_file);
-			AbstractExporter exporter = null;
-			if (type.equals("ppt"))
-				exporter = new Export_PPT();
-			else if (type.equals("xls"))
-				exporter = new Export_XLS();
-			else if (type.equals("pdf"))
-				exporter = new Export_PDF();
-			if (exporter != null) {
-				exporter.export(output_file);
-				System.out.println("Done!");
-			} 
-			else
-				System.err.println("Error: Wrong output file extension.\nAdmissible extensions are .pdf, .ppt and .xls.");
-		}
-		*/
-
-		// export
-		if(Configuration.doexport){
-			(new Export_PDF()).export(reportfile, export_pdf);
-			(new Export_PPT()).export(reportfile, export_ppt);
-			(new Export_XLS()).export(reportfile, export_xls);
-		}
+		(new Export_PDF()).export(reportfile, export_pdf);
+		(new Export_PPT()).export(reportfile, export_ppt);
+		(new Export_XLS()).export(reportfile, export_xls);
 
 	}
 	

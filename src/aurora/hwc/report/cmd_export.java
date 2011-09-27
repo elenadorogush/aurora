@@ -6,7 +6,6 @@ package aurora.hwc.report;
 
 import java.io.*;
 
-
 /**
  * Main class for exporting report.
  * @author Alex Kurzhanskiy

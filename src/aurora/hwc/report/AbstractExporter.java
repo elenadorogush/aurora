@@ -15,13 +15,12 @@ import aurora.service.*;
  * @author Gabriel Gomes
  */
 public abstract class AbstractExporter {
-	protected String reportURL = "file:" + Configuration.getTempDir() + "/detailed.xml";
+	protected String reportURL = ""; //"file:" + Configuration.getTempDir() + "/detailed.xml";
 	protected Updatable updater = null;
 	protected int update_period = 5;
 	protected int max_percent = 100;
 	protected int offset_percent = 0;
 	
-
 	protected void openFile(File file){};
 
 	protected void closeFile(){};
@@ -58,14 +57,14 @@ public abstract class AbstractExporter {
 		closeFile();
 	}
 	
-	final public Vector<ReportSection> readxml(File configfile) {
+	final private Vector<ReportSection> readxml(File reportfile) {
 		Vector<ReportSection> report = new Vector<ReportSection>();
 		int i,j,k;
 		String name1;
 		try {
 			Document doc = null;
-			if (configfile != null) {
-				doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse("file:" + configfile.getAbsolutePath());
+			if (reportfile != null) {
+				doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse("file:" + reportfile.getAbsolutePath());
 			}
 			else
 				doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(reportURL);
