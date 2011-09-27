@@ -30,7 +30,7 @@ public class cmd_export {
 			exporter = new Export_PDF();
 		if (exporter != null) {
 			exporter.setReportURL(args[0]);
-			exporter.export(output_file);
+			exporter.export(null, output_file);
 			System.out.println("Done!");
 		} 
 		else

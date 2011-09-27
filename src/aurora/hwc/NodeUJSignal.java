@@ -25,16 +25,13 @@ public final class NodeUJSignal extends AbstractNodeHWC {
 	private static final long serialVersionUID = 8638143194434976281L;
 
 	private boolean secondpass = false;
-	private SignalManager sigman = null;
+	private SignalManager sigman = new SignalManager(this);;
 	public boolean hasdata = false;
 
 	
-	public NodeUJSignal() { 		
-		sigman = new SignalManager(this);
-	}
+	public NodeUJSignal() { }		
 	public NodeUJSignal(int id) { 
 		this.id = id; 
-		sigman = new SignalManager(this);
 	}
 
 	
@@ -47,52 +44,52 @@ public final class NodeUJSignal extends AbstractNodeHWC {
 	}
 	
 	/**
-	 * Initializes the simple Node from given DOM structure.
+	 * Initializes the signalized intersection Node from given DOM structure.
+	 * @param p DOM node.
+	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
+	 * @throws ExceptionConfiguration
+	 */
+	public boolean initSignalFromDOM(Node p) throws ExceptionConfiguration {
+		boolean res = true;
+		if (p == null)
+			return false;
+		hasdata = true;
+		NodeList pp = p.getChildNodes();
+		for (int i = 0; i < pp.getLength(); i++) {
+			if (pp.item(i).getNodeName().equals("phase")) {
+				Node nemaAttr = pp.item(i).getAttributes().getNamedItem("nema");
+				if (nemaAttr != null) {
+					int nema_idx = NEMAtoIndex(Integer.parseInt(nemaAttr.getNodeValue()));
+					if (nema_idx < 0)
+						continue;
+					res &= sigman.Phase(nema_idx).initFromDOM(pp.item(i));
+				}
+			}
+		}	
+		return res;
+	}
+	
+	/**
+	 * Initializes the signalized intersection Node from given DOM structure.
 	 * @param p DOM node.
 	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
 	 * @throws ExceptionConfiguration
 	 */
 	public boolean initFromDOM(Node p) throws ExceptionConfiguration {
 		boolean res = super.initFromDOM(p);
-		int i, j;
-		Node nodeattr;
-
-		if (secondpass)
-		{
+		if (secondpass)	{
 			if (p.hasChildNodes()) {
 				NodeList pp = p.getChildNodes();
-				for (i = 0; i < pp.getLength(); i++) {
-					
-					if (pp.item(i).getNodeName().equals("signal")){
-						
-						hasdata = true;
-
-						if (pp.item(i).hasChildNodes()) {
-							NodeList pp2 = pp.item(i).getChildNodes();
-							for (j = 0; j < pp2.getLength(); j++){
-
-								if (pp2.item(j).getNodeName().equals("phase")) {
-
-									nodeattr = pp2.item(j).getAttributes().getNamedItem("nema");
-									if(nodeattr==null)
-										return false;
-									int nemaind = NEMAtoIndex(Integer.parseInt(nodeattr.getNodeValue()));
-									if (nemaind<0)
-										return false;
-									res &= sigman.Phase(nemaind).initFromDOM(pp2.item(j));
-								}
-							}
-						}
-					}	// end "signal"
+				for (int i = 0; i < pp.getLength(); i++) {
+					if (pp.item(i).getNodeName().equals("signal"))
+						res &= initSignalFromDOM(pp.item(i));
 				}
 			}
 			else
 				res = false;
 		}	// secondpass
-		else{
+		else
 			secondpass = true;
-		}
-		
 		return res;
 	}
 	
@@ -102,45 +99,16 @@ public final class NodeUJSignal extends AbstractNodeHWC {
 	 * @param out print stream.
 	 * @throws IOException
 	 */
-	public void xmlDump(PrintStream out) throws IOException {
+	public void xmlDumpSignal(PrintStream out) throws IOException {
 		if (out == null)
 			out = System.out;
-		out.print("<node type=\"" + getTypeLetterCode() + "\" id=\"" + id + "\" name=\"" + name + "\">");
-		out.print("<description>" + description + "</description>\n");
-		out.print("<outputs>");
-		for (int i = 0; i < successors.size(); i++)
-			out.print("<output id=\"" + successors.get(i).getId() + "\"/>");
-		out.print("</outputs>\n<inputs>");
-		for (int i = 0; i < predecessors.size(); i++) {
-			String buf = "";
-			String buf2 = "";
-			for (int j = 0; j < successors.size(); j++) {
-				if (j > 0) {
-					buf += ", ";
-					buf2 += ", ";
-				}
-				buf += splitRatioMatrix[i][j].toString();
-				buf2 += Double.toString(weavingFactorMatrix[i][j]);
-			}
-			out.print("<input id=\"" + predecessors.get(i).getId() + "\">");
-			out.print("<splitratios>" + buf + "</splitratios>");
-			out.print("<weavingfactors>" + buf2 + "</weavingfactors>");
-			if (controllers.get(i) != null)
-				controllers.get(i).xmlDump(out);
-			out.print("</input>");
-		}
-		out.print("</inputs>\n");
-		if (srmProfile != null)
-			out.print("<splitratios tp=\"" + Double.toString(srTP) + "\">\n" + getSplitRatioProfileAsXML() + "</splitratios>\n");
-		position.xmlDump(out);
 		if (hasdata) {
-			out.print("<signal>\n");
+			out.print("<signal node_id=\"" + id + "\">\n");
 			for (int i = 0; i < 8; i++) {	
 				sigman.Phase(i).xmlDump(out);
 			}
 			out.print("</signal>\n");
 		}
-		out.print("</node>\n");
 		return;
 	}
 	

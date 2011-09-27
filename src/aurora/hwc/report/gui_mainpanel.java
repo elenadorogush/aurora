@@ -24,6 +24,9 @@ import org.w3c.dom.Document;
  */
 public class gui_mainpanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = -7405218897970299291L;
+
+	public static String homePath = System.getProperty("user.home") + "\\ARG";
+	public static String tempPath = homePath + "\\tempfiles";
 	
 	private Configuration config = new Configuration();
 	private Vector<String> colors = new Vector<String>();
@@ -970,12 +973,18 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 				return;
 			}	
 		}
+		
+		// create the export files
+		File export_pdf = new File(Utils.outfilename + ".pdf");
+		File export_ppt = new File(Utils.outfilename + ".ppt");
+		File export_xls = new File(Utils.outfilename + ".xlsx");
+		File reportfile = new File(Utils.outfilename + ".xml");
 
 		// clean out old files
 		gui_mainpanel.cleantempfolder();
-				
 		// generate the report
 		ReportGenerator rg = new ReportGenerator(C);
+		rg.setReportFile(new File(Utils.outfilename));
 		//rg.setReportFile(new File(Utils.outfilename));	// The report file is not the same as the output file!
 
 		rg.run(C);
@@ -1002,6 +1011,20 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 				System.err.println("Error: Wrong output file extension.\nAdmissible extensions are .pdf, .ppt and .xls.");
 		}
 		
+		/*/ export
+		AbstractExporter exporter = null;
+		switch(C.exporttype){
+		case pdf:
+			exporter = new Export_PDF();
+			break;
+		case ppt:
+			exporter = new Export_PPT();
+			break;
+		case xls:
+			exporter = new Export_XLS();
+			break;
+		}
+		exporter.export(exportfile); FIXME */
 	}
 	
 	////////////////////////////////////////////////////////////////////////

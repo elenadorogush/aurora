@@ -69,7 +69,35 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 	}
 	
 	/**
-	 * Initializes the complex Node from given DOM structure.
+	 * Initialize signal list from the DOM structure.
+	 */
+	protected boolean initSignalListFromDOM(Node p) throws Exception {
+		boolean res = true;
+		if (p == null)
+			return false;
+		if (p.hasChildNodes()) {
+			NodeList pp2 = p.getChildNodes();
+			for (int j = 0; j < pp2.getLength(); j++) {
+				if (pp2.item(j).getNodeName().equals("signal")) {
+					Node attr = pp2.item(j).getAttributes().getNamedItem("node_id");
+					if (attr != null) {
+						AbstractNodeSimple nd = getNodeById(Integer.parseInt(attr.getNodeValue()));
+						if (nd.getType() == TypesHWC.NODE_SIGNAL)
+							res &= ((NodeUJSignal)nd).initSignalFromDOM(pp2.item(j));
+					}
+				}
+				if (pp2.item(j).getNodeName().equals("include")) {
+					Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(pp2.item(j).getAttributes().getNamedItem("uri").getNodeValue());
+					if (doc.hasChildNodes())
+						res &= initSignalListFromDOM(doc.getChildNodes().item(0));
+				}
+			}
+		}
+		return res;
+	}
+	
+	/**
+	 * Initializes Network from given DOM structure.
 	 * @param p DOM node.
 	 * @return <code>true</code> if operation succeeded, <code>false</code> - otherwise.
 	 * @throws ExceptionConfiguration
@@ -90,6 +118,13 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 		if (p.hasChildNodes()) {
 			NodeList pp = p.getChildNodes();
 			for (int i = 0; i < pp.getLength(); i++) {
+				if (p.getChildNodes().item(i).getNodeName().equals("SignalList"))
+					try {
+						res &= initSignalListFromDOM(p.getChildNodes().item(i));
+					}
+					catch(Exception e) {
+						throw new ExceptionConfiguration(e.getMessage());
+					}
 				if (p.getChildNodes().item(i).getNodeName().equals("DirectionsCache")) {
 					dircache = new DirectionsCache();
 					res &= dircache.initFromDOM(p.getChildNodes().item(i));
@@ -186,6 +221,24 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 	}
 	
 	/**
+	 * Generates XML buffer for the signal list.<br>
+	 * If the print stream is specified, then XML buffer is written to the stream.
+	 * @param out print stream.
+	 * @throws IOException
+	 */
+	public void xmlDumpSignalList(PrintStream out) throws IOException {
+		if (out == null)
+			out = System.out;
+		out.print("\n<SignalList>\n");
+		for (int i = 0; i < nodes.size(); i++) {
+			if (nodes.get(i).getType() == TypesHWC.NODE_SIGNAL)
+				((NodeUJSignal)nodes.get(i)).xmlDumpSignal(out);
+		}
+		out.print("</SignalList>\n");
+		return;
+	}
+	
+	/**
 	 * Generates XML description of the complex Node.<br>
 	 * If the print stream is specified, then XML buffer is written to the stream.
 	 * @param out print stream.
@@ -196,13 +249,14 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 			out = System.out;
 		out.print("\n<network id=\"" + id + "\" name=\"" + name + "\" ml_control=\"" + controlled + "\" q_control=\"" + qControl + "\"  dt=\"" + 3600*tp + "\">\n");
 		super.xmlDump(out);
-		out.print("</network>\n");
+		xmlDumpSignalList(out);
 		if (dircache != null) {
 			dircache.xmlDump(out);
 		}
 		if (ixcache != null) {
 			ixcache.xmlDump(out);
 		}
+		out.print("\n</network>\n");
 		return;
 	}
 	

@@ -10,6 +10,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 import aurora.service.*;
 
+
 /**
  * Base class for making report exporters
  * @author Gabriel Gomes
@@ -18,6 +19,9 @@ public abstract class AbstractExporter {
 	protected String reportURL = "file:" + Configuration.getTempDir() + "/detailed.xml";
 	protected Updatable updater = null;
 	protected int update_period = 5;
+	protected int max_percent = 100;
+	protected int offset_percent = 0;
+	
 
 	protected void openFile(File file){};
 
@@ -30,8 +34,8 @@ public abstract class AbstractExporter {
 	/**
 	 * Access function used to export the entire report to a file
 	 */
-	final public void export(File outfile){
-		Vector<ReportSection> report = readxml();
+	final public void export(File infile, File outfile){
+		Vector<ReportSection> report = readxml(infile);
 		openFile(outfile);
 		int total_slides = 0;
 		int slide_count = 0;
@@ -48,19 +52,24 @@ public abstract class AbstractExporter {
 				if ((sys_curr_time - sys_lst_time) >= 1000*update_period) {
 					sys_lst_time = sys_curr_time;
 					if (updater != null)
-						updater.notify_update(Math.round(100*(float)slide_count/total_slides));
+						updater.notify_update(offset_percent + Math.round(max_percent*(float)slide_count/total_slides));
 				}
 			}
 		}
 		closeFile();
 	}
 	
-	final public Vector<ReportSection> readxml(){
+	final public Vector<ReportSection> readxml(File configfile) {
 		Vector<ReportSection> report = new Vector<ReportSection>();
 		int i,j,k;
 		String name1;
 		try {
-			Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(reportURL);
+			Document doc = null;
+			if (configfile != null) {
+				doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse("file:" + configfile.getAbsolutePath());
+			}
+			else
+				doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(reportURL);
 			Node p = doc.getChildNodes().item(0);
 			if ((p == null) || (!p.hasChildNodes()))
 				return null;
@@ -113,9 +122,11 @@ public abstract class AbstractExporter {
 	/**
 	 * Sets progress updater.
 	 */
-	public synchronized void setUpdater(Updatable upd, int prd) {
+	public synchronized void setUpdater(Updatable upd, int prd, int offset_prgr, int max_prgr) {
 		updater = upd;
 		update_period = Math.max(1, prd);
+		offset_percent = offset_prgr;
+		max_percent = max_prgr;
 		return;
 	}
 }

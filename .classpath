@@ -26,5 +26,9 @@
 	<classpathentry kind="lib" path="libPDF/itext-2.0.6.jar"/>
 	<classpathentry kind="lib" path="libPPT/poi-3.7-20101029.jar"/>
 	<classpathentry kind="lib" path="libPPT/poi-scratchpad-3.7-20101029.jar"/>
+	<classpathentry kind="lib" path="libPPT/poi-ooxml-schemas-3.7-20101029.jar"/>
+	<classpathentry kind="lib" path="libPPT/poi-ooxml-3.7-20101029.jar"/>
+	<classpathentry kind="lib" path="libPPT/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="libPPT/xbean.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

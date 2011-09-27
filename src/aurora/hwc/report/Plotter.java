@@ -176,9 +176,11 @@ public class Plotter {
 		        
 		        float minVal = zlimits.lower;
 		        float maxVal = zlimits.upper;
-		        if(maxVal<=minVal)
-		        	maxVal=minVal+1;
-		        LookupPaintScale pScale = new LookupPaintScale(minVal,maxVal,Color.white);
+		        if (maxVal < minVal) {
+		        	minVal = 0;
+		        	maxVal = 0;
+		        }
+		        LookupPaintScale pScale = new LookupPaintScale(minVal,maxVal+aurora.util.Util.EPSILON,Color.white);
 		        Color[] clr = UtilGUI.byrColorScale();		        
 		        double delta = (maxVal - minVal)/(clr.length - 1);
 		        double value = minVal;

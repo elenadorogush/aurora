@@ -97,7 +97,7 @@ public class Configuration implements AuroraConfigurable {
 				if (nodename.equals("cmb_export"))
 					exporttype = Utils.exportString2Type.get(n1.getTextContent());
 				if (nodename.equals("cmb_reporttype"))
-					reporttype = Utils.reportString2Type.get(n1.getTextContent());
+					reporttype = Utils.reportString2Type.get(n1.getTextContent().toLowerCase());
 				if (nodename.equals("chk_tree"))
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),chk_tree);
 				/*
@@ -135,14 +135,14 @@ public class Configuration implements AuroraConfigurable {
 				if (nodename.equals("txt_timefrom")) {
 					str = n1.getTextContent();
 					if(Utils.isNumber(str))
-						timefrom = Float.parseFloat(str);
+						timefrom = Float.parseFloat(str) / (float)3600.0;
 					else
 						timefrom = Float.NaN;
 				}
 				if (nodename.equals("txt_timeto")) {
 					str = n1.getTextContent();
 					if(Utils.isNumber(str))
-						timeto = Float.parseFloat(str);
+						timeto = Float.parseFloat(str) / (float)3600.0;
 					else
 						timefrom = Float.NaN;
 				}
@@ -218,19 +218,19 @@ public class Configuration implements AuroraConfigurable {
 					cbx_boxplot = Boolean.parseBoolean(n1.getTextContent());
 				if (nodename.equals("cmb_xaxis_subnetwork")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_xaxis_subnetwork) ;
-					cmb_xaxis_subnetwork_selected = Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
+					//FIXME: cmb_xaxis_subnetwork_selected = Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
 				}
 				if (nodename.equals("cmb_xaxis_quantity")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_xaxis_quantity) ;
-					cmb_xaxis_quantity_selected =  Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
+					//FIXME: cmb_xaxis_quantity_selected =  Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
 				}
 				if (nodename.equals("cmb_yaxis_subnetwork")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_yaxis_subnetwork) ;
-					cmb_yaxis_subnetwork_selected = Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());;
+					//FIXME: cmb_yaxis_subnetwork_selected = Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());;
 				}
 				if (nodename.equals("cmb_yaxis_quantity")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_yaxis_quantity) ;
-					cmb_yaxis_quantity_selected =  Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
+					//FIXME: cmb_yaxis_quantity_selected =  Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
 				}
 			}
 		}
@@ -260,8 +260,8 @@ public class Configuration implements AuroraConfigurable {
 		out.print("\t<cbx_linkstate>" + cbx_linkstate +  "</cbx_linkstate>\n");
 		out.print("\t<cbx_sysperf>" + cbx_sysperf +  "</cbx_sysperf>\n");
 		out.print("\t<txt_outputfile>" + txt_outputfile +  "</txt_outputfile>\n");
-		out.print("\t<txt_timefrom>" + timefrom +  "</txt_timefrom>\n");
-		out.print("\t<txt_timeto>" + timeto +  "</txt_timeto>\n");
+		out.print("\t<txt_timefrom>" + 3600*timefrom +  "</txt_timefrom>\n");
+		out.print("\t<txt_timeto>" + 3600*timeto +  "</txt_timeto>\n");
 		out.print("\t<txt_customxaxis>" + txt_customxaxis +  "</txt_customxaxis>\n");
 		out.print("\t<cbx_boxplot>" + cbx_boxplot +  "</cbx_boxplot>\n");
 		out.print("\t<colors>" + Utils.writeMatlabFormattedVector(colors) + "</colors>\n");

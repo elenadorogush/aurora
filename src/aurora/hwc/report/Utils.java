@@ -28,10 +28,10 @@ public class Utils {
 	static{
 		
 		// populate report type hashmaps
-		reportType2String.put(ReportType.vehicletypes,"Compare vehicle types, single run");
-		reportType2String.put(ReportType.aggvehicletypes,"Aggregate vehicle types, multiple runs");
-		reportType2String.put(ReportType.bestworst,"Best/Worst case performance");
-		reportType2String.put(ReportType.scatter, "Scatter plot");
+		reportType2String.put(ReportType.vehicletypes,"compare vehicle types, single run");
+		reportType2String.put(ReportType.aggvehicletypes,"aggregate vehicle types, multiple runs");
+		reportType2String.put(ReportType.bestworst,"best/worst case performance");
+		reportType2String.put(ReportType.scatter, "scatter plot");
 		Set<ReportType> c1 = Utils.reportType2String.keySet();
 	    Iterator<ReportType> it1 = c1.iterator();
 	    while(it1.hasNext()){

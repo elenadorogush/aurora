@@ -106,7 +106,7 @@ public abstract class AbstractNetworkElement implements AuroraConfigurable, Seri
 	 * Returns true if the state is to be saved, false - otherwise.
 	 */
 	public final boolean toSave() {
-		if (saveState > 1)
+		if ((saveState > 1) || (myNetwork.getContainer().isBatch()))
 			return true;
 		return false;
 	}

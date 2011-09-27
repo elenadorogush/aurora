@@ -256,6 +256,8 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 				if (pp.item(ii).getNodeName().equals("srm")) {
 					AuroraIntervalVector[][] srm = new AuroraIntervalVector[m][n];
 					String bufM = pp.item(ii).getTextContent();
+					if ((bufM.isEmpty()) || (bufM.equals("\n")) || (bufM.equals("\r\n")))
+						continue;
 					StringTokenizer st1 = new StringTokenizer(bufM, ";");
 					int sz = ((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).countVehicleTypes();
 					int i = -1;

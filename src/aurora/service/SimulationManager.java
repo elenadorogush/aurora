@@ -43,14 +43,22 @@ public class SimulationManager implements ProcessManager {
 			initial_time = mySystem.getMySettings().getTimeInitial();
 			max_time = mySystem.getMySettings().getTimeMax();
 			if (input_files.length > 1) {
+				double initial_time0 = initial_time;
+				double max_time0 = max_time;
 				is.setCharacterStream(new StringReader(input_files[1]));
 				Node trp = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is).getChildNodes().item(0);
 				Node bt_attr = trp.getAttributes().getNamedItem("begin_time");
 				if (bt_attr != null)
-					initial_time = Math.max(initial_time, Double.parseDouble(bt_attr.getNodeValue())/3600.0);
+					initial_time0 = Double.parseDouble(bt_attr.getNodeValue())/3600.0;
 				Node dur_attr = trp.getAttributes().getNamedItem("duration");
 				if (dur_attr != null)
-					max_time = initial_time + (Double.parseDouble(dur_attr.getNodeValue()) / 3600.0);
+					max_time0 = initial_time0 + (Double.parseDouble(dur_attr.getNodeValue()) / 3600.0);
+				initial_time0 = Math.max(initial_time0, initial_time);
+				max_time0 = Math.min(max_time0, max_time);
+				if (initial_time0 < max_time0) {
+					initial_time = initial_time0;
+					max_time = max_time0;
+				}
 			}
 		}
 		catch(Exception e) {
