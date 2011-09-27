@@ -18,6 +18,8 @@ public class Configuration implements AuroraConfigurable {
 	private static String tempDir = System.getProperty("user.home") + "\\ARG\\tempfiles";
 	private static String filesDir = System.getProperty("user.home") + "\\ARG\\files";
 	
+	public static boolean doexport = false;
+	
 	public Utils.ExporterType exporttype;
 	public ReportType reporttype;
 	public int maxpointspercurve;

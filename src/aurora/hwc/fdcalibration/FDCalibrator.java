@@ -71,8 +71,9 @@ public class FDCalibrator {
 				Vector<HistoricalDataSource> dsrc = S.getDataSources();
 				for (int j = 0; j < dsrc.size(); j++) {
 					String myurl =  dsrc.get(j).getURL();
+					String myformat = dsrc.get(j).getFormat();
 					if( uniqueurls.indexOf(myurl)<0 ){
-						datasourcemap.put(myurl,new DataSource(myurl));
+						datasourcemap.put(myurl,new DataSource(myurl,myformat));
 						uniqueurls.add(myurl);
 					}
 					DataSource thisdatasource = datasourcemap.get(myurl);
@@ -265,7 +266,6 @@ public class FDCalibrator {
 		mySystem.xmlDump(oos);
 		oos.close();
 	}
-	
 	
 	// routines called from service.....................
 	

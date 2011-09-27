@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class DataSource {
 	private URL url;
+	private String format;
 	private ArrayList<Integer> for_vds = new ArrayList<Integer>();
 	private ArrayList<ArrayList<Integer>> for_vdslanes = new ArrayList<ArrayList<Integer>>();
 
@@ -12,6 +13,10 @@ public class DataSource {
 		return url;
 	}
 
+	public String getFormat() {
+		return format;
+	}
+	
 	public ArrayList<Integer> getFor_vds() {
 		return for_vds;
 	}
@@ -28,8 +33,9 @@ public class DataSource {
 		for_vdslanes.add(vdslanes);
 	}
 	
-	public DataSource(String urlname) throws Exception{
+	public DataSource(String urlname,String f) throws Exception{
 		url = new URL(urlname);
+		format = f;
 	}
 	
 	public void addVDS(int vds,ArrayList<Integer> vdslanes){

@@ -61,7 +61,7 @@ public class HistoricalDataSource implements AuroraConfigurable, Serializable, C
 	public String getURL() {
 		return url;
 	}
-
+	
 	/**
 	 * Return sampling period.
 	 */

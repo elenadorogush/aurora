@@ -18,7 +18,6 @@ public class gui_mainframe extends JFrame {
 	private static final long serialVersionUID = 8742484261790264586L;
 
 	public gui_mainframe(File inputfile){
-		
         setContentPane(new gui_mainpanel(inputfile));
         pack();
 		setTitle("Aurora Report Generator");
@@ -57,6 +56,9 @@ public class gui_mainframe extends JFrame {
 			if( args[2*i].equals("-rootdir") )
 				Configuration.setRootDir(args[2*i+1]);
 		}
+
+		// run export if in gui mode
+		Configuration.doexport = launchgui;
 		
 		if(launchgui){
 		    JFrame.setDefaultLookAndFeelDecorated(true);

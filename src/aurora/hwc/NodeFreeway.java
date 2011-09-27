@@ -126,7 +126,7 @@ public final class NodeFreeway extends AbstractNodeHWC {
 				(type != TypesHWC.LINK_HOV) &&
 				(type != TypesHWC.LINK_INTERCONNECT) &&
 				(type != TypesHWC.LINK_ONRAMP) &&
-				(type != TypesHWC.LINK_DUMMY)) {
+				(type != TypesHWC.LINK_DUMMY) ) { 
 				myNetwork.addConfigurationError(new ErrorConfiguration(this, "In-Link of wrong type (" + cnm + ")."));
 				res = false;
 				//throw new ExceptionConfiguration(this, "In-Link of wrong type (" + cnm + ").");
@@ -139,7 +139,7 @@ public final class NodeFreeway extends AbstractNodeHWC {
 				(type != TypesHWC.LINK_HOV) &&
 				(type != TypesHWC.LINK_INTERCONNECT) &&
 				(type != TypesHWC.LINK_OFFRAMP) &&
-				(type != TypesHWC.LINK_DUMMY)) {
+				(type != TypesHWC.LINK_DUMMY) ) {  
 				myNetwork.addConfigurationError(new ErrorConfiguration(this, "Out-Link of wrong type (" + cnm + ")."));
 				res = false;
 				//throw new ExceptionConfiguration(this, "Out-Link of wrong type (" + cnm + ").");

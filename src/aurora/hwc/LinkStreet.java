@@ -75,7 +75,7 @@ public final class LinkStreet extends AbstractLinkHWC {
 			if ((type != TypesHWC.NETWORK_HWC) &&
 				(type != TypesHWC.NODE_SIGNAL) &&
 				(type != TypesHWC.NODE_STOP) &&
-				(type != TypesHWC.NODE_TERMINAL)) {
+				(type != TypesHWC.NODE_TERMINAL) ) {
 				myNetwork.addConfigurationError(new ErrorConfiguration(this, "End Node of wrong type (" + cnm + ")."));
 				res = false;
 				//throw new ExceptionConfiguration(this, "End Node of wrong type (" + cnm + ").");

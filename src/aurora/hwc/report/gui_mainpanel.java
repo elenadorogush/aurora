@@ -71,7 +71,7 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 	private JCheckBox cb_routeperf_contour 		= new JCheckBox();
 	private JCheckBox cb_routetraveltime_contour = new JCheckBox();	
 	private JCheckBox cb_boxplot 				= new JCheckBox("Box plot");
-
+	
 	public gui_mainpanel(File configfile){
 
 		colors.add("#69A7D6");
@@ -813,7 +813,7 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 	////////////////////////////////////////////////////////////////////////
 	// Auxiliary methods
 	////////////////////////////////////////////////////////////////////////
-	
+		
 	public static boolean canstart(Configuration cfg){
 		return (cfg.reporttype!=ReportType.vehicletypes & cfg.datafiles.size()>0) | (cfg.reporttype==ReportType.vehicletypes & cfg.datafiles.size()==1);
 	}
@@ -970,36 +970,38 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 				return;
 			}	
 		}
-		/*String ext = "." + C.exporttype.toString();
-		if (!Utils.outfilename.endsWith(ext))
-			Utils.outfilename += ext; FIXME: remove */
-		
-		// create the export file
-		File exportfile = new File(Utils.outfilename);
 
 		// clean out old files
 		gui_mainpanel.cleantempfolder();
 				
 		// generate the report
 		ReportGenerator rg = new ReportGenerator(C);
-		rg.setReportFile(new File(Utils.outfilename));
+		//rg.setReportFile(new File(Utils.outfilename));	// The report file is not the same as the output file!
 
 		rg.run(C);
 
-		/*/ export
-		AbstractExporter exporter = null;
-		switch(C.exporttype){
-		case pdf:
-			exporter = new Export_PDF();
-			break;
-		case ppt:
-			exporter = new Export_PPT();
-			break;
-		case xls:
-			exporter = new Export_XLS();
-			break;
+		// run exporter
+		if(Configuration.doexport){
+			String ext = "." + C.exporttype.toString();
+			if (!Utils.outfilename.endsWith(ext))
+				Utils.outfilename += ext; 
+			File output_file = new File(Utils.outfilename);
+			String type = Utils.getExtension(output_file);
+			AbstractExporter exporter = null;
+			if (type.equals("ppt"))
+				exporter = new Export_PPT();
+			else if (type.equals("xls"))
+				exporter = new Export_XLS();
+			else if (type.equals("pdf"))
+				exporter = new Export_PDF();
+			if (exporter != null) {
+				exporter.export(output_file);
+				System.out.println("Done!");
+			} 
+			else
+				System.err.println("Error: Wrong output file extension.\nAdmissible extensions are .pdf, .ppt and .xls.");
 		}
-		exporter.export(exportfile); FIXME */
+		
 	}
 	
 	////////////////////////////////////////////////////////////////////////
