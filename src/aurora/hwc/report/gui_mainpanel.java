@@ -984,12 +984,13 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 		gui_mainpanel.cleantempfolder();
 		// generate the report
 		ReportGenerator rg = new ReportGenerator(C);
-		rg.setReportFile(new File(Utils.outfilename));
 		//rg.setReportFile(new File(Utils.outfilename));	// The report file is not the same as the output file!
 
 		rg.run(C);
-
+		
 		// run exporter
+		/* KEEP THIS. It is used to export only the requested type. 
+		 * I will be used later 
 		if(Configuration.doexport){
 			String ext = "." + C.exporttype.toString();
 			if (!Utils.outfilename.endsWith(ext))
@@ -1010,21 +1011,15 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 			else
 				System.err.println("Error: Wrong output file extension.\nAdmissible extensions are .pdf, .ppt and .xls.");
 		}
-		
-		/*/ export
-		AbstractExporter exporter = null;
-		switch(C.exporttype){
-		case pdf:
-			exporter = new Export_PDF();
-			break;
-		case ppt:
-			exporter = new Export_PPT();
-			break;
-		case xls:
-			exporter = new Export_XLS();
-			break;
+		*/
+
+		// export
+		if(Configuration.doexport){
+			(new Export_PDF()).export(reportfile, export_pdf);
+			(new Export_PPT()).export(reportfile, export_ppt);
+			(new Export_XLS()).export(reportfile, export_xls);
 		}
-		exporter.export(exportfile); FIXME */
+
 	}
 	
 	////////////////////////////////////////////////////////////////////////

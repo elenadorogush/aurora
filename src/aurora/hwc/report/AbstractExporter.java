@@ -10,7 +10,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.*;
 import aurora.service.*;
 
-
 /**
  * Base class for making report exporters
  * @author Gabriel Gomes
