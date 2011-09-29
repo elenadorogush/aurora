@@ -54,9 +54,6 @@ public class PeMSClearinghouseInterpreter {
     	String line,str;
     	int indexof;
     	ArrayList<Integer> lanes;
-    	ArrayList<Float> laneflw = new ArrayList<Float>();
-    	ArrayList<Float> laneocc = new ArrayList<Float>();
-    	ArrayList<Float> lanespd = new ArrayList<Float>();
         Calendar calendar = Calendar.getInstance();
     	float flw,dty,spd;
     	long time;
@@ -76,9 +73,9 @@ public class PeMSClearinghouseInterpreter {
     		time = calendar.getTime().getTime()/1000;
     
             lanes = datasource.getFor_vdslanes().get(indexof);
-        	laneflw.clear();
-        	laneocc.clear();
-        	lanespd.clear();
+        	ArrayList<Float> laneflw = new ArrayList<Float>();
+        	ArrayList<Float> laneocc = new ArrayList<Float>();
+        	ArrayList<Float> lanespd = new ArrayList<Float>();
         
         	// store in lane-wise ArrayList
             for (int j = 0; j < lanes.size(); j++) {
@@ -126,9 +123,6 @@ public class PeMSClearinghouseInterpreter {
     	String line,str;
     	int indexof;
     	ArrayList<Integer> lanes;
-    	ArrayList<Float> laneflw = new ArrayList<Float>();
-    	ArrayList<Float> laneocc = new ArrayList<Float>();
-    	ArrayList<Float> lanespd = new ArrayList<Float>();
         Calendar calendar = Calendar.getInstance();
     	float flw,dty,spd;
     	long time;
@@ -148,9 +142,9 @@ public class PeMSClearinghouseInterpreter {
     		time = calendar.getTime().getTime()/1000;
     
             lanes = datasource.getFor_vdslanes().get(indexof);
-        	laneflw.clear();
-        	laneocc.clear();
-        	lanespd.clear();
+        	ArrayList<Float> laneflw = new ArrayList<Float>();
+        	ArrayList<Float> laneocc = new ArrayList<Float>();
+        	ArrayList<Float> lanespd = new ArrayList<Float>();
         
         	// store in lane-wise ArrayList
             for (int j = 0; j < lanes.size(); j++) {
