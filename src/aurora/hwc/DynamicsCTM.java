@@ -122,9 +122,9 @@ public class DynamicsCTM implements DynamicsHWC, Serializable {
 				ofL = ofl.getLowerBounds();
 				ofU = ofl.getUpperBounds();
 				for (int i = 0; i < ofL.length; i++) {
-					if (lbc < 0)
+					if (lbc < 1)
 						ofL[i] = lbc * ofL[i];
-					if (ubc < 0)
+					if (ubc < 1)
 						ofU[i] = ubc * ofU[i];
 					if (Math.abs(ofL[i] - ofU[i]) < Util.EPSILON) // to avoid rounding errors
 						ofL[i] = ofU[i];

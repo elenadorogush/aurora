@@ -119,12 +119,12 @@ public final class NodeHWCNetwork extends AbstractNodeComplex {
 			NodeList pp = p.getChildNodes();
 			for (int i = 0; i < pp.getLength(); i++) {
 				if (p.getChildNodes().item(i).getNodeName().equals("SignalList"))
-					try {
-						res &= initSignalListFromDOM(p.getChildNodes().item(i));
-					}
-					catch(Exception e) {
-						throw new ExceptionConfiguration(e.getMessage());
-					}
+						try {
+							res &= initSignalListFromDOM(p.getChildNodes().item(i));
+						}
+						catch(Exception e) {
+							throw new ExceptionConfiguration(e.getMessage());
+						}
 				if (p.getChildNodes().item(i).getNodeName().equals("DirectionsCache")) {
 					dircache = new DirectionsCache();
 					res &= dircache.initFromDOM(p.getChildNodes().item(i));

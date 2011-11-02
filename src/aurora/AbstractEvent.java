@@ -21,6 +21,7 @@ public abstract class AbstractEvent implements AuroraConfigurable, Serializable 
 	
 	protected String description = "";
 	protected double tstamp = 0.0; // timestamp
+	protected int neid;
 	protected AbstractNetworkElement myNE = null; // network element
 	protected boolean enabled = true; // to fire or not
 	
@@ -28,13 +29,7 @@ public abstract class AbstractEvent implements AuroraConfigurable, Serializable 
 	
 	protected AbstractEvent() { }
 	protected AbstractEvent(int neid) {
-		myNE = myManager.getContainer().getMyNetwork().getMonitorById(neid);
-		if (myNE == null)
-    		myNE = myManager.getContainer().getMyNetwork().getNetworkById(neid);
-    	if (myNE == null)
-    		myNE = myManager.getContainer().getMyNetwork().getNodeById(neid);
-    	if (myNE == null)
-    		myNE = myManager.getContainer().getMyNetwork().getLinkById(neid);
+		this.neid = neid;
 	}
 
 	
