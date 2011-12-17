@@ -50,10 +50,10 @@ public class ReportGenerator {
 		try {
 			PerformanceCalculator perfcalc = new PerformanceCalculator(cfg, header);							
 			// Compile a high level description of the report
-			Utils.writeToConsole("\t+ Compiling slide list.");
+			c.writeToConsole("\t+ Compiling slide list.");
 			GenerateHighLevel();
 
-			Utils.writeToConsole("\t+ Computing performance measures.");
+			c.writeToConsole("\t+ Computing performance measures.");
 
 			// Apply the performance calculator to each element
 			PrintStream xml = new PrintStream(new FileOutputStream(reportfile));
@@ -71,9 +71,9 @@ public class ReportGenerator {
 			for (int i = 0; i < report.size(); i++) {
 				xml.print("\t\t<Section title=\"" + report.get(i).title + "\">\n");
 				for (int j = 0; j < report.get(i).slides.size(); j++) {
-					Utils.writeToConsole("\t\t+ Slide " + report.get(i).slides.get(j).id);
+					c.writeToConsole("\t\t+ Slide " + report.get(i).slides.get(j).id);
 					for (int k = 0; k < report.get(i).slides.get(j).plots.size(); k++) {
-						Utils.writeToConsole("\t\t\t+ Plot " + k);
+						c.writeToConsole("\t\t\t+ Plot " + k);
 						Plot thisplot = report.get(i).slides.get(j).plots.get(k);
 						thisplot.showlegend = cfg.cbx_dolegend;
 						thisplot.showlegend &= thisplot.elements.get(0).type!=PlotElement.Type.contour;

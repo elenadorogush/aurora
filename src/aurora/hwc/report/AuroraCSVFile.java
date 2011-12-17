@@ -16,6 +16,7 @@ import org.w3c.dom.*;
  */
 public class AuroraCSVFile {
 
+	public boolean hasdata;
 	public AuroraCSVData data;
 	public AuroraCSVHeader header;
 	public Vector<Float> time = new Vector<Float>();
@@ -25,11 +26,13 @@ public class AuroraCSVFile {
 	public AuroraCSVFile(){
 		data = new AuroraCSVData();
 		header = new AuroraCSVHeader();
+		hasdata = false;
 	}
 	
 	public AuroraCSVFile(AuroraCSVHeader h){
 		header = new AuroraCSVHeader();
 		h.deepcopy(header);
+		hasdata = false;
 		data = new AuroraCSVData();
 		for(int i=0;i<h.links.size();i++)
 			alllinkids.add(h.links.get(i).id);
@@ -161,6 +164,9 @@ public class AuroraCSVFile {
 		    // otherwise read the csv file
 			readData(foldername,filename,p.cfg);
 		  
+			if(!hasdata)
+				return;
+			
 			if(p.cfg.reporttype!=ReportType.vehicletypes)
 				aggregatefirstdimension();
 			
@@ -267,8 +273,14 @@ public class AuroraCSVFile {
  			int n=-1;
  			int numvehtypes = header.vehicletype.size();
  			int numlinks = header.links.size();
+ 			
  			time.clear();
  			data.clear();
+ 			hasdata = false;
+
+ 			if(numlinks==0 || numvehtypes==0)
+ 				return;
+ 			
  			data.allocate(numvehtypes, numlinks);
  			int i,j;
  			
@@ -289,6 +301,10 @@ public class AuroraCSVFile {
  			    time.add(newtime*header.simT/3600f);
  			  			    
  			    vecstr.remove(0);
+ 			    
+ 			    if(!hasdata && vecstr.size()>0)
+ 			    	hasdata=true;
+ 			    
   			    for(j=0;j<vecstr.size();j++){
   			    	Utils.splitbydelimiter(vecstr.get(j),";",celldata);
   			    	Utils.splitbydelimiter(celldata.get(0),":",dens);
@@ -471,7 +487,7 @@ public class AuroraCSVFile {
 	private void aggregatefirstdimension(){
 		int i,j,k;
 		float f;
-		
+				
 		int size1 = data.Density.size();
 		int size2 = data.Density.get(0).size();		
 		int size3 = data.Density.get(0).get(0).size();
@@ -516,10 +532,10 @@ public class AuroraCSVFile {
 		AuroraCSVFile firstFile = new AuroraCSVFile();
 		AuroraCSVFile newFile = new AuroraCSVFile();
 
-		Utils.writeToConsole("\t+ Comparing networks.");
+		cfg.writeToConsole("\t+ Comparing networks.");
 
 		for(i=0;i<cfg.scenarios.size();i++){
-			Utils.writeToConsole("\t\t+ " + cfg.datafiles.get(i));
+			cfg.writeToConsole("\t\t+ " + cfg.datafiles.get(i));
 			if(i==0)
 				firstFile.readHeader(cfg.datafiles.get(i));
 			else{

@@ -6,6 +6,10 @@ package aurora.hwc.report;
 
 import java.io.*;
 import java.util.Vector;
+
+import javax.swing.JTextArea;
+import javax.swing.text.BadLocationException;
+
 import org.w3c.dom.Node;
 import aurora.*;
 
@@ -18,6 +22,11 @@ public class Configuration implements AuroraConfigurable {
 	private static String tempDir = System.getProperty("user.home") + "\\ARG\\tempfiles";
 	private static String filesDir = System.getProperty("user.home") + "\\ARG\\files";
 	public static boolean rgguilaunched = false;
+	
+	private JTextArea textarea;
+	private boolean iswritetotextarea = false;
+	private int maxconsolelines = 400;
+	private int consolelinecount=0;
 	
 	public Utils.ExporterType exporttype;
 	public ReportType reporttype;
@@ -217,19 +226,19 @@ public class Configuration implements AuroraConfigurable {
 					cbx_boxplot = Boolean.parseBoolean(n1.getTextContent());
 				if (nodename.equals("cmb_xaxis_subnetwork")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_xaxis_subnetwork) ;
-					//FIXME: cmb_xaxis_subnetwork_selected = Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
+					cmb_xaxis_subnetwork_selected = Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
 				}
 				if (nodename.equals("cmb_xaxis_quantity")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_xaxis_quantity) ;
-					//FIXME: cmb_xaxis_quantity_selected =  Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
+					cmb_xaxis_quantity_selected =  Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
 				}
 				if (nodename.equals("cmb_yaxis_subnetwork")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_yaxis_subnetwork) ;
-					//FIXME: cmb_yaxis_subnetwork_selected = Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());;
+					cmb_yaxis_subnetwork_selected = Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());;
 				}
 				if (nodename.equals("cmb_yaxis_quantity")){
 					Utils.readMatlabFormattedStringVector(n1.getTextContent(),cmb_yaxis_quantity) ;
-					//FIXME: cmb_yaxis_quantity_selected =  Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
+					cmb_yaxis_quantity_selected =  Integer.parseInt(n1.getAttributes().getNamedItem("selected").getNodeValue());
 				}
 			}
 		}
@@ -316,7 +325,9 @@ public class Configuration implements AuroraConfigurable {
 				batch_name = scenarios.get(j);
 				out.print("\t\t<batch name=\"" + batch_name + "\">\n");
 			}
-			out.print("\t\t\t<data_file url=\"file:" + Configuration.getFilesDir() + "\\" + batch_name + "\\" + datafiles.get(j) + "\" />\n");
+			//out.print("\t\t\t<data_file url=\"file:" + Configuration.getFilesDir() + "\\" + batch_name + "\\" + datafiles.get(j) + "\" />\n");
+			out.print("\t\t\t<data_file url=\"" + datafiles.get(j) + "\" />\n");
+
 			j++;
 		}
 		out.print("\t\t</batch>\n");
@@ -403,9 +414,40 @@ public class Configuration implements AuroraConfigurable {
 	 */
 	public static synchronized void setRootDir(String r) {
 		if ((r != null) && (!r.isEmpty())){
-			tempDir = r + "\\tempfiles";
-			filesDir = r + "\\files";
+			filesDir = r;
 		}
 		return;
 	}
+
+	
+	// console output
+	public void setConsoleToTextArea(JTextArea t){
+		textarea = t;
+		iswritetotextarea = true;
+	}
+
+	public void unsetConsoleToTextArea(JTextArea t){
+		textarea = null;
+		iswritetotextarea = false;
+	}
+
+	public void writeToConsole(final String str){
+		if(!Utils.verbose)
+			return;
+		if(iswritetotextarea){
+			consolelinecount++;
+			if(consolelinecount>maxconsolelines){
+				try {
+					textarea.replaceRange("",textarea.getLineStartOffset(0),textarea.getLineStartOffset(1));
+				} catch (BadLocationException e) {
+					e.printStackTrace();
+				}
+			}
+			textarea.append(str + "\n");
+			}
+		else{
+			System.out.println(str);
+		}
+	}
+
 }

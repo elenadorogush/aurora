@@ -541,7 +541,7 @@ public class AuroraInterval implements Serializable {
 	public String toString3() {
 		NumberFormat form = NumberFormat.getInstance();
 		form.setMinimumFractionDigits(0);
-		form.setMaximumFractionDigits(2);
+		form.setMaximumFractionDigits(5);
 		form.setGroupingUsed(false);
 		String buf = form.format(center);
 		if (!(size < 0.01))
