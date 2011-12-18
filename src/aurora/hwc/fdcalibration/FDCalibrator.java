@@ -88,18 +88,17 @@ public class FDCalibrator {
 		int vds = S.getVDS();
 
 		// output:
-		float vf;
-		float w;
-		float q_max;
-		float rj;
-	    float rho_crit;
+		float vf;			// [mph]
+		float w;			// [mph]
+		float q_max;		// [veh/hr/lane]
+		float rj;			// [veh/mile/lane]
+	    float rho_crit;		// [veh/mile/lane]
 	    
 		// nominal values
-		float nom_vf = 65;
-		float nom_w_min = 10;
-		float nom_w_max = 19;
-		float nom_w = 15;
-		float nom_Qmax = 2000;
+		float nom_vf = 65;				// [mph]
+		float nom_w_min = 10;			// [mph]
+		float nom_w_max = 19;			// [mph]
+		float nom_w = 15;				// [mph]
 
 		// get data
 		FiveMinuteData D = data.get(vds);
@@ -107,6 +106,7 @@ public class FDCalibrator {
 
 		// degenerate case
 		if(numdatapoints==0){
+			float nom_Qmax = 2000;			// [veh/hr/lane]
 			S.setFD(nom_vf,nom_w,nom_Qmax,nom_Qmax/nom_vf+nom_Qmax/nom_w,nom_Qmax/nom_vf);
 			return;  
 		}
@@ -194,6 +194,7 @@ public class FDCalibrator {
 
 		// store parameters in sensor
 		S.setFD(vf,w,q_max,rj,rho_crit);
+		
 	}
   
 	// step 4

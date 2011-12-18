@@ -66,8 +66,8 @@ public class ExtractStationData {
 			else
 				System.out.println("ERROR");
 				
-			// Write to text file
-			X.WritePerLaneDataToFile();
+//			// Write to text file
+//			X.WritePerLaneDataToFile();
 						
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -82,30 +82,30 @@ public class ExtractStationData {
 			vds.add( Integer.parseInt(strLine));
 	}
 	
-	private void WritePerLaneDataToFile() throws Exception{
-		
-		int i;
-		
-		for(Integer thisvds : data.keySet()) {
-			FiveMinuteData D = data.get(thisvds);
-
-			PrintStream flw_out = new PrintStream(new FileOutputStream(outfolder + File.separator + thisvds + "_flw.txt"));
-            for(i=0;i<D.flw.size();i++)
-            	flw_out.print(tabformat(D.flw.get(i)));
-            flw_out.close();
-
-			PrintStream occ_out = new PrintStream(new FileOutputStream(outfolder + File.separator + thisvds + "_occ.txt"));
-            for(i=0;i<D.occ.size();i++)
-            	occ_out.print(tabformat(D.occ.get(i)));
-            occ_out.close();
-            
-			PrintStream spd_out = new PrintStream(new FileOutputStream(outfolder + File.separator + thisvds + "_spd.txt"));
-            for(i=0;i<D.spd.size();i++)
-            	spd_out.print(tabformat(D.spd.get(i)));
-            spd_out.close();
-			
-		}		
-	}
+//	private void WritePerLaneDataToFile() throws Exception{
+//		
+//		int i;
+//		
+//		for(Integer thisvds : data.keySet()) {
+//			FiveMinuteData D = data.get(thisvds);
+//
+//			PrintStream flw_out = new PrintStream(new FileOutputStream(outfolder + File.separator + thisvds + "_flw.txt"));
+//            for(i=0;i<D.flw.size();i++)
+//            	flw_out.print(tabformat(D.flw.get(i)));
+//            flw_out.close();
+//
+//			PrintStream occ_out = new PrintStream(new FileOutputStream(outfolder + File.separator + thisvds + "_occ.txt"));
+//            for(i=0;i<D.occ.size();i++)
+//            	occ_out.print(tabformat(D.occ.get(i)));
+//            occ_out.close();
+//            
+//			PrintStream spd_out = new PrintStream(new FileOutputStream(outfolder + File.separator + thisvds + "_spd.txt"));
+//            for(i=0;i<D.spd.size();i++)
+//            	spd_out.print(tabformat(D.spd.get(i)));
+//            spd_out.close();
+//			
+//		}		
+//	}
 	
 	private static String tabformat(ArrayList<Float> V){
 		String out = "";
