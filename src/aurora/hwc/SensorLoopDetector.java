@@ -6,6 +6,7 @@ package aurora.hwc;
 
 import java.io.*;
 import java.util.*;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -50,19 +51,19 @@ public final class SensorLoopDetector extends AbstractSensor {
 	protected Vector<HistoricalDataSource> data_files = new Vector<HistoricalDataSource>();
 	
 	// calibrated parameters
-	public float vf;
-	public float w;
-	public float q_max;
-	public float rj;
-	public float rho_crit;  
+	public float vf;		// [mph]
+	public float w;			// [mph]
+	public float q_max;		// [miles/hr/lane]
+	public float rj;		// [veh/hr/lane]
+	public float rho_crit;  // [veh/hr/lane]
 
 //	 ========================================================================
 //	 INTERFACE ==============================================================
 //	 ========================================================================
 	
-	public int getLanes() {
-		return lanes;
-	}
+//	public int getLanes() {
+//		return lanes;
+//	}
 	
 	public boolean IsCounter() 	 { return iscounter; } 
 //	-------------------------------------------------------------------------
@@ -264,9 +265,17 @@ public final class SensorLoopDetector extends AbstractSensor {
 							NodeList cc = cl.item(i).getChildNodes();
 							for (int j = 0; j < cc.getLength(); j++)
 								if (cc.item(j).getNodeName().equals("source")) {
-									HistoricalDataSource hdc = new HistoricalDataSource();
-									hdc.initFromDOM(cc.item(j));
-									data_files.add(hdc);
+									Node n1 = cc.item(j);
+									Node n2 = n1.getAttributes().getNamedItem("url");
+									if(n2!=null){
+										StringTokenizer st = new StringTokenizer(n2.getTextContent(), ",");
+										while (st.hasMoreTokens()) {
+											HistoricalDataSource hdc = new HistoricalDataSource();
+											hdc.initFromDOM(n1);
+											hdc.setUrl(st.nextToken());
+											data_files.add(hdc);
+										}
+									}
 								}
 						}
 				}

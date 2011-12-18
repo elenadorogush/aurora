@@ -80,5 +80,14 @@ public class HistoricalDataSource implements AuroraConfigurable, Serializable, C
 	public boolean validate() throws ExceptionConfiguration {
 		return true;
 	}
+
+	/**
+	 * Set URL.
+	 */
+	public void setUrl(String url) {
+		this.url = url;
+	}
+	
+	
 	
 }
