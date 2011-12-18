@@ -342,6 +342,7 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 					os = myNetwork.getContainer().getMySettings().getTmpDataOutput();
 			}
 			tsCount++;
+
 			if (predecessors.size() == 0) {
 				AuroraIntervalVector ofl = getActualFlow();
 				double tp = myNetwork.getTP();
@@ -402,8 +403,8 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 					qSize.get(i).setBounds(Math.max(qSize.get(i).getLowerBound(), 0.0), qSize.get(i).getUpperBound());
 			}
 			speed.copy((AuroraInterval)myDynamics.computeSpeed(this));
-			speedSum.add(speed);
-			density = (AuroraIntervalVector)myDynamics.computeDensity(this);
+			speedSum.add(speed);			
+			density = (AuroraIntervalVector)myDynamics.computeDensity(this);	
 			densitySum.add(density);
 			if (os != null) {
 				NumberFormat form = NumberFormat.getInstance();
@@ -1015,7 +1016,7 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 		if ((idx < 0) || (idx > n))
 			idx = n;
 		dmnd.copy(procDemand.get(idx));
-		dmnd.affineTransform(demandKnobs, 0);
+		dmnd.affineTransform(demandKnobs, 0);		
 		return dmnd;
 	}
 	

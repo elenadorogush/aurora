@@ -60,13 +60,8 @@ public class FDCalibrator {
 		for(int i = 0; i < SensorList.size(); i++) {
 			SensorLoopDetector S = (SensorLoopDetector) SensorList.get(i);
 			if ((S.getVDS() != 0) && (S.getLink() != null)) {
-				
 				int thisvds = S.getVDS();
-				ArrayList<Integer> thisvdslanes = new ArrayList<Integer>();
-				for (int j = 1; j <= S.getLanes(); j++)
-					thisvdslanes.add(j);		// THIS IS TEMPORARY, EVENTUALLY THE LOOP<->LANES MAP SHOULD BE SPECIFIED IN NE
-				
-				data.put(thisvds, new FiveMinuteData(thisvds));
+				data.put(thisvds, new FiveMinuteData(thisvds,true));
 				
 				Vector<HistoricalDataSource> dsrc = S.getDataSources();
 				for (int j = 0; j < dsrc.size(); j++) {
@@ -78,12 +73,11 @@ public class FDCalibrator {
 					}
 					DataSource thisdatasource = datasourcemap.get(myurl);
 					thisdatasource.add_to_for_vds(thisvds);
-					thisdatasource.add_to_for_vdslanes(thisvdslanes);
 				}
 			}
 		}
 		// Read 5 minute data to "data"
-		PeMSClearinghouseInterpreter P = new PeMSClearinghouseInterpreter(datasourcemap);
+		PeMSReader P = new PeMSReader(datasourcemap);
 		P.Read5minData(data, updater);
 	}
 
@@ -119,9 +113,10 @@ public class FDCalibrator {
 
 		// organize into an array of DataPoint
 		ArrayList<DataPoint> datavec = new ArrayList<DataPoint>();
-		for(i=0;i<numdatapoints;i++)
-			datavec.add(new DataPoint(D.dty.get(i),D.flw.get(i),D.spd.get(i)));
-  
+		for(i=0;i<numdatapoints;i++){
+			datavec.add(new DataPoint(D.getAggDty(i),D.getAggFlw(i),D.getAggSpd(i)));
+		}
+		
 		// Find free-flow velocity ...............................
 
 		// maximum flow and its corresponding density

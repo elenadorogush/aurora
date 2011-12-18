@@ -24,9 +24,6 @@ import org.w3c.dom.Document;
  */
 public class gui_mainpanel extends JPanel implements ActionListener {
 	private static final long serialVersionUID = -7405218897970299291L;
-
-	public static String homePath = System.getProperty("user.home") + "\\ARG";
-	public static String tempPath = homePath + "\\tempfiles";
 	
 	private Configuration config = new Configuration();
 	private Vector<String> colors = new Vector<String>();
@@ -89,10 +86,10 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 		colors.add("#07CAFF");
 		colors.add("#1C9F22");
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		
+
 		// tabbed pane ............
 		tabbedPane.addTab("Basic"         ,null,new BasicPanel(this)        ,null);
-		tabbedPane.addTab("Sections"      ,null,new SectionsPanel(this)       ,null);
+		tabbedPane.addTab("Sections"      ,null,new SectionsPanel(this)     ,null);
 		tabbedPane.addTab("Options"       ,null,new OptionsPanel(this)      ,null);
 		tabbedPane.addTab("Scatter Groups",null,new ScatterGroupsPanel(this),null);
 		tabbedPane.addTab("Scatter Plots" ,null,new ScatterPlotsPanel(this) ,null);
@@ -130,16 +127,17 @@ public class gui_mainpanel extends JPanel implements ActionListener {
         tabbedPane.setEnabledAt(4,false);
         button_start.setEnabled(false);
 
-        System.setOut(new PrintStream(new JTextAreaOutputStream(txt_console)));
-        
+        // Configuration
+        config.setConsoleToTextArea(this.txt_console);
+        // System.setOut(new PrintStream(new JTextAreaOutputStream(txt_console)));
+
         // load configuration
         if(configfile!=null)
         	loadconfigfile(configfile);
         
-        Utils.writeToConsole("Welcome to the TOPL Report Generator.");
+       config.writeToConsole("Welcome to the TOPL Report Generator.");
 	}
 	
-
 	////////////////////////////////////////////////////////////////////////
 	// Panels
 	////////////////////////////////////////////////////////////////////////
@@ -446,7 +444,7 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 		x.setBorder(titled);
 		return x;
 	}
-
+	
 	////////////////////////////////////////////////////////////////////////
 	// Listeners
 	////////////////////////////////////////////////////////////////////////
@@ -544,7 +542,7 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 		
 		// Load routes button pressed ............................................
 		if(command.equals("loadroutesbutton")){
-			Utils.writeToConsole("Loading and comparing routes...");
+			config.writeToConsole("Loading and comparing routes...");
 			AuroraCSVHeader commonHeader = new AuroraCSVHeader();
 			if(!AuroraCSVFile.loadCommonHeader(config, commonHeader)){
 				//System.out.println("Error: headers in selected files are not all the same");
@@ -580,7 +578,7 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 				for(i=0;i<newlist.size();i++)
 					cmb_yaxis_subnetwork.addItem(newlist.get(i));
 			}
-			Utils.writeToConsole("\t+ Done.");
+			config.writeToConsole("\t+ Done.");
 		}		
 
 		// edit custom x label ............................................
@@ -921,7 +919,7 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 				Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(configURI);
 				config.initFromDOM(doc.getChildNodes().item(0));
 				if(!config.xmlValidate()){
-					Utils.writeToConsole("Invalid configuration file");
+					config.writeToConsole("Invalid configuration file");
 					return;
 				}
 				readConfiguration();
@@ -950,12 +948,12 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 		try {
 			C.check();
 		} catch (Exception e) {
-			Utils.writeToConsole(e.getMessage());
+			C.writeToConsole(e.getMessage());
 			return;
 		}
 		
 		// select an output file if not already specified
-		if(Utils.outfilename==null){
+		if(Utils.outfilename==null && Configuration.rgguilaunched){
 			JFileChooser fc = new JFileChooser();
 		    myFileFilter filter = new myFileFilter(C.exporttype);
 		    fc.setFileFilter(filter);
@@ -969,7 +967,7 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 				Utils.outfilename = fp.getAbsolutePath();
 			}
 			else{
-				Utils.writeToConsole("Run aborted.");
+				C.writeToConsole("Run aborted.");
 				return;
 			}	
 		}
@@ -990,6 +988,8 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 		(new Export_PDF()).export(reportfile, export_pdf);
 		(new Export_PPT()).export(reportfile, export_ppt);
 		(new Export_XLS()).export(reportfile, export_xls);
+		
+		C.writeToConsole("Done.");
 
 	}
 	
@@ -1126,7 +1126,6 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 		((scenariosgroupsTableModel) table_scenariosgroups.getModel()).setData(config.table_scenariogroups_scenario,config.table_scenariogroups_group);
 		((groupsTableModel) table_groups.getModel()).setData(config.table_groups_group,config.table_groups_xvalue);	
 
-		
 		for(i=0;i<config.cmb_xaxis_subnetwork.size();i++)
 			cmb_xaxis_subnetwork.addItem(config.cmb_xaxis_subnetwork.get(i));
 		if(config.cmb_xaxis_subnetwork_selected>=0)
@@ -1254,4 +1253,13 @@ public class gui_mainpanel extends JPanel implements ActionListener {
 		}
 		
 	}
+
+
+	
+	
+	
+	
+	
+	
+	
 }

@@ -248,7 +248,7 @@ public class Util {
 				M[i][idxNegative] = Math.max(0, (1-sum));
 				sum += M[i][idxNegative];
 			}
-			if ((!hasNegative) && (sum == 0.0)) {
+			if ((!hasNegative) && (sum == 0.0)) {				
 				M[i][0] = 1;
 				//for (int j = 0; j < n; j++)
 					//M[i][j] = -1;

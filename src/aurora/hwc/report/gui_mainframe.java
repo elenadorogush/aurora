@@ -27,7 +27,7 @@ public class gui_mainframe extends JFrame {
 	
 	////////////////////////////////////////////////////////////////////////
 	// main
-	// java -jar gui_mainframe.jar [-view <[on]|off>] [-config <filename>] [-verbose <[on],off>] [-saveto <filename>]
+	// java -jar gui_mainframe.jar [-view <[on]|off>] [-config <filename>] [-verbose <[on],off>] [-saveto <filename>] [-tempdir <folder>] [-rootdir <folder>]
 	////////////////////////////////////////////////////////////////////////
 	
 	public static void main(String[] args) {	
@@ -37,7 +37,13 @@ public class gui_mainframe extends JFrame {
 		
 		// check usage
 		if(args.length%2!=0 | args.length>12){
-			Utils.writeToConsole("Usage: java -jar arg.jar [-view <[on]|off>] [-config <filename>] [-verbose <[on],off>]");
+			System.out.println("Usage: java -jar arg.jar [-view <[on]|off>] [-config <filename>] [-verbose <[on],off>] [-saveto <filename>] [-tempdir <folder>] [-rootdir <folder>]");
+			System.out.println("	-view		Whether to show the GUI.");
+			System.out.println("	-config		report generator configuration file.");
+			System.out.println("	-verbose	Turn on verbose execution mode.");
+			System.out.println("	-saveto		Name of the report.");
+			System.out.println("	-tempdir	Folder used for storing intermediate files. Default is <user.home>/ARG/tempfiles");
+			System.out.println("	-rootdir	Output folder. Default is <user.home>/ARG/files");
 			return;
 		}
 
@@ -56,7 +62,7 @@ public class gui_mainframe extends JFrame {
 			if( args[2*i].equals("-rootdir") )
 				Configuration.setRootDir(args[2*i+1]);
 		}
-		
+
 		if(Configuration.rgguilaunched){
 		    JFrame.setDefaultLookAndFeelDecorated(true);
 			gui_mainframe window = new gui_mainframe(inputfile);
@@ -64,9 +70,14 @@ public class gui_mainframe extends JFrame {
 			window.setLocationRelativeTo(null);
 		}
 		else{
-			
+
 			if(inputfile==null){
-				Utils.writeToConsole("A config file is required to run the command line mode.");
+				System.out.println("A config file is required to run the command line mode.");
+				return;
+			}
+
+			if(Utils.outfilename==null){
+				System.out.println("An output file is required to run the command line mode.");
 				return;
 			}
 			
@@ -77,7 +88,7 @@ public class gui_mainframe extends JFrame {
 				config.initFromDOM(doc.getChildNodes().item(0));
 
 				if(!config.xmlValidate()){
-					Utils.writeToConsole("Invalid configuration file");
+					config.writeToConsole("Invalid configuration file");
 					return;
 				}
 
@@ -89,6 +100,7 @@ public class gui_mainframe extends JFrame {
 				e.printStackTrace();
 			} 
 		}
+		
 		
 	}
 }

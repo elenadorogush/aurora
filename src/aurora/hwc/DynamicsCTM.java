@@ -144,6 +144,7 @@ public class DynamicsCTM implements DynamicsHWC, Serializable {
 			den.copy((AuroraIntervalVector)x.getDensity());
 			den2.copy(den);
 			double dtdx = x.getMyNetwork().getTP()/x.getLength();
+
 			for (int i = 0; i < den.size(); i++) {
 				double dlb = den.get(i).getLowerBound() + dtdx * (ifL[i] - ofL[i]);
 				double dub = den.get(i).getUpperBound() + dtdx * (ifU[i] - ofU[i]);

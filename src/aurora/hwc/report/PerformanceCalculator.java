@@ -46,7 +46,7 @@ public class PerformanceCalculator {
 		for(i=0;i<E.size();i++){
 
 			PlotElement e = E.get(i);
-			Utils.writeToConsole("\t\t\t\t+ Element " + i);
+			cfg.writeToConsole("\t\t\t\t+ Element " + i);
 			
 			subsetlinklength.clear();
 			subsetlinkissource.clear();
@@ -75,7 +75,9 @@ public class PerformanceCalculator {
 			
 			Vector<Quantity> getq = new Vector<Quantity>();
 			Vector<Vector<Vector<Float>>> phi = new Vector<Vector<Vector<Float>>>();
-			for(j=0;j<e.scenarios.size();j++){
+		    Float dt = Float.NaN;
+			
+		    for(j=0;j<e.scenarios.size();j++){
 	
 				// make list of quantities to retrieve from data files
 				getq.clear();
@@ -116,9 +118,21 @@ public class PerformanceCalculator {
 			    	break;
 			    }
 		    	
-			    Utils.writeToConsole("\t\t\t\t+ Loading " + e.datafiles.get(j));
+			    cfg.writeToConsole("\t\t\t\t+ Loading " + e.datafiles.get(j));
 			    csv.loadData(getq,e.scenarios.get(j),e.datafiles.get(j),subsetlinkids,this);
 	
+			    if(!csv.hasdata){
+			    	phi.add(null);
+			    	continue;
+			    }
+			    
+			    // compute dt, check that it is the same for all scenarios
+			    Float newdt = csv.time.get(1)-csv.time.get(0);
+			    if(!dt.isNaN() && newdt!=dt){
+			    	// ERROR dt must be the same for all scenarios
+			    }
+			    dt = newdt;
+			    
 			    // size of 1st dimension of Density and/or OutFlow data blocks
 			    switch(e.yquantity){
 			    case flow:
@@ -198,8 +212,6 @@ public class PerformanceCalculator {
 		        }
 			    
 			} // loop scenarios
-			
-		    float dt = csv.time.get(1)-csv.time.get(0);
 	
 			if(e.type==PlotElement.Type.contour){
 		        // matrix in 3rd dimension case (for contours)
@@ -220,7 +232,7 @@ public class PerformanceCalculator {
 		            	e.legendval.add(Utils.sum(e.ydata.get(k)));
 		            break;
 		        case time:
-		        	e.ydata = Utils.sumoverdimension3(phi,Quantity.space);
+ 		        	e.ydata = Utils.sumoverdimension3(phi,Quantity.space);
 		            e.xdata = (Vector<Float>) csv.time.clone();
 		            for(k=0;k<e.ydata.size();k++)
 		            	e.legendval.add(Utils.sum(e.ydata.get(k))*dt);
@@ -256,7 +268,7 @@ public class PerformanceCalculator {
 		
 		for(i=0;i<e.scenarios.size();i++){
 
-		    Utils.writeToConsole("\t\t\t\t+ Loading " + e.datafiles.get(i));
+		    cfg.writeToConsole("\t\t\t\t+ Loading " + e.datafiles.get(i));
 
 		    csv.loadDataScatter(e.scenarios.get(i),e.datafiles.get(i),e.yaxis_linkids,this);		    
 		    

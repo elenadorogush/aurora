@@ -15,7 +15,7 @@ import javax.swing.tree.*;
  */
 public class Utils {
 	
-	public static boolean verbose = false;
+	public static boolean verbose = true;
 	public static String outfilename = null;
 	public static enum ExporterType {pdf,ppt,xls};
 	
@@ -50,24 +50,6 @@ public class Utils {
 	    	exportString2Type.put(exportType2String.get(etype),etype);
 	    }
 	    
-	}
-	
-	public static void writeToConsole(final String str){
-		if(Utils.verbose)
-			System.out.println(str);
-		//private static int maxconsolelines = 400;
-		//private static int consolelinecount=0;
-		/*
-		consolelinecount++;
-		if(consolelinecount>maxconsolelines){
-			try {
-				txt_console.replaceRange("",txt_console.getLineStartOffset(0),txt_console.getLineStartOffset(1));
-			} catch (BadLocationException e) {
-				e.printStackTrace();
-			}
-		}
-		txt_console.append(str + "\n");
-		*/
 	}
 	
 	public static boolean isInteger(String s) {
@@ -129,6 +111,8 @@ public class Utils {
 	
 	public static <T> String writeMatlabFormattedVector(Vector<T> V){
 		String str = new String("");
+		if(V==null)
+			return str;
 		if(V.isEmpty())
 			return str;
 		str = str + V.get(0).toString();
@@ -139,6 +123,8 @@ public class Utils {
 
 	public static <T> String writeMatlabFormattedMatrix(Vector<Vector<T>> M){
 		String str = new String("");
+		if(M==null)
+			return str;
 		if(M.isEmpty())
 			return str;
 		str = str + writeMatlabFormattedVector(M.get(0));
@@ -327,6 +313,7 @@ public class Utils {
 	}
 	
 	public static Vector<Vector<Float>> sumoverdimension3(Vector<Vector<Vector<Float>>> phi,Quantity dim){
+		
 		Vector<Vector<Float>> z = new Vector<Vector<Float>>();
 		Vector<Vector<Float>> P;
 		float f;
@@ -336,6 +323,10 @@ public class Utils {
 		for(i=0;i<phi.size();i++){
 			Vector<Float> z1 = new Vector<Float>();
 			P = phi.get(i);
+			if(P==null){
+				z.add(null);
+				continue;
+			}
 			numspace = P.size();
 			numtime = P.get(0).size();
 			
@@ -367,7 +358,6 @@ public class Utils {
 	}
 	
 	public static Vector<Float> sumoverdimension2(Vector<Vector<Float>> phi,Quantity dim){
-				
 		Vector<Float> z = new Vector<Float>();
 		float f;
 		int ii,jj;
@@ -400,17 +390,23 @@ public class Utils {
 	}
 	
 	public static void multiplyscalar2(Vector<Vector<Float>> A,float x){
+		if(A==null)
+			return;
 		for(int i=0;i<A.size();i++)
 			for(int j=0;j<A.get(i).size();j++)
 				A.get(i).set(j, A.get(i).get(j)*x );
 	}
 		
 	public static void multiplyscalar1(Vector<Float> A,float x){
+		if(A==null)
+			return;
 		for(int i=0;i<A.size();i++)
 			A.set(i, A.get(i)*x );
 	}
 	
 	public static float sum(Vector<Float> A){
+		if(A==null)
+			return Float.NaN;
 		float z = 0;
 		for(int i=0;i<A.size();i++)
 			z += A.get(i);

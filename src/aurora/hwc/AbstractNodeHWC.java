@@ -410,6 +410,7 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 		//
 		// start up
 		//
+		
 		int nIn = predecessors.size(); // number of inputs
 		int nOut = successors.size(); // number of outputs
 		int nTypes = ((SimulationSettingsHWC)myNetwork.getContainer().getMySettings()).countVehicleTypes();  // number of vehicle types
@@ -418,17 +419,19 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 		//
 		double t = myNetwork.getSimTime(); // current simulation time
 		t -= srST;
-		int idx = (int)Math.floor(t/srTP);
+		int idx = (int)Math.floor(t/srTP);		
 		if (splitRatioMatrix0 != null)
 			setSplitRatioMatrix(splitRatioMatrix0);
-		else if ((!srmProfile.isEmpty()) && (idx >= 0))
+		else if ((!srmProfile.isEmpty()) && (idx >= 0)){
 			setSplitRatioMatrix(srmProfile.get(Math.min(idx, srmProfile.size()-1)));
+		}
 		else {
 			splitRatioMatrix = new AuroraIntervalVector[nIn][nOut];
 			for (int i = 0; i < nIn; i++)
 				for (int j = 0; j < nOut; j++)
 					splitRatioMatrix[i][j] = new AuroraIntervalVector(nTypes);
 		}
+		
 		//
 		// Initialize input demands
 		//
@@ -462,6 +465,7 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 					srm[i + ii*nIn][j] = splitRatioMatrix[i][j].get(ii).getCenter();
 		// 2. Make sure split ratio matrix is valid
 		Util.normalizeMatrix(srm);
+					
 		// 3. Record outputs with undefined split ratios
 		Vector<Integer> badColumns = new Vector<Integer>();
 		for (int j = 0; j < nOut; j++) {
@@ -488,6 +492,7 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 		//
 		// Reduce input demand according to capacities on the outputs for which all split ratios are known
 		//
+		
 		for (int j = 0; j < nOut; j++) {
 			if (badColumns.indexOf((Integer)j) > -1)
 				continue;
@@ -527,7 +532,8 @@ public abstract class AbstractNodeHWC extends AbstractNodeSimple {
 					} // vehicle types 'for' loop
 				} // contributors 'for' loop
 			} // 'if'
-		} // column 'for' loop
+		} // column 'for' loop	
+
 		//
 		// Process outputs with undefined split ratios if there are any
 		//
