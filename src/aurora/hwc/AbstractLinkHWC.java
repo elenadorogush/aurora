@@ -176,13 +176,16 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 						flowMaxRange.setIntervalFromString(pp.item(i).getAttributes().getNamedItem("flowMax").getNodeValue());
 						double cd = Double.parseDouble(pp.item(i).getAttributes().getNamedItem("densityCritical").getNodeValue());
 						double jd = Double.parseDouble(pp.item(i).getAttributes().getNamedItem("densityJam").getNodeValue());
+						flowMaxRange.affineTransform(lanes, 0);
+						cd = cd * lanes;
+						jd = jd * lanes;
 						if (!setFD(flowMaxRange.getCenter(), cd, jd))
 							defaultFD();
 						if ((myNetwork.getContainer().isSimulation()) && !myNetwork.getContainer().getMySettings().isPrediction())
 							randomizeFD();
 						Node cdp = pp.item(i).getAttributes().getNamedItem("capacityDrop");
 						if (cdp != null)
-							capacityDrop = Math.max(0, Math.min(flowMax, Double.parseDouble(cdp.getNodeValue())));
+							capacityDrop = Math.max(0, Math.min(flowMax, lanes*Double.parseDouble(cdp.getNodeValue())));
 					}
 					if (pp.item(i).getNodeName().equals("position")) {
 						myPosition = new PositionLink();
@@ -317,7 +320,9 @@ public abstract class AbstractLinkHWC extends AbstractLink {
 		out.print("  <end node_id=\"" + eid + "\"/>\n");
 		out.print("  <dynamics type=\"" + myDynamics.getTypeLetterCode() + "\"/>\n");
 		out.print("  <qmax>" + Double.toString(qMax) + "</qmax>\n");
-		out.print("  <fd densityCritical =\"" + densityCritical + "\" densityJam=\"" + densityJam + "\" flowMax=\"" + flowMaxRange.toString() + "\" capacityDrop=\"" + capacityDrop + "\"/>\n");
+		AuroraInterval fmr = new AuroraInterval(flowMaxRange.getCenter(), flowMaxRange.getSize());
+		fmr.affineTransform(1/lanes, 0);
+		out.print("  <fd densityCritical =\"" + Double.toString(densityCritical/lanes) + "\" densityJam=\"" + Double.toString(densityJam/lanes) + "\" flowMax=\"" + fmr.toString() + "\" capacityDrop=\"" + Double.toString(capacityDrop/lanes) + "\"/>\n");
 		out.print("</link>\n");
 		return;
 	}
