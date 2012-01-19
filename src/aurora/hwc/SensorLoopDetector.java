@@ -49,6 +49,9 @@ public final class SensorLoopDetector extends AbstractSensor {
 	// data files
 	protected double start_time = 0.0;
 	protected Vector<HistoricalDataSource> data_files = new Vector<HistoricalDataSource>();
+	protected Node data_sources_node; // save this so that we can replicate the urls in xmldump;
+	
+	
 	
 	// calibrated parameters
 	public float vf;		// [mph]
@@ -56,6 +59,7 @@ public final class SensorLoopDetector extends AbstractSensor {
 	public float q_max;		// [miles/hr/lane]
 	public float rj;		// [veh/hr/lane]
 	public float rho_crit;  // [veh/hr/lane]
+	
 
 //	 ========================================================================
 //	 INTERFACE ==============================================================
@@ -261,6 +265,7 @@ public final class SensorLoopDetector extends AbstractSensor {
 								}
 						}
 					if (cl.item(i).getNodeName().equals("data_sources"))
+						data_sources_node = cl.item(i).cloneNode(true);			// keep a copy
 						if (cl.item(i).hasChildNodes()) {
 							NodeList cc = cl.item(i).getChildNodes();
 							for (int j = 0; j < cc.getLength(); j++)
@@ -268,12 +273,16 @@ public final class SensorLoopDetector extends AbstractSensor {
 									Node n1 = cc.item(j);
 									Node n2 = n1.getAttributes().getNamedItem("url");
 									if(n2!=null){
-										StringTokenizer st = new StringTokenizer(n2.getTextContent(), ",");
+										String n2str = n2.getTextContent();
+										StringTokenizer st = new StringTokenizer(n2str, ",");
 										while (st.hasMoreTokens()) {
-											HistoricalDataSource hdc = new HistoricalDataSource();
-											hdc.initFromDOM(n1);
-											hdc.setUrl(st.nextToken());
-											data_files.add(hdc);
+											String thisurl = st.nextToken();
+											if(isValidURL(thisurl)){
+												HistoricalDataSource hdc = new HistoricalDataSource();
+												hdc.initFromDOM(n1);
+												hdc.setUrl(thisurl);
+												data_files.add(hdc);
+											}
 										}
 									}
 								}
@@ -346,9 +355,24 @@ public final class SensorLoopDetector extends AbstractSensor {
 		out.print("    <parameter name=\"start_time\" value=\"" + (int)Math.round(3600*start_time) + "\" />\n");
 		out.print("  </parameters>\n");
 		out.print("  <data_sources>\n");
-		for (int i = 0; i < data_files.size(); i++) {
-			out.print("    ");
-			data_files.get(i).xmlDump(out);
+		if (data_sources_node.hasChildNodes()) {
+			NodeList cc = data_sources_node.getChildNodes();
+			for (int j = 0; j < cc.getLength(); j++)
+				if (cc.item(j).getNodeName().equals("source")) {
+					out.print("    <source");
+					Node n1 = cc.item(j);
+					Node n2;
+					n2 = n1.getAttributes().getNamedItem("url");
+					if(n2!=null)
+						out.print(" url=\"" + n2.getTextContent() + "\"");
+					n2 = n1.getAttributes().getNamedItem("dt");
+					if(n2!=null)
+						out.print(" dt=\"" + n2.getTextContent() + "\"");
+					n2 = n1.getAttributes().getNamedItem("format");
+					if(n2!=null)
+						out.print(" format=\"" + n2.getTextContent() + "\"");
+					out.print(" />\n");
+				}
 		}
 		out.print("  </data_sources>\n");
 		if ((display_lat != null) && (display_lng != null))
@@ -364,4 +388,10 @@ public final class SensorLoopDetector extends AbstractSensor {
 		
 	}
 
+	private boolean isValidURL(String url){
+		if(url.compareToIgnoreCase("null")==0)
+				return false;
+		// TODO: more comprehensive verification
+		return true;
+	}
 }
