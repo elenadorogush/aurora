@@ -98,7 +98,13 @@ public final class SensorLoopDetector extends AbstractSensor {
 //	-------------------------------------------------------------------------
 	public double Speed()	 { return speed; }
 //	-------------------------------------------------------------------------
-	public double Occupancy() { return dens / myHWCLink.getJamDensity(); }
+	public double Occupancy() { 
+		if(myHWCLink==null)
+			return Double.NaN;
+		if(myHWCLink.getJamDensity()<=0.0)
+			return Double.NaN;
+		return dens / myHWCLink.getJamDensity(); 
+	}
 //	-------------------------------------------------------------------------
 	public int Count() { return count; }
 //	-------------------------------------------------------------------------
@@ -120,6 +126,9 @@ public final class SensorLoopDetector extends AbstractSensor {
 	public synchronized boolean dataUpdate(int ts) throws ExceptionDatabase, ExceptionSimulation {
 		boolean res = true;
 		res &= super.dataUpdate(ts);
+		
+		if(myHWCLink==null)
+			return res;
 		
 		flow = myHWCLink.getFlow().sum().getCenter();	
 		dens = myHWCLink.getDensity().sum().getCenter();
