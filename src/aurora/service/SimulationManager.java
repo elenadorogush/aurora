@@ -54,7 +54,7 @@ public class SimulationManager implements ProcessManager {
 				if (dur_attr != null)
 					max_time0 = initial_time0 + (Double.parseDouble(dur_attr.getNodeValue()) / 3600.0);
 				initial_time0 = Math.max(initial_time0, initial_time);
-				max_time0 = Math.min(max_time0, max_time);
+				//max_time0 = Math.min(max_time0, max_time);
 				if (initial_time0 < max_time0) {
 					initial_time = initial_time0;
 					max_time = max_time0;

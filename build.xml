@@ -71,22 +71,22 @@
 	</target>
 
 	<target name="exe4j" depends="copy.jar" description="Create executables">
-		<exec executable="C:\Program Files\exe4j\bin\exe4jc.exe">
+		<exec executable="C:\Program Files (x86)\exe4j\bin\exe4jc.exe">
 			<arg value="${build.dir}\exe4j\importer.exe4j" />
 		</exec>
-		<exec executable="C:\Program Files\exe4j\bin\exe4jc.exe">
+		<exec executable="C:\Program Files (x86)\exe4j\bin\exe4jc.exe">
 			<arg value="${build.dir}\exe4j\configurator.exe4j" />
 		</exec>
-		<exec executable="C:\Program Files\exe4j\bin\exe4jc.exe">
+		<exec executable="C:\Program Files (x86)\exe4j\bin\exe4jc.exe">
 			<arg value="${build.dir}\exe4j\simulator.exe4j" />
 		</exec>
-		<exec executable="C:\Program Files\exe4j\bin\exe4jc.exe">
+		<exec executable="C:\Program Files (x86)\exe4j\bin\exe4jc.exe">
 			<arg value="${build.dir}\exe4j\simbatch.exe4j" />
 		</exec>
 	</target>
 
     <target name="install_file" depends="exe4j" description="Create install file">
-        <exec executable="C:\Program Files\NSIS\makensis.exe">
+        <exec executable="C:\Program Files (x86)\NSIS\makensis.exe">
             <arg value="aurora_setup.nsi" />
         </exec>
     </target>

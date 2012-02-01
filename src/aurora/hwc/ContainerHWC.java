@@ -265,7 +265,7 @@ public final class ContainerHWC extends AbstractContainer {
 					res &= initControllerSetFromDOM(p.getChildNodes().item(i));
 				if (p.getChildNodes().item(i).getNodeName().equals("SRProfile") || p.getChildNodes().item(i).getNodeName().equals("SplitRatioProfileSet"))
 					res &= initSplitRatioProfileSetFromDOM(p.getChildNodes().item(i));
-				if (p.getChildNodes().item(i).getNodeName().equals("DemandProfileSet") || p.getChildNodes().item(i).getNodeName().equals("DemandProfileSet"))
+				if (p.getChildNodes().item(i).getNodeName().equals("DemandProfile") || p.getChildNodes().item(i).getNodeName().equals("DemandProfileSet"))
 					res &= initDemandProfileSetFromDOM(p.getChildNodes().item(i));
 				if (p.getChildNodes().item(i).getNodeName().equals("CapacityProfile") || p.getChildNodes().item(i).getNodeName().equals("CapacityProfileSet"))
 					res &= initCapacityProfileSetFromDOM(p.getChildNodes().item(i));
