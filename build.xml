@@ -70,7 +70,11 @@
 	<target name="copy.jar" depends="jar" description="Deploy">
 	</target>
 
-	<target name="exe4j" depends="copy.jar" description="Create executables">
+	<condition property="windows">
+		<os family="windows"/>
+	</condition>
+
+	<target name="exe4j" depends="copy.jar" description="Create executables" if="windows">
 		<exec executable="C:\Program Files (x86)\exe4j\bin\exe4jc.exe">
 			<arg value="${build.dir}\exe4j\importer.exe4j" />
 		</exec>
@@ -85,7 +89,7 @@
 		</exec>
 	</target>
 
-    <target name="install_file" depends="exe4j" description="Create install file">
+    <target name="install_file" depends="exe4j" description="Create install file" if="windows">
         <exec executable="C:\Program Files (x86)\NSIS\makensis.exe">
             <arg value="aurora_setup.nsi" />
         </exec>
